@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отправка запроса на C# сервер</title>
+</head>
+<body>
+    <h2>Отправить сообщение на сервер</h2>
+    <input type="text" id="messageInput" placeholder="Введите сообщение">
+    <button onclick="sendMessage()">Отправить</button>
+    <p id="response"></p>
+
+    <script>
+        async function sendMessage() {
+            try {
+                const messageInput = document.getElementById('messageInput').value; // Получаем текст из input
+    
+                const response = await fetch('https://localhost:7103/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: messageInput }) // Передаем правильное значение
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                console.log('Success:', data);
+                document.getElementById('response').textContent = data.response;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+    
+</body>
+</html>
