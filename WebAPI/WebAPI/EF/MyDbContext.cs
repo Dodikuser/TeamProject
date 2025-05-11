@@ -14,11 +14,11 @@ namespace WebAPI.EF
         public virtual DbSet<Favorite> Favorites { get; set; }
         public virtual DbSet<Hashtag> Hashtags { get; set; }
         public virtual DbSet<History> Histories { get; set; }
-        public virtual DbSet<Photo> Photos { get; set; }
         public virtual DbSet<Place> Places { get; set; }
+        public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Search> Searches { get; set; }
-        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Photo> Photos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
