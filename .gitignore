@@ -1,9 +1,10 @@
 # Visual Studio specific
 .vs/
-*.suo
+obj/
+bin/
 *.user
-*.userosscache
-*.sln.docstates
+*.suo
+*.cache
 
 # Build output
 bin/
@@ -12,6 +13,7 @@ out/
 
 # ASP.NET specific
 appsettings.*.json
+!appsettings.json
 secrets.json
 
 # Logs
