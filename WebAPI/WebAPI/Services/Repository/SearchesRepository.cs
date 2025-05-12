@@ -8,13 +8,10 @@ namespace WebAPI.Services.Repository
     public class SearchesRepository
     {
         private readonly MyDbContext _context;
-
         public SearchesRepository(MyDbContext context)
         {
             _context = context;
         }
-
-        // Добавить новую строку поиска
         public async Task AddAsync(int userId, string queryText)
         {
             var search = new Search
@@ -27,8 +24,6 @@ namespace WebAPI.Services.Repository
             _context.Searches.Add(search);
             await _context.SaveChangesAsync();
         }
-
-        // Удалить один запрос
         public async Task RemoveAsync(int searchId)
         {
             var search = await _context.Searches
@@ -40,8 +35,6 @@ namespace WebAPI.Services.Repository
                 await _context.SaveChangesAsync();
             }
         }
-
-        // Удалить все запросы пользователя
         public async Task RemoveAllAsync(int userId)
         {
             var searches = await _context.Searches
@@ -51,7 +44,6 @@ namespace WebAPI.Services.Repository
             _context.Searches.RemoveRange(searches);
             await _context.SaveChangesAsync();
         }
-
         public async Task<List<Search>> GetSearchesPagedAsync(int userId, int skip = 0, int take = 50)
         {
             return await _context.Searches

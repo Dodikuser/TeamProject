@@ -8,13 +8,10 @@ namespace WebAPI.Services.Repository
     public class HistoryRepository
     {
         private readonly MyDbContext _context;
-
         public HistoryRepository(MyDbContext context)
         {
             _context = context;
         }
-
-        // Добавить посещение
         public async Task AddAsync(int userId, int placeId, bool isFromRecs = false)
         {
             var history = new History
@@ -28,8 +25,6 @@ namespace WebAPI.Services.Repository
             _context.Histories.Add(history);
             await _context.SaveChangesAsync();
         }
-
-        // Удалить одно посещение
         public async Task RemoveAsync(int historyId)
         {
             var record = await _context.Histories
@@ -41,8 +36,6 @@ namespace WebAPI.Services.Repository
                 await _context.SaveChangesAsync();
             }
         }
-
-        // Удалить всю историю пользователя
         public async Task RemoveAllAsync(int userId)
         {
             var records = await _context.Histories
@@ -52,14 +45,11 @@ namespace WebAPI.Services.Repository
             _context.Histories.RemoveRange(records);
             await _context.SaveChangesAsync();
         }
-
-        // Проверка: посещал ли пользователь это место
         public async Task<bool> WasVisitedAsync(int userId, int placeId)
         {
             return await _context.Histories
                 .AnyAsync(h => h.UserId == userId && h.PlaceId == placeId);
         }
-
         public async Task<List<History>> GetHistoryPagedAsync(int userId, int skip = 0, int take = 50)
         {
             return await _context.Histories
