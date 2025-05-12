@@ -3,12 +3,16 @@ package com.example.maps1;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -20,11 +24,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import fragment.AccountFragment;
+import fragment.FavoritesFragment;
+import fragment.HistoryFragment;
+import fragment.MapFragment;
+import fragment.RecommendationsFragment;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private BottomNavigationView bottomNav;
+    private int currentNavItemId = R.id.nav_home;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,29 +54,51 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Setup bottom navigation
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
+        bottomNav = findViewById(R.id.bottomNavigation);
+        bottomNav.setOnItemSelectedListener(this::onNavigationItemSelected);
 
-            if (id == R.id.nav_home) {
-                // Already on home
-                return true;
-            } else if (id == R.id.nav_favorites) {
-                Toast.makeText(this, "Улюблене", Toast.LENGTH_SHORT).show();
-                return true;
-            } else if (id == R.id.nav_recommendations) {
-                Toast.makeText(this, "Рекомендації", Toast.LENGTH_SHORT).show();
-                return true;
-            } else if (id == R.id.nav_history) {
-                Toast.makeText(this, "Історія", Toast.LENGTH_SHORT).show();
-                return true;
-            } else if (id == R.id.nav_account) {
-                Toast.makeText(this, "Аккаунт", Toast.LENGTH_SHORT).show();
-                return true;
-            }
+        // Highlight home by default
+        bottomNav.setSelectedItemId(R.id.nav_home);
+    }
 
-            return false;
-        });
+    private boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == currentNavItemId) {
+            return true; // Already on this screen
+        }
+
+        currentNavItemId = id;
+
+        if (id == R.id.nav_home) {
+            // Show map fragment
+            showFragment(new MapFragment(), "Головна");
+            return true;
+        } else if (id == R.id.nav_favorites) {
+            showFragment(new FavoritesFragment(), "Улюблене");
+            return true;
+        } else if (id == R.id.nav_recommendations) {
+            showFragment(new RecommendationsFragment(), "Рекомендації");
+            return true;
+        } else if (id == R.id.nav_history) {
+            showFragment(new HistoryFragment(), "Історія");
+            return true;
+        } else if (id == R.id.nav_account) {
+            showFragment(new AccountFragment(), "Аккаунт");
+            return true;
+        }
+
+        return false;
+    }
+
+    private void showFragment(Fragment fragment, String title) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+
+        // Update toolbar title
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
