@@ -7,7 +7,9 @@ using System.Configuration;
 using System.Text;
 using WebAPI.EF;
 using WebAPI.Services;
+using WebAPI.EF.Models;
 using WebAPI.Services.AI;
+using WebAPI.Services.Repository;
 
 namespace WebAPI
 {
@@ -29,6 +31,16 @@ namespace WebAPI
                 connString,
                 Microsoft.EntityFrameworkCore.ServerVersion.Parse(dbServerVersion))
             );
+
+            builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<PlaceRepository>();
+            builder.Services.AddScoped<FavoritesRepository>();
+            builder.Services.AddScoped<HashtagRepository>();
+            builder.Services.AddScoped<AdHashtagRepository>();
+            builder.Services.AddScoped<PhotoRepository>();
+            builder.Services.AddScoped<HistoryRepository>();
+            builder.Services.AddScoped<SearchesRepository>();
+            builder.Services.AddScoped<ReviewRepository>();
 
             //DeepSeek
             var DeepSeekKey = mapSettings.DeepSeekKey;

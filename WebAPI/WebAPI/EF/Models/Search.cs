@@ -7,7 +7,6 @@
         public DateTime SearchDateTime { get; set; }
 
 
-
         public int UserId { get; set; }
 
         // Связь с User

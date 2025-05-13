@@ -5,7 +5,6 @@ namespace WebAPI.EF.Models
     public class Place
     {
 
-
         public int PlaceId { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
@@ -18,6 +17,8 @@ namespace WebAPI.EF.Models
 
         [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")]
         public string? Email { get; set; }
+        public double Longitude { get; set; }
+        public double Latitude { get; set; }
         public int? Radius { get; set; }
         public int? TokensAvailable { get; set; }
         public DateTime? LastPromotionDateTime { get; set; }

@@ -143,6 +143,7 @@ namespace WebAPI.EF
                 entity.Property(e => e.TokensAvailable);
                 entity.Property(e => e.LastPromotionDateTime).IsRequired(false);
                 entity.Property(e => e.GmapsPlaceId);
+                entity.HasIndex(e => e.GmapsPlaceId);
 
                 entity.HasIndex(e => e.UserId);
                 //entity.Property(e => e.UserId);
