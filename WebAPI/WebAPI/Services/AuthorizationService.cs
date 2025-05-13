@@ -1,64 +1,142 @@
 ﻿using WebAPI.EF.Models;
 using WebAPI.Controllers;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace WebAPI.Services
 {
+
     public class AuthorizationService
     {
-        static public void Register(LoginData loginData)
+        private readonly UserRepository _userRepository;
+
+        public AuthorizationService(UserRepository userRepository)
+        {
+            _userRepository=userRepository;
+        }
+
+        public async Task<Result> Register(LoginData loginData)
         {
             switch (loginData)
             {
                 case StandardLoginData standard:
-                    RegisterUsereDefault(standard.Name, standard.Name, standard.Email, standard.Password);
-                    break;
+                    return await RegisterUsereDefault(standard.Name, standard.Name, standard.Email, standard.Password);
 
                 case GoogleLoginData google:
-                    RegisterUserGoogle(google.GoogleId);
-                    break;
+                    return await RegisterUserGoogle(google.GoogleId);
 
                 case FacebookLoginData facebook:
-                    RegisterUserFacebook(facebook.FacebookId);
-                    break;
+                    return await RegisterUserFacebook(facebook.FacebookId);
+
+                default:
+                    return Result.Fail("Unknown login type.");
             }
-
-
         }
 
-        static public void RegisterUsereDefault(string firstName, string? lastName, string email, string password)
+        public async Task<Result> RegisterUsereDefault(string firstName, string? lastName, string email, string password)
         {
-            if (UserExist()) return;
+            if (_userRepository.GetByEmailAsync(email) != null) 
+                return Result.Fail("this email is already registered");
 
             string passwordHash = Convert.ToString(password.GetHashCode()); // можно сделать через другую хеш функцию
             User user = new User()
             {
-                UserId = 0,
                 Name = firstName,
                 Email = email,
                 PasswordHash = passwordHash,
-                //
-                //
                 CreatedAt = DateTime.Now,
                 SearchHistoryOn = true,
                 VisitHistoryOn = true
             };
 
-            //запрос в базу на создание юзера
+           await _userRepository.AddAsync(user);
+
+            return Result.Ok();
         }
-        static public void RegisterUserGoogle(string GoogleId)
+        public async Task<Result> RegisterUserGoogle(string googleId)
         {
-            if (UserExist()) return;
+            if (_userRepository.GetByGoogleIdAsync(googleId) != null)
+                return Result.Fail("this email is already registered");
+
+            // нужно вытянуть из googleId 
+            string name = "";
+            string email = "";
+
+            User user = new User()
+            {
+                Name = name,
+                Email = email,
+                GoogleId = googleId,
+                CreatedAt = DateTime.Now,
+                SearchHistoryOn = true,
+                VisitHistoryOn = true
+            };
+
+            await _userRepository.AddAsync(user);
+
+            return Result.Ok();
+        }
+        public async Task<Result> RegisterUserFacebook(string facebookId)
+        {
+            if (_userRepository.GetByGoogleIdAsync(facebookId) != null)
+                return Result.Fail("this facebook account is already registered");
+
+            // нужно вытянуть из FacebookId 
+            string name = "";
+            string email = "";
+
+            User user = new User()
+            {
+                Name = name,
+                Email = email,
+                FacebookId = facebookId,
+                CreatedAt = DateTime.Now,
+                SearchHistoryOn = true,
+                VisitHistoryOn = true
+            };
+
+            await _userRepository.AddAsync(user);
+
+            return Result.Ok();
 
         }
-        static public void RegisterUserFacebook(string FacebookId)
-        {
-            if (UserExist()) return;
 
+        public async Task<Result> LoginUser(ClaimsPrincipal claimsPrincipal)
+        {
+            int userId = await GetUserIdAsync(claimsPrincipal);
+
+            if (_userRepository.GetByIdAsync(userId) == null)
+                return Result.Fail("user not found");
+            else 
+                return Result.Ok();
         }
 
-        static public bool UserExist()
+        public async Task<int> GetUserIdAsync(ClaimsPrincipal claimsPrincipal)
         {
-            return false; // запрос в базу 
-        }
+            var authType = claimsPrincipal.FindFirst("auth_type")?.Value;
+
+            if (string.IsNullOrEmpty(authType))
+                throw new UnauthorizedAccessException("Authentication type is missing.");
+
+            User? user = authType switch
+            {
+                "standard" =>
+                    await _userRepository.GetByEmailAsync(claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty),
+
+                "google" =>
+                    await _userRepository.GetByGoogleIdAsync(claimsPrincipal.FindFirst("google_id")?.Value ?? string.Empty),
+
+                "facebook" =>
+                    await _userRepository.GetByFacebookIdAsync(claimsPrincipal.FindFirst("facebook_id")?.Value ?? string.Empty),
+
+                _ => throw new UnauthorizedAccessException("Unsupported authentication type.")
+            };
+
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found.");
+
+            return user.UserId;
+        }  
     }
 }

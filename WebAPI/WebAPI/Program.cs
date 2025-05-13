@@ -10,6 +10,8 @@ using WebAPI.Services;
 using WebAPI.EF.Models;
 using WebAPI.Services.AI;
 using WebAPI.Services.Repository;
+using WebAPI.Controllers;
+using Microsoft.OpenApi.Models;
 
 namespace WebAPI
 {
@@ -41,6 +43,9 @@ namespace WebAPI
             builder.Services.AddScoped<HistoryRepository>();
             builder.Services.AddScoped<SearchesRepository>();
             builder.Services.AddScoped<ReviewRepository>();
+
+            builder.Services.AddScoped<AuthorizationService>();
+            builder.Services.AddScoped<UserService>();
 
             //DeepSeek
             var DeepSeekKey = mapSettings.DeepSeekKey;
@@ -89,6 +94,21 @@ namespace WebAPI
                         ValidAudience = jwtConfig["Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(key)
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            Console.WriteLine($"Authentication failed: {context.Exception}");
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            Console.WriteLine($"Token validated for {context.Principal.Identity.Name}");
+                            return Task.CompletedTask;
+                        }
+                    };
+
                 });
 
             builder.Services.AddSingleton(new TokenService(
@@ -98,8 +118,44 @@ namespace WebAPI
             ));
 
 
+            // Настройка авторизации через JWT
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-            builder.Services.AddControllers();
+                
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "Введите токен в формате: Bearer {токен}",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+            });
+
+
+            // конвертер для LoginData
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new LoginDataConverter());
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -115,27 +171,31 @@ namespace WebAPI
 
             var app = builder.Build();
 
-
-            app.UseCors("AllowAll");
-
             if (app.Environment.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
-                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseAuthorization();
-            app.MapControllers();
 
+
+            app.UseRouting();
+
+            app.UseCors("AllowAll");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.MapControllers();
             app.MapGet("/", () => app.Configuration.AsEnumerable());
 
             app.Run();
-
-
-
 
         }
     }
