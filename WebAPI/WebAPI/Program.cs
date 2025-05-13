@@ -1,8 +1,12 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.Configuration;
+using System.Text;
 using WebAPI.EF;
+using WebAPI.Services;
 using WebAPI.Services.AI;
 
 namespace WebAPI
@@ -55,6 +59,32 @@ namespace WebAPI
             {
                 Console.WriteLine("Ollama settings are missing or invalid!");
             }
+
+            // JWT для регестрации 
+            var jwtConfig = builder.Configuration.GetSection("JwtSettings");
+            var secretKey = jwtConfig["Key"];
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var key = Encoding.UTF8.GetBytes(secretKey);
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtConfig["Issuer"],
+                        ValidAudience = jwtConfig["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(key)
+                    };
+                });
+
+            builder.Services.AddSingleton(new TokenService(
+                jwtConfig["Key"],
+                jwtConfig["Issuer"],
+                jwtConfig["Audience"]
+            ));
+
 
 
             builder.Services.AddControllers();
