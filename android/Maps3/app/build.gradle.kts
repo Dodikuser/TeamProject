@@ -1,7 +1,6 @@
-val implementation: Unit = Unit
-
 plugins {
     alias(libs.plugins.android.application)
+    // Убираем плагин для Firebase
 }
 
 android {
@@ -9,7 +8,6 @@ android {
     compileSdk = 35
 
     defaultConfig {
-
         applicationId = "com.example.maps1"
         minSdk = 24
         targetSdk = 35
@@ -28,6 +26,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -35,14 +34,25 @@ android {
 }
 
 dependencies {
+    // Убираем зависимости Firebase
+    // implementation("com.google.firebase:firebase-auth:22.1.1")
+
+    // Добавляем зависимости для Retrofit и Gson
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1") // Обновлена версия Gson
+
+    // Google Maps
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
-    implementation(libs.appcompat)
-    implementation(libs.material)
+
+    // AndroidX & UI
+    implementation("androidx.appcompat:appcompat:1.6.1") // Добавлена зависимость для AppCompat
+    implementation("com.google.android.material:material:1.9.0") // Обновлена зависимость для Material Design
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    // Тесты
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

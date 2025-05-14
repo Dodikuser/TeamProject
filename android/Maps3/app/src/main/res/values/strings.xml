@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Maps1</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="button_login">Login</string>
 </resources>

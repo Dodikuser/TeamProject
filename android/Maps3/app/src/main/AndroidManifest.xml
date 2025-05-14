@@ -20,12 +20,16 @@
             android:value="AIzaSyAYKPr03PuapY_lftN5aieFXrn4Zg_pYZc"/>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".MainActivity" />
+
     </application>
 </manifest>
