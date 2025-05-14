@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
 
             if (!result.Success)
                 return BadRequest(result.Error);
-            return Ok();
+            return Ok(new { message = "Регистрация прошла успешно" });
         }
 
         [HttpPost("login")]
@@ -41,7 +41,7 @@ namespace WebAPI.Controllers
                 return BadRequest(result.Error);
 
             var token = await _tokenService.GenerateToken(loginData);
-            return Ok(token);
+            return Ok(new { token });
         }
 
 

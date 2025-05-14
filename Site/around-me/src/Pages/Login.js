@@ -23,6 +23,49 @@ export default function LoginRegister() {
     setFormData({ firstName: '', lastName: '', email: '', password: '' });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const SERVER_URL = 'https://localhost:7103/api/User';
+    const url = isLogin ? `${SERVER_URL}/login` : `${SERVER_URL}/register`;
+
+
+    const payload = isLogin
+      ? {
+          type: 'standard',
+          name: 'name',
+          email: formData.email,
+          password: formData.password
+        }
+      : {
+          type: 'standard',
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          password: formData.password
+        };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (isLogin){
+        localStorage.setItem('authToken', data.token);
+        const token = localStorage.getItem('authToken');
+      console.log('Token:', token);
+      }
+      console.log('Response:', data);
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <Container
       fluid
@@ -38,58 +81,62 @@ export default function LoginRegister() {
 
         <h5 className="mt-1 mb-3">{isLogin ? 'Вхід' : 'Реєстрація'}</h5>
 
-        <Form>
-          {/* Ім’я */}
-          <Form.Group controlId="firstName" className="mb-3 position-relative">
-            <Form.Control
-              type="text"
-              placeholder="Ім’я"
-              value={formData.firstName}
-              onChange={handleChange('firstName')}
-              className="bg-light-subtle p-2 pe-5"
-            />
-            {formData.firstName && (
-              <i
-                className="bi bi-x-circle-fill"
-                onClick={() => handleClear('firstName')}
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  right: '10px',
-                  transform: 'translateY(-50%)',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  color: '#6c757d'
-                }}
-              ></i>
-            )}
-          </Form.Group>
+        <Form onSubmit={handleSubmit}>
+          {!isLogin && (
+            <>
+              {/* Ім’я */}
+              <Form.Group controlId="firstName" className="mb-3 position-relative">
+                <Form.Control
+                  type="text"
+                  placeholder="Ім’я"
+                  value={formData.firstName}
+                  onChange={handleChange('firstName')}
+                  className="bg-light-subtle p-2 pe-5"
+                />
+                {formData.firstName && (
+                  <i
+                    className="bi bi-x-circle-fill"
+                    onClick={() => handleClear('firstName')}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      right: '10px',
+                      transform: 'translateY(-50%)',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      color: '#6c757d'
+                    }}
+                  ></i>
+                )}
+              </Form.Group>
 
-          {/* Прізвище */}
-          <Form.Group controlId="lastName" className="mb-3 position-relative">
-            <Form.Control
-              type="text"
-              placeholder="Прізвище"
-              value={formData.lastName}
-              onChange={handleChange('lastName')}
-              className="bg-light-subtle p-2 pe-5"
-            />
-            {formData.lastName && (
-              <i
-                className="bi bi-x-circle-fill"
-                onClick={() => handleClear('lastName')}
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  right: '10px',
-                  transform: 'translateY(-50%)',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  color: '#6c757d'
-                }}
-              ></i>
-            )}
-          </Form.Group>
+              {/* Прізвище */}
+              <Form.Group controlId="lastName" className="mb-3 position-relative">
+                <Form.Control
+                  type="text"
+                  placeholder="Прізвище"
+                  value={formData.lastName}
+                  onChange={handleChange('lastName')}
+                  className="bg-light-subtle p-2 pe-5"
+                />
+                {formData.lastName && (
+                  <i
+                    className="bi bi-x-circle-fill"
+                    onClick={() => handleClear('lastName')}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      right: '10px',
+                      transform: 'translateY(-50%)',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      color: '#6c757d'
+                    }}
+                  ></i>
+                )}
+              </Form.Group>
+            </>
+          )}
 
           {/* Email */}
           <Form.Group controlId="email" className="mb-3 position-relative">
@@ -176,7 +223,6 @@ export default function LoginRegister() {
           </Row>
         </Form>
 
-        {/* Стилі для підсвічування */}
         <style>
           {`
             .link-hover {
