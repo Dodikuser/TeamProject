@@ -16,6 +16,7 @@
         public string DeepSeekKey { get; set; }
         public string GoogleMapsKey { get; set; }
         public string BDConnectionString { get; set; }
+        public string SQLiteConnectionString { get; set; }
 
 
         //appsettings.json

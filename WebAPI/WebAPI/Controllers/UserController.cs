@@ -35,12 +35,12 @@ namespace WebAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginData loginData)
         {
-            var result = await _authorizationService.LoginUser(User);
+            var result = await _authorizationService.LoginUser(loginData);
 
             if (!result.Success)
                 return BadRequest(result.Error);
 
-            var token = _tokenService.GenerateToken(loginData);
+            var token = await _tokenService.GenerateToken(loginData);
             return Ok(token);
         }
 
@@ -49,7 +49,9 @@ namespace WebAPI.Controllers
         [HttpPost("incognito")]
         public async Task<IActionResult> SetIncognitoMode(bool enabled)
         {
-            var result = await _userService.SetIncognito(User, enabled);
+            int userId = Convert.ToInt32(User.FindFirst("UserId").Value);
+
+            var result = await _userService.SetIncognito(userId, !enabled);
 
             if (!result.Success)
                 return BadRequest(result.Error);

@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +11,7 @@ using WebAPI.Services.AI;
 using WebAPI.Services.Repository;
 using WebAPI.Controllers;
 using Microsoft.OpenApi.Models;
+
 
 namespace WebAPI
 {
@@ -27,12 +27,10 @@ namespace WebAPI
             //Достаем через костыли натсройки
             var mapSettings = builder.Configuration.GetSection("MapSettings").Get<Config>();
 
-            var connString = mapSettings.BDConnectionString;
-            var dbServerVersion = mapSettings.DBServerVersion;
-            builder.Services.AddDbContext<MyDbContext>(options => options.UseMySql(
-                connString,
-                Microsoft.EntityFrameworkCore.ServerVersion.Parse(dbServerVersion))
-            );
+            var sqliteConnString = mapSettings.SQLiteConnectionString;
+            builder.Services.AddDbContext<MyDbContext>(options =>
+                options.UseSqlite(sqliteConnString));
+
 
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<PlaceRepository>();
@@ -46,6 +44,8 @@ namespace WebAPI
 
             builder.Services.AddScoped<AuthorizationService>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<TokenService>();
+
 
             //DeepSeek
             var DeepSeekKey = mapSettings.DeepSeekKey;
@@ -78,8 +78,11 @@ namespace WebAPI
             }
 
             // JWT для регестрации 
+
             var jwtConfig = builder.Configuration.GetSection("JwtSettings");
             var secretKey = jwtConfig["Key"];
+
+            builder.Services.Configure<JwtConfig>(jwtConfig);
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -110,12 +113,6 @@ namespace WebAPI
                     };
 
                 });
-
-            builder.Services.AddSingleton(new TokenService(
-                jwtConfig["Key"],
-                jwtConfig["Issuer"],
-                jwtConfig["Audience"]
-            ));
 
 
             // Настройка авторизации через JWT

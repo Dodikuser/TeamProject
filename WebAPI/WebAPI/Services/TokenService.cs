@@ -4,47 +4,62 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using WebAPI.Controllers;
+using WebAPI.EF.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+
 
 namespace WebAPI.Services
 {
+
     public class TokenService
     {
         private readonly string _secretKey;
         private readonly string _issuer;
         private readonly string _audience;
+        private readonly UserRepository _userRepository;
 
-        public TokenService(string secretKey, string issuer, string audience)
+        public TokenService( IOptions<JwtConfig> config, UserRepository userRepository)
         {
-            _secretKey = secretKey;
-            _issuer = issuer;
-            _audience = audience;
+            _secretKey = config.Value.Key;
+            _issuer = config.Value.Issuer;
+            _audience = config.Value.Audience;
+            _userRepository = userRepository;
         }
 
-        public string GenerateToken(LoginData loginData)
+
+        public async Task<string> GenerateToken(LoginData loginData)
         {
             List<Claim> claims = new();
+            int? UserId = null;
 
             switch (loginData)
             {
                 case StandardLoginData standard:
-                    claims.Add(new Claim(ClaimTypes.Name, standard.Name ?? ""));
-                    claims.Add(new Claim(ClaimTypes.Email, standard.Email ?? ""));
-                    claims.Add(new Claim("auth_type", "standard"));
+                    var userByEmail = await _userRepository.GetByEmailAsync(standard.Email);
+                    UserId = userByEmail?.UserId;
                     break;
 
                 case GoogleLoginData google:
-                    claims.Add(new Claim("google_id", google.GoogleId ?? ""));
-                    claims.Add(new Claim("auth_type", "google"));
+                    var userByGoogle = await _userRepository.GetByGoogleIdAsync(google.GoogleId);
+                    UserId = userByGoogle?.UserId;
                     break;
 
                 case FacebookLoginData facebook:
-                    claims.Add(new Claim("facebook_id", facebook.FacebookId ?? ""));
-                    claims.Add(new Claim("auth_type", "facebook"));
+                    var userByFacebook = await _userRepository.GetByFacebookIdAsync(facebook.FacebookId);
+                    UserId = userByFacebook?.UserId;
                     break;
 
                 default:
                     throw new ArgumentException("Unsupported login type");
             }
+
+            if (UserId == null)
+            {
+                throw new UnauthorizedAccessException("User not found");
+            }
+
+            claims.Add(new Claim("UserId", UserId.Value.ToString()));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -59,5 +74,32 @@ namespace WebAPI.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        public int GetUserIdFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_secretKey);
+
+            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = _issuer,
+                ValidAudience = _audience,
+                ValidateLifetime = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuerSigningKey = true,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "UserId");
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                throw new SecurityTokenException("UserId claim missing or invalid");
+            }
+
+            return userId;
+        }
+
     }
 }

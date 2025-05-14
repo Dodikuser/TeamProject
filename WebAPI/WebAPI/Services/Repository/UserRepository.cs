@@ -56,6 +56,31 @@ public class UserRepository
     {
         return await _context.Users.AnyAsync(u => u.Email == email);
     }
+    public async Task<bool> ExistsByNameAsync(string name)
+    {
+        return await _context.Users.AnyAsync(u => u.Name == name);
+    }
+    public async Task<bool> IsPasswordValidNasmeAsync(string name, string passwordHash)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Name == name);
+
+        if (user == null || string.IsNullOrEmpty(user.PasswordHash))
+            return false;
+
+        return user.PasswordHash == passwordHash;
+    }
+    public async Task<bool> IsPasswordValidByEmailAsync(string email, string passwordHash)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+        if (user == null || string.IsNullOrEmpty(user.PasswordHash))
+            return false;
+
+        return user.PasswordHash == passwordHash;
+    }
+
     public async Task SetSearchHistoryAsync(int userId, bool enabled)
     {
         var user = await _context.Users.FindAsync(userId);

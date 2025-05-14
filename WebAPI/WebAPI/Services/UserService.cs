@@ -14,11 +14,10 @@ namespace WebAPI.Services
             _userRepository=userRepository;
         }
 
-        public async Task<Result> SetIncognito(ClaimsPrincipal claimsPrincipal, bool enabled)
+        public async Task<Result> SetIncognito(int userId, bool enabled)
         {
-            int UsetId = await _authorizationService.GetUserIdAsync(claimsPrincipal);
-            await _userRepository.SetVisitHistoryAsync(UsetId, enabled);
-            await _userRepository.SetSearchHistoryAsync(UsetId, enabled);
+            await _userRepository.SetVisitHistoryAsync(userId, enabled);
+            await _userRepository.SetSearchHistoryAsync(userId, enabled);
 
             return Result.Ok();
         }

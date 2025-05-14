@@ -3,6 +3,11 @@ using WebAPI.Controllers;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using WebAPI.Migrations;
+using System.Text;
+using System.Security.Cryptography;
+using Microsoft.IdentityModel.Tokens;
+
 
 namespace WebAPI.Services
 {
@@ -13,7 +18,7 @@ namespace WebAPI.Services
 
         public AuthorizationService(UserRepository userRepository)
         {
-            _userRepository=userRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<Result> Register(LoginData loginData)
@@ -33,13 +38,12 @@ namespace WebAPI.Services
                     return Result.Fail("Unknown login type.");
             }
         }
-
-        public async Task<Result> RegisterUsereDefault(string firstName, string? lastName, string email, string password)
+        private async Task<Result> RegisterUsereDefault(string firstName, string? lastName, string email, string password)
         {
-            if (_userRepository.GetByEmailAsync(email) != null) 
+            if (await _userRepository.GetByEmailAsync(email) != null) 
                 return Result.Fail("this email is already registered");
 
-            string passwordHash = Convert.ToString(password.GetHashCode()); // можно сделать через другую хеш функцию
+            string passwordHash = HashFunction(password);
             User user = new User()
             {
                 Name = firstName,
@@ -50,13 +54,13 @@ namespace WebAPI.Services
                 VisitHistoryOn = true
             };
 
-           await _userRepository.AddAsync(user);
+            await _userRepository.AddAsync(user);
 
             return Result.Ok();
         }
-        public async Task<Result> RegisterUserGoogle(string googleId)
+        private async Task<Result> RegisterUserGoogle(string googleId)
         {
-            if (_userRepository.GetByGoogleIdAsync(googleId) != null)
+            if (await _userRepository.GetByGoogleIdAsync(googleId) != null)
                 return Result.Fail("this email is already registered");
 
             // нужно вытянуть из googleId 
@@ -77,9 +81,9 @@ namespace WebAPI.Services
 
             return Result.Ok();
         }
-        public async Task<Result> RegisterUserFacebook(string facebookId)
+        private async Task<Result> RegisterUserFacebook(string facebookId)
         {
-            if (_userRepository.GetByGoogleIdAsync(facebookId) != null)
+            if (await _userRepository.GetByGoogleIdAsync(facebookId) != null)
                 return Result.Fail("this facebook account is already registered");
 
             // нужно вытянуть из FacebookId 
@@ -102,41 +106,64 @@ namespace WebAPI.Services
 
         }
 
-        public async Task<Result> LoginUser(ClaimsPrincipal claimsPrincipal)
+        public async Task<Result> LoginUser(LoginData loginData)
         {
-            int userId = await GetUserIdAsync(claimsPrincipal);
+            switch (loginData)
+            {
+                case StandardLoginData standard:
+                    return await LoginUsereDefault(standard.Email, standard.Password);
 
-            if (_userRepository.GetByIdAsync(userId) == null)
-                return Result.Fail("user not found");
-            else 
-                return Result.Ok();
+                case GoogleLoginData google:
+                    return await LoginUserGoogle(google.GoogleId);
+
+                case FacebookLoginData facebook:
+                    return await LoginUserFacebook(facebook.FacebookId);
+
+                default:
+                    return Result.Fail("Unknown login type.");
+            }
+        }
+        private async Task<Result> LoginUsereDefault(string email, string password)
+        {
+            bool userExists = await _userRepository.ExistsByEmailAsync(email);
+
+            if (!userExists)
+                return Result.Fail("Incorrect email");
+
+            string passwordHash = HashFunction(password);
+
+            bool isPasswordValid = await _userRepository.IsPasswordValidByEmailAsync(email, passwordHash);
+
+            return isPasswordValid
+                ? Result.Ok()
+                : Result.Fail("Incorrect password");
+        }
+        private async Task<Result> LoginUserGoogle(string googleId)
+        {
+            if (await _userRepository.GetByGoogleIdAsync(googleId) == null)
+                return Result.Fail("this email is not registered");
+
+            return Result.Ok();
+        }
+        private async Task<Result> LoginUserFacebook(string facebookId)
+        {
+            if (await _userRepository.GetByFacebookIdAsync(facebookId) == null)
+                return Result.Fail("this facebook is not registered");
+
+            return Result.Ok();
         }
 
-        public async Task<int> GetUserIdAsync(ClaimsPrincipal claimsPrincipal)
+        public string HashFunction(string password)
         {
-            var authType = claimsPrincipal.FindFirst("auth_type")?.Value;
-
-            if (string.IsNullOrEmpty(authType))
-                throw new UnauthorizedAccessException("Authentication type is missing.");
-
-            User? user = authType switch
+            using (SHA256 sha256 = SHA256.Create())
             {
-                "standard" =>
-                    await _userRepository.GetByEmailAsync(claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty),
-
-                "google" =>
-                    await _userRepository.GetByGoogleIdAsync(claimsPrincipal.FindFirst("google_id")?.Value ?? string.Empty),
-
-                "facebook" =>
-                    await _userRepository.GetByFacebookIdAsync(claimsPrincipal.FindFirst("facebook_id")?.Value ?? string.Empty),
-
-                _ => throw new UnauthorizedAccessException("Unsupported authentication type.")
-            };
-
-            if (user == null)
-                throw new UnauthorizedAccessException("User not found.");
-
-            return user.UserId;
-        }  
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in bytes)
+                    builder.Append(b.ToString("x2"));
+                return builder.ToString();
+            }
+        }
+        
     }
 }
