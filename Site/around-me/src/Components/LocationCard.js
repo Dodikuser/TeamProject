@@ -54,23 +54,26 @@ const LocationCard = ({
         </div>
       </div>
 
-      <span
-        className="material-symbols-outlined position-absolute top-0 end-0 m-2 text-primary"
-        style={{
-          fontSize: '26px',
-          cursor: 'pointer',
-          transform: isAnimating ? 'scale(1.2)' : 'scale(1)',
-          transition: 'transform 0.2s ease',
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsAnimating(true);
-          onToggleFavorite();
-          setTimeout(() => setIsAnimating(false), 200);
-        }}
-      >
-        {isFavorite ? 'favorite' : 'favorite_border'}
-      </span>
+     <span
+  className="material-symbols-outlined position-absolute top-0 end-0 m-2"
+  style={{
+    fontSize: '26px',
+    cursor: 'pointer',
+    color: isFavorite ? '#dc3545' : '#6c757d',
+    fontVariationSettings: `'FILL' ${isFavorite ? 1 : 0}, 'wght' 400, 'GRAD' 0, 'opsz' 24`,
+    transition: 'font-variation-settings 0.3s ease, transform 0.2s ease',
+    transform: isAnimating ? 'scale(1.3)' : 'scale(1)',
+  }}
+  onClick={(e) => {
+    e.stopPropagation();
+    setIsAnimating(true);
+    onToggleFavorite(); // Меняет isFavorite
+    setTimeout(() => setIsAnimating(false), 200);
+  }}
+>
+  favorite
+</span>
+
     </Card>
   );
 };

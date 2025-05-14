@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import LocationCard from './LocationCard';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 
 const sampleData = [
-  { id: 1, title: 'Заклад 1', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '100 км' },
-  { id: 2, title: 'Заклад 2', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '120 км' },
-  { id: 3, title: 'Заклад 3', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '140 км' },
-  { id: 4, title: 'Заклад 4', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '160 км' },
+  { id: 1, title: 'Назва 1', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '100 км' },
+  { id: 2, title: 'Назва 2', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '120 км' },
+  { id: 3, title: 'Назва 3', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '140 км' },
+  { id: 4, title: 'Назва 4', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '160 км' },
+  { id: 5, title: 'Назва 5', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '180 км' },
 ];
 
 function LocationList() {
@@ -19,10 +20,26 @@ function LocationList() {
   };
 
   return (
-    <Container fluid className="my-4">
-      <Row className="g-4">
+    <Container fluid className=" my-4" style={{ paddingTop: '0px' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+          maxHeight: '60vh',
+          overflowY: 'auto',
+          overflowX: 'hidden', 
+            
+        }}
+      >
         {sampleData.map((place) => (
-          <Col key={place.id} xs={12} sm={6} md={4} lg={3}>
+          <div
+            key={place.id}
+            style={{
+              width: '100%',
+              maxWidth: '23%',
+            }}
+          >
             <LocationCard
               image={place.image}
               title={place.title}
@@ -31,9 +48,9 @@ function LocationList() {
               onToggleFavorite={() => toggleFavorite(place.id)}
               onClick={() => alert(`Перехід до: ${place.title}`)}
             />
-          </Col>
+          </div>
         ))}
-      </Row>
+      </div>
     </Container>
   );
 }

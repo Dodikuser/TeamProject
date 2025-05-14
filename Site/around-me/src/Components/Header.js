@@ -1,66 +1,70 @@
 import React from 'react';
-import { Container, Navbar, Form, FormControl, Button, Row, Col } from 'react-bootstrap';
+import { Container, Navbar, Dropdown } from 'react-bootstrap';
+import { Link, useLocation } from 'react-router-dom';
 
 function Header() {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   return (
-    <>
-      <Navbar expand="lg" className="shadow-sm bg-white py-2">
-        <Container fluid>
-          <Navbar.Brand href="#" className="d-flex align-items-center gap-2 text-dark fw-bold fs-4" style={{ fontFamily: "'Righteous', sans-serif" }}>
-            <span className="material-symbols-outlined fs-2 text-primary">location_on</span>
-            Around Me
-          </Navbar.Brand>
+    <Navbar expand="lg" className="shadow-sm bg-white py-2">
+      <Container fluid>
+        <Navbar.Brand
+          as={Link}
+          to="/"
+          className="d-flex align-items-center gap-2 text-dark fw-bold fs-4"
+          style={{ fontFamily: "'Righteous', sans-serif" }}
+        >
+          <span className="material-symbols-outlined fs-2 text-primary">location_on</span>
+          Around Me
+        </Navbar.Brand>
 
-          <div className="d-flex gap-4 align-items-center mx-auto">
-            {['home', 'favorite', 'recommend', 'history'].map((icon, idx) => (
-              <div key={idx} className="text-center text-secondary small">
-                <span className="material-symbols-outlined d-block">{icon}</span>
-                {['Головна', 'Улюблене', 'Рекомендації', 'Історія'][idx]}
-              </div>
-            ))}
-          </div>
+        <div className="d-flex gap-4 align-items-center mx-auto">
+          {[
+            { icon: 'home', label: 'Головна', path: '/' },
+            { icon: 'favorite', label: 'Улюблене', path: '/favorites' },
+            { icon: 'recommend', label: 'Рекомендації', path: '/recommendations' },
+            { icon: 'history', label: 'Історія', path: '/history' },
+          ].map((item, idx) => {
+            const isActive = currentPath === item.path;
 
-          <div className="d-flex align-items-center gap-3 ms-auto text-secondary">
-            <span className="material-symbols-outlined fs-4">notifications</span>
-            <span className="material-symbols-outlined fs-1">account_circle</span>
-            <span className="material-symbols-outlined fs-4">keyboard_arrow_down</span>
-          </div>
-        </Container>
-      </Navbar>
-
-      <div className="bg-white py-3 px-4 mt-2">
-        <Container fluid>
-          <Form className="d-flex">
-            <div className="position-relative" style={{ maxWidth: '320px', width: '100%' }}>
-              <FormControl
-                type="search"
-                placeholder="Запит"
-                className="bg-light border-0 rounded px-3 py-3"
-                style={{ height: '60px' }}
-              />
-              <span className="material-symbols-outlined position-absolute bottom-0 end-0 me-3 mb-2 text-secondary" style={{ cursor: 'pointer' }}>
-                mic
+            return (
+              <Link
+              key={idx}
+              to={item.path}
+              className="text-center small text-decoration-none"
+              style={{ color: isActive ? '#626FC2' : '#6c757d' }}
+            >
+              <span className="material-symbols-outlined d-block">
+                {item.icon}
               </span>
-            </div>
-          </Form>
+              {item.label}
+            </Link>
 
-          <Row className="mt-3">
-            <Col xs="auto">
-              <Button variant="outline-secondary" className="d-flex align-items-center gap-2">
-                <span className="material-symbols-outlined">filter_list</span>
-                Фільтри
-              </Button>
-            </Col>
-            <Col xs="auto">
-              <Button variant="outline-secondary" className="d-flex align-items-center gap-2">
-                <span className="material-symbols-outlined">sort</span>
-                Сортувати
-              </Button>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-    </>
+            );
+          })}
+        </div>
+
+        <div className="d-flex align-items-center gap-3 ms-auto text-secondary">
+          <span className="material-symbols-outlined fs-4">notifications</span>
+
+          <Dropdown align="end">
+            <Dropdown.Toggle
+              variant="link"
+              className="p-0 text-decoration-none text-secondary d-flex align-items-center gap-1"
+            >
+              <span className="material-symbols-outlined fs-1">account_circle</span>
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu className="mt-3">
+              <Dropdown.Item as={Link} to="/login">Вхід / Реєстрація</Dropdown.Item>
+              <Dropdown.Item href="#language">Мова інтерфейсу</Dropdown.Item>
+              <Dropdown.Item as={Link} to="/my-places">Мої заклади</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+      </Container>
+    </Navbar>
   );
 }
 
