@@ -10,7 +10,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Переключение между входом и регистрацией -->
+        <!-- Режим перемикання між входом та реєстрацією -->
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleGroup"
             android:layout_width="match_parent"
@@ -34,7 +34,7 @@
                 android:text="@string/register"/>
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
-        <!-- Поля для регистрации -->
+        <!-- Поля для реєстрації (спочатку приховані) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layoutFirstName"
             android:layout_width="match_parent"
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Общие поля -->
+        <!-- Загальні поля -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

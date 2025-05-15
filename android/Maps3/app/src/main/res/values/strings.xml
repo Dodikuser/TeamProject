@@ -4,4 +4,11 @@
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="button_login">Login</string>
+    <string name="login">Увійти</string>
+    <string name="register">Реєстрація</string>
+    <string name="first_name">Ім\'я</string>
+    <string name="last_name">Прізвище</string>
+    <string name="city">Місто</string>
+    <string name="email">Email</string>
+    <string name="password">Пароль</string>
 </resources>

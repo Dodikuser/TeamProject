@@ -5,15 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Name Field -->
+    <!-- First Name -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:hint="@string/hint_name"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:importantForAutofill="yes"
-        android:autofillHints="username">
+        android:hint="@string/first_name"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/nameEditText"
@@ -21,19 +19,50 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:inputType="textPersonName"
-            android:imeOptions="actionNext"/>
-
+            android:imeOptions="actionNext" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Email Field -->
+    <!-- Last Name -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:hint="@string/hint_email"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:importantForAutofill="yes"
-        android:autofillHints="email">
+        android:hint="@string/last_name"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/lastNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:inputType="textPersonName"
+            android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- City -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="@string/city"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/cityEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:inputType="text"
+            android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Email -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="@string/email"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/emailEditText"
@@ -41,19 +70,16 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:inputType="textEmailAddress"
-            android:imeOptions="actionNext"/>
-
+            android:imeOptions="actionNext" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Password Field -->
+    <!-- Password -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:hint="@string/hint_password"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:importantForAutofill="yes"
-        android:autofillHints="password">
+        android:hint="@string/password"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordEditText"
@@ -61,8 +87,7 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:inputType="textPassword"
-            android:imeOptions="actionDone"/>
-
+            android:imeOptions="actionDone" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Login Button -->
@@ -72,6 +97,6 @@
         android:layout_height="wrap_content"
         android:minHeight="48dp"
         android:text="@string/button_login"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
 </LinearLayout>

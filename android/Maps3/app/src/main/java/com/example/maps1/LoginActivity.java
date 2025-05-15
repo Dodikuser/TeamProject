@@ -1,4 +1,4 @@
-package com.example.maps1;  // Добавлено
+package com.example.maps1;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +15,7 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText nameEditText, emailEditText, passwordEditText;
+    private EditText nameEditText, lastNameEditText, cityEditText, emailEditText, passwordEditText;
     private Button loginButton;
 
     @Override
@@ -25,35 +25,39 @@ public class LoginActivity extends AppCompatActivity {
 
         // Инициализация View
         nameEditText = findViewById(R.id.nameEditText);
+        lastNameEditText = findViewById(R.id.lastNameEditText);
+        cityEditText = findViewById(R.id.cityEditText);
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
 
         loginButton.setOnClickListener(v -> {
             String name = nameEditText.getText().toString().trim();
+            String lastName = lastNameEditText.getText().toString().trim();
+            String city = cityEditText.getText().toString().trim();
             String email = emailEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
 
-            if (validateInput(name, email, password)) {
-                sendAuthRequest(name, email, password);
+            if (validateInput(name, lastName, city, email, password)) {
+                sendAuthRequest(name, lastName, city, email, password);
             }
         });
     }
 
-    private boolean validateInput(String name, String email, String password) {
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Все поля обязательны", Toast.LENGTH_SHORT).show();
+    private boolean validateInput(String name, String lastName, String city, String email, String password) {
+        if (name.isEmpty() || lastName.isEmpty() || city.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Усі поля обов'язкові", Toast.LENGTH_SHORT).show();
             return false;
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Некорректный email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Некоректний email", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
     }
 
-    private void sendAuthRequest(String name, String email, String password) {
-        AuthRequest request = new AuthRequest("standard", name, email, password);
+    private void sendAuthRequest(String name, String lastName, String city, String email, String password) {
+        AuthRequest request = new AuthRequest("standard", name, lastName, email, password, city);
         ApiService apiService = ApiClient.getApiService();
 
         apiService.authenticate(request).enqueue(new Callback<AuthResponse>() {
@@ -68,13 +72,13 @@ public class LoginActivity extends AppCompatActivity {
                         showError(authResponse.message);
                     }
                 } else {
-                    showError("Ошибка сервера: " + response.code());
+                    showError("Помилка сервера: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                showError("Ошибка сети: " + t.getMessage());
+                showError("Помилка мережі: " + t.getMessage());
             }
 
             private void showError(String message) {
