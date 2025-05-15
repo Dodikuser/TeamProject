@@ -1,6 +1,6 @@
 // MapComponent.js
 import React from 'react';
-import { GoogleMap, Marker } from '@react-google-maps/api'; // ⬅️ Без LoadScript
+import { GoogleMap, Marker } from '@react-google-maps/api'; 
 
 const mapContainerStyle = {
   width: '75%',

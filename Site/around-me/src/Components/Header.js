@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
+
 import { Container, Navbar, Dropdown } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
+
+
+
 
 function Header() {
   const location = useLocation();
   const currentPath = location.pathname;
+const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 
   return (
     <Navbar expand="lg" className="shadow-sm bg-white py-2">
@@ -58,10 +63,47 @@ function Header() {
 
             <Dropdown.Menu className="mt-3">
               <Dropdown.Item as={Link} to="/login">Вхід / Реєстрація</Dropdown.Item>
-              <Dropdown.Item href="#language">Мова інтерфейсу</Dropdown.Item>
+              <Dropdown.Item onClick={() => setShowLanguageMenu(!showLanguageMenu)}>
+               Мова інтерфейсу
+            </Dropdown.Item>
+
               <Dropdown.Item as={Link} to="/my-places">Мої заклади</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
+          {showLanguageMenu && (
+  <div
+    className="position-absolute bg-white border rounded shadow p-3"
+    style={{
+      top: '70px', 
+      right: '10px',
+      width: '200px',
+      zIndex: 1050,
+    }}
+  >
+    <div className="d-flex align-items-center mb-3 gap-2">
+      <span
+        className="material-symbols-outlined cursor-pointer"
+        style={{ cursor: 'pointer' }}
+        onClick={() => setShowLanguageMenu(false)}
+      >
+        arrow_back
+      </span>
+      <span className="fw-semibold">Обрати мову</span>
+    </div>
+
+    <div className="d-flex flex-column gap-2">
+      <label className="d-flex justify-content-between align-items-center border rounded px-3 py-2">
+        <span>Українська (uk)</span>
+        <input type="radio" name="language" value="uk" />
+      </label>
+      <label className="d-flex justify-content-between align-items-center border rounded px-3 py-2">
+        <span>Англійська (en)</span>
+        <input type="radio" name="language" value="en" />
+      </label>
+    </div>
+  </div>
+)}
+
         </div>
       </Container>
     </Navbar>

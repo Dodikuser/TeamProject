@@ -67,11 +67,21 @@ export default function LoginRegister() {
   };
 
   return (
+  <div
+    style={{
+      backgroundImage: 'url("/images/background(login).png")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      minHeight: '100vh',
+    }}
+  >
     <Container
       fluid
-      className="d-flex justify-content-center align-items-center bg-white"
+      className="d-flex justify-content-center align-items-center"
       style={{ height: '90vh' }}
     >
+
       <Card
         className="p-4 shadow rounded border-primary"
         style={{ width: '100%', maxWidth: '650px', borderWidth: '2px' }}
@@ -253,5 +263,6 @@ export default function LoginRegister() {
         </style>
       </Card>
     </Container>
+    </div>
   );
 }

@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { LoadScript } from '@react-google-maps/api'; // ⬅️ Добавь это
+import { LoadScript } from '@react-google-maps/api'; 
 import Header from './Components/Header';
 import MapComponent from './Components/MapComponent';
 import LocationList from './Components/LocationList';
+
 
 import Home from './Pages/Home';
 import Favorites from './Pages/Favorites';

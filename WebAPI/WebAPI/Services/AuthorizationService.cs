@@ -3,7 +3,7 @@ using WebAPI.Controllers;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using WebAPI.Migrations;
+
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
