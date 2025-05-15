@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Application;
+using Application.Services;
+using Application.Services.AI;
+using Entities;
+using Infrastructure;
+using Infrastructure.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Configuration;
-using System.Text;
-using WebAPI.EF;
-using WebAPI.Services;
-using WebAPI.EF.Models;
-using WebAPI.Services.AI;
-using WebAPI.Services.Repository;
-using WebAPI.Controllers;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 
 namespace WebAPI
@@ -25,12 +22,11 @@ namespace WebAPI
             builder.Services.Configure<Config>(builder.Configuration.GetSection("MapSettings"));
 
             //Достаем через костыли натсройки
-            var mapSettings = builder.Configuration.GetSection("MapSettings").Get<Config>();
+            Config mapSettings = builder.Configuration.GetSection("MapSettings").Get<Config>()!;
+            builder.Services.AddSingleton<Config>(mapSettings);
 
-            var sqliteConnString = mapSettings.SQLiteConnectionString;
-            builder.Services.AddDbContext<MyDbContext>(options =>
-                options.UseSqlite(sqliteConnString));
-
+            string sqliteConnString = mapSettings.SQLiteConnectionString;
+            builder.Services.AddInfrastructure(builder.Configuration);
 
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<PlaceRepository>();
@@ -48,7 +44,7 @@ namespace WebAPI
 
 
             //DeepSeek
-            var DeepSeekKey = mapSettings.DeepSeekKey;
+            string? DeepSeekKey = mapSettings.DeepSeekKey;
             builder.Services.AddHttpClient<IAIService, DeepSeekService>(client =>
             {
                 client.BaseAddress = new Uri("https://api.deepseek.com");
@@ -120,7 +116,7 @@ namespace WebAPI
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-                
+
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "Введите токен в формате: Bearer {токен}",

@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Application;
+using Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using WebAPI.EF.Models;
-using WebAPI.Services;
 
 
 namespace WebAPI.Controllers
@@ -19,13 +18,13 @@ namespace WebAPI.Controllers
         {
             _authorizationService = authorizationService;
             _tokenService = tokenService;
-            _userService=userService;
+            _userService = userService;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(LoginData loginData) 
+        public async Task<IActionResult> Register(LoginData loginData)
         {
-            var result = await _authorizationService.Register(loginData);
+            Entities.Result result = await _authorizationService.Register(loginData);
 
             if (!result.Success)
                 return BadRequest(result.Error);
@@ -51,12 +50,12 @@ namespace WebAPI.Controllers
         {
             int userId = Convert.ToInt32(User.FindFirst("UserId").Value);
 
-            var result = await _userService.SetIncognito(userId, !enabled);
+            Entities.Result result = await _userService.SetIncognito(userId, !enabled);
 
             if (!result.Success)
                 return BadRequest(result.Error);
             return Ok();
-        } 
+        }
     }
 
 }

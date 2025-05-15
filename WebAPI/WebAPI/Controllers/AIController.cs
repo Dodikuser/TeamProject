@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebAPI.Services.AI;
+using Application.Services.AI;
 
 namespace WebAPI.Controllers
 {
