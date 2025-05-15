@@ -21,8 +21,8 @@ public class AccountActivity extends AppCompatActivity {
 
     private boolean isRegisterMode = false;
 
-    private TextInputLayout layoutFirstName, layoutLastName, layoutCity;
-    private TextInputEditText etFirstName, etLastName, etCity, etEmail, etPassword;
+    private TextInputLayout layoutFirstName, layoutLastName;
+    private TextInputEditText etFirstName, etLastName, etEmail, etPassword;
     private MaterialButton btnSubmit;
     private MaterialButton btnLogin, btnRegister;
 
@@ -33,10 +33,8 @@ public class AccountActivity extends AppCompatActivity {
 
         layoutFirstName = findViewById(R.id.layoutFirstName);
         layoutLastName = findViewById(R.id.layoutLastName);
-        layoutCity = findViewById(R.id.layoutCity);
         etFirstName = findViewById(R.id.etFirstName);
         etLastName = findViewById(R.id.etLastName);
-        etCity = findViewById(R.id.etCity);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnSubmit = findViewById(R.id.btnSubmit);
@@ -51,13 +49,11 @@ public class AccountActivity extends AppCompatActivity {
                     isRegisterMode = true;
                     layoutFirstName.setVisibility(View.VISIBLE);
                     layoutLastName.setVisibility(View.VISIBLE);
-                    layoutCity.setVisibility(View.VISIBLE);
                     btnSubmit.setText(R.string.register);
                 } else {
                     isRegisterMode = false;
                     layoutFirstName.setVisibility(View.GONE);
                     layoutLastName.setVisibility(View.GONE);
-                    layoutCity.setVisibility(View.GONE);
                     btnSubmit.setText(R.string.login);
                 }
             }
@@ -71,14 +67,13 @@ public class AccountActivity extends AppCompatActivity {
             if (isRegisterMode) {
                 String firstName = etFirstName.getText().toString().trim();
                 String lastName = etLastName.getText().toString().trim();
-                String city = etCity.getText().toString().trim();
 
-                if (firstName.isEmpty() || lastName.isEmpty() || city.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
                     Toast.makeText(this, "Будь ласка, заповніть усі поля", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                sendRegistrationRequest(firstName, lastName, city, email, password);
+                sendRegistrationRequest(firstName, lastName, email, password);
             } else {
                 // TODO: логика входа (если нужно)
                 Toast.makeText(this, "Логін ще не реалізовано", Toast.LENGTH_SHORT).show();
@@ -86,11 +81,11 @@ public class AccountActivity extends AppCompatActivity {
         });
     }
 
-    private void sendRegistrationRequest(String firstName, String lastName, String city, String email, String password) {
+    private void sendRegistrationRequest(String firstName, String lastName, String email, String password) {
         new Thread(() -> {
             try {
                 // ⛳ Укажи свой IP и порт
-                URL url = new URL("http://192.168.1.100:5000/api/register");
+                URL url = new URL("http://10.0.2.2:7103/api/User/register");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -98,9 +93,8 @@ public class AccountActivity extends AppCompatActivity {
                 conn.setDoInput(true);
 
                 JSONObject jsonParam = new JSONObject();
-                jsonParam.put("firstName", firstName);
-                jsonParam.put("lastName", lastName);
-                jsonParam.put("city", city);
+                jsonParam.put("type", "standard");
+                jsonParam.put("name", firstName+" "+lastName);
                 jsonParam.put("email", email);
                 jsonParam.put("password", password);
 

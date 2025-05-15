@@ -3,19 +3,24 @@ package com.example.maps1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
-import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Scanner;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText nameEditText, lastNameEditText, cityEditText, emailEditText, passwordEditText;
+    private EditText emailEditText, passwordEditText;
     private Button loginButton;
 
     @Override
@@ -23,29 +28,22 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Инициализация View
-        nameEditText = findViewById(R.id.nameEditText);
-        lastNameEditText = findViewById(R.id.lastNameEditText);
-        cityEditText = findViewById(R.id.cityEditText);
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
 
         loginButton.setOnClickListener(v -> {
-            String name = nameEditText.getText().toString().trim();
-            String lastName = lastNameEditText.getText().toString().trim();
-            String city = cityEditText.getText().toString().trim();
             String email = emailEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
 
-            if (validateInput(name, lastName, city, email, password)) {
-                sendAuthRequest(name, lastName, city, email, password);
+            if (validateInput(email, password)) {
+                sendLoginRequest(email, password);
             }
         });
     }
 
-    private boolean validateInput(String name, String lastName, String city, String email, String password) {
-        if (name.isEmpty() || lastName.isEmpty() || city.isEmpty() || email.isEmpty() || password.isEmpty()) {
+    private boolean validateInput(String email, String password) {
+        if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Усі поля обов'язкові", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -56,34 +54,51 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    private void sendAuthRequest(String name, String lastName, String city, String email, String password) {
-        AuthRequest request = new AuthRequest("standard", name, lastName, email, password, city);
-        ApiService apiService = ApiClient.getApiService();
+    private void sendLoginRequest(String email, String password) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:7103/api/User/login"); // ⛳ Укажи актуальный путь
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                conn.setDoOutput(true);
+                conn.setDoInput(true);
 
-        apiService.authenticate(request).enqueue(new Callback<AuthResponse>() {
-            @Override
-            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    AuthResponse authResponse = response.body();
-                    if (authResponse.success) {
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("type", "standard");
+                jsonParam.put("name", " ");
+                jsonParam.put("email", email);
+                jsonParam.put("password", password);
+
+                OutputStream os = conn.getOutputStream();
+                os.write(jsonParam.toString().getBytes("UTF-8"));
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+
+                InputStream is = (responseCode == 200) ? conn.getInputStream() : conn.getErrorStream();
+                Scanner scanner = new Scanner(is).useDelimiter("\\A");
+                final String response = scanner.hasNext() ? scanner.next() : "";
+
+                runOnUiThread(() -> {
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        // Вход успешный
+                        Toast.makeText(this, "Успішний вхід!", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
                     } else {
-                        showError(authResponse.message);
+                        // Ошибка входа
+                        Toast.makeText(this, "Помилка входу: " + response, Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    showError("Помилка сервера: " + response.code());
-                }
-            }
+                });
 
-            @Override
-            public void onFailure(Call<AuthResponse> call, Throwable t) {
-                showError("Помилка мережі: " + t.getMessage());
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Помилка підключення: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
             }
-
-            private void showError(String message) {
-                Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
-            }
-        });
+        }).start();
     }
 }
