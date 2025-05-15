@@ -23,10 +23,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+import android.content.Intent;
 import fragment.AccountFragment;
 import fragment.FavoritesFragment;
-import fragment.HistoryFragment;
+import com.example.maps1.history.HistoryFragment;
 import fragment.MapFragment;
 import fragment.RecommendationsFragment;
 
@@ -94,7 +94,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void showFragment(Fragment fragment, String title) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
+
+        // Hide all fragments first
+        for (Fragment frag : fragmentManager.getFragments()) {
+            transaction.hide(frag);
+        }
+
+        // Add new fragment if not already added
+        if (fragment.isAdded()) {
+            transaction.show(fragment);
+        } else {
+            transaction.add(R.id.fragment_container, fragment);
+        }
+
         transaction.commit();
 
         // Update toolbar title
@@ -104,7 +116,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                // Ignore single clicks
+            }
+        });
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                // Open place details activity
+                Intent intent = new Intent(MainActivity.this, PlaceDetailsActivity.class);
+
+                // You can pass the clicked location to the activity
+                // intent.putExtra("latitude", latLng.latitude);
+                // intent.putExtra("longitude", latLng.longitude);
+
+                startActivity(intent);
+            }
+        });
         enableMyLocation();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (currentNavItemId == R.id.nav_home) {
+            // Refresh map when returning to app
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            if (mapFragment != null) {
+                mapFragment.getMapAsync(this);
+            }
+        }
     }
 
     private void enableMyLocation() {
@@ -119,11 +163,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void getLastKnownLocation() {
+    public void getLastKnownLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
-                if (location != null) {
+                if (location != null && mMap != null) {
                     LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     mMap.addMarker(new MarkerOptions()
                             .position(userLocation)
@@ -146,4 +190,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
+
 }
