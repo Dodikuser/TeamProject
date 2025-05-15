@@ -1,13 +1,11 @@
 package com.example.maps1;
 
-import android.content.Intent;
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -45,38 +43,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Инициализация карты Google
+        // Initialize Google Maps
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
 
-        // Инициализация клиента местоположения
+        // Initialize location client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Настройка нижнего навигационного меню
+        // Setup bottom navigation
         bottomNav = findViewById(R.id.bottomNavigation);
         bottomNav.setOnItemSelectedListener(this::onNavigationItemSelected);
 
-        // Установка домашнего экрана по умолчанию
+        // Highlight home by default
         bottomNav.setSelectedItemId(R.id.nav_home);
-
-        // Инициализация кнопки перехода в AccountActivity
-
     }
 
     private boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == currentNavItemId) {
-            return true; // Уже на этом экране
+            return true; // Already on this screen
         }
 
         currentNavItemId = id;
 
         if (id == R.id.nav_home) {
-            // Показать фрагмент карты
+            // Show map fragment
             showFragment(new MapFragment(), "Головна");
             return true;
         } else if (id == R.id.nav_favorites) {
@@ -102,30 +97,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
 
-        // Обновить название в Toolbar
+        // Update toolbar title
         getSupportActionBar().setTitle(title);
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
         enableMyLocation();
     }
 
     private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             getLastKnownLocation();
         } else {
             ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
 
-    private void getLastKnownLocation() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+    public void getLastKnownLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
