@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 
-// Карточка одного місця
+import FilterOffcanvas from '../Components/FilterOffcanvas';
+import SortOffcanvas from '../Components/SortOffcanvas';
+
 function FavoritesCard({
   image,
   title = 'Назва місця',
@@ -50,18 +52,45 @@ function FavoritesCard({
               {'☆'.repeat(5 - rating)}
             </div>
           </div>
-          <Button size="sm" variant="outline-primary" onClick={onGoTo}>
+          <Button
+            size="sm"
+            variant="outline-primary"
+            onClick={onGoTo}
+            className="custom-animated-button"
+          >
             Перейти
           </Button>
+
+          <style>
+            {`
+              .custom-animated-button {
+                background-color: #626FC2;
+                border-color: #626FC2;
+                color: white;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+              }
+
+              .custom-animated-button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(98, 111, 194, 0.5);
+              }
+
+              .custom-animated-button:active {
+                transform: scale(0.97);
+                box-shadow: 0 2px 6px rgba(98, 111, 194, 0.5);
+              }
+            `}
+          </style>
         </div>
       </Card.Body>
     </Card>
   );
 }
 
-// Главный компонент страницы Улюблене
 export default function Favorites() {
-  // Пример массива данных
+  const [showFilters, setShowFilters] = useState(false);
+  const [showSort, setShowSort] = useState(false);
+
   const favoritePlaces = [
     {
       image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
@@ -98,55 +127,60 @@ export default function Favorites() {
       rating: 3,
       distance: '0.9 км',
     },
-    {
-      image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
-      title: 'Ресторан "Гармонія"',
-      locationText: 'пл. Ринок, 5',
-      rating: 3,
-      distance: '0.9 км',
-    },
+
   ];
 
-  // Обработчик удаления
   const handleDelete = (idx) => {
     alert(`Видалити місце з індексом ${idx}`);
   };
 
-  // Обработчик перехода
   const handleGoTo = (idx) => {
     alert(`Перейти до місця з індексом ${idx}`);
   };
 
   return (
-    <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#CAC4D0', minHeight: '100vh' }}>
+    <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', minHeight: '100vh' }}>
       {/* Панель фільтрів і пошуку */}
-     <div className="bg-white p-3 rounded-3 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3 shadow-sm">
-  {/* Левая часть: кнопки */}
-  <div className="d-flex gap-2">
-    <Button variant="outline-secondary" className="d-flex align-items-center gap-2">
-      <span className="material-symbols-outlined">filter_list</span> Фільтри
-    </Button>
-    <Button variant="outline-secondary" className="d-flex align-items-center gap-2">
-      <span className="material-symbols-outlined">sort</span> Сортувати
-    </Button>
-  </div>
+    <Row className="mb-4 align-items-center g-3">
 
-  {/* Правая часть: поиск */}
-  <div className="position-relative" style={{ maxWidth: '400px', width: '100%' }}>
-    <Form.Control
-      type="search"
-      placeholder="Пошук"
-      className="ps-3 pe-5"
-      style={{ borderRadius: '8px' }} // без скруглений
-    />
-    <span
-      className="material-symbols-outlined position-absolute end-0 top-50 translate-middle-y me-3 text-muted"
-      style={{ pointerEvents: 'none' }}
-    >
-      search
-    </span>
-  </div>
-</div>
+  <Col xs={12} md="auto">
+    <div className="bg-white p-3 rounded-3 shadow-sm d-flex gap-2 flex-wrap">
+      <Button
+        variant="outline-secondary"
+        className="d-flex align-items-center gap-2"
+        onClick={() => setShowFilters(true)}
+      >
+        <span className="material-symbols-outlined">filter_list</span> Фільтри
+      </Button>
+      <Button
+        variant="outline-secondary"
+        className="d-flex align-items-center gap-2"
+        onClick={() => setShowSort(true)}
+      >
+        <span className="material-symbols-outlined">sort</span> Сортувати
+      </Button>
+    </div>
+  </Col>
+
+  <Col xs={12} md>
+    <div className="d-flex justify-content-center mb-5 mt-4">
+           <div className="position-relative" style={{ width: '60%', maxWidth: '600px',  marginLeft: '-300px'  }}>
+             <Form.Control
+               type="search"
+               placeholder="Пошук"
+               className="ps-3 pe-5"
+               style={{ borderRadius: '8px' }}
+      />
+      <span
+        className="material-symbols-outlined position-absolute end-0 top-50 translate-middle-y me-3 text-muted"
+        style={{ pointerEvents: 'none' }}
+      >
+        search
+      </span>
+      </div>
+    </div>
+  </Col>
+</Row>
 
       <Row>
         {favoritePlaces.map((place, idx) => (
@@ -163,6 +197,11 @@ export default function Favorites() {
           </Col>
         ))}
       </Row>
+
+   
+      <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} />
+<SortOffcanvas show={showSort} onClose={() => setShowSort(false)} />
+
     </Container>
   );
 }

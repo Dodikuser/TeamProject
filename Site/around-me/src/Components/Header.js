@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 
 import { Container, Navbar, Dropdown } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
-
-
+import NotificationsMenu from './NotificationsMenu';
 
 
 function Header() {
@@ -51,7 +50,8 @@ const [showLanguageMenu, setShowLanguageMenu] = useState(false);
         </div>
 
         <div className="d-flex align-items-center gap-3 ms-auto text-secondary">
-          <span className="material-symbols-outlined fs-4">notifications</span>
+         <NotificationsMenu />
+
 
           <Dropdown align="end">
             <Dropdown.Toggle
