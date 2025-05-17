@@ -1,11 +1,14 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.Configuration;
-using WebAPI.EF;
-using WebAPI.EF.Models;
-using WebAPI.Services.AI;
-using WebAPI.Services.Repository;
+﻿using Application;
+using Application.Services;
+using Application.Services.AI;
+using Entities;
+using Infrastructure;
+using Infrastructure.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
+
 
 namespace WebAPI
 {
@@ -19,14 +22,11 @@ namespace WebAPI
             builder.Services.Configure<Config>(builder.Configuration.GetSection("MapSettings"));
 
             //Достаем через костыли натсройки
-            var mapSettings = builder.Configuration.GetSection("MapSettings").Get<Config>();
+            Config mapSettings = builder.Configuration.GetSection("MapSettings").Get<Config>()!;
+            builder.Services.AddSingleton<Config>(mapSettings);
 
-            var connString = mapSettings.BDConnectionString;
-            var dbServerVersion = mapSettings.DBServerVersion;
-            builder.Services.AddDbContext<MyDbContext>(options => options.UseMySql(
-                connString,
-                Microsoft.EntityFrameworkCore.ServerVersion.Parse(dbServerVersion))
-            );
+            string sqliteConnString = mapSettings.SQLiteConnectionString;
+            builder.Services.AddInfrastructure(builder.Configuration);
 
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<PlaceRepository>();
@@ -38,8 +38,13 @@ namespace WebAPI
             builder.Services.AddScoped<SearchesRepository>();
             builder.Services.AddScoped<ReviewRepository>();
 
+            builder.Services.AddScoped<AuthorizationService>();
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<TokenService>();
+
+
             //DeepSeek
-            var DeepSeekKey = mapSettings.DeepSeekKey;
+            string? DeepSeekKey = mapSettings.DeepSeekKey;
             builder.Services.AddHttpClient<IAIService, DeepSeekService>(client =>
             {
                 client.BaseAddress = new Uri("https://api.deepseek.com");
@@ -68,8 +73,82 @@ namespace WebAPI
                 Console.WriteLine("Ollama settings are missing or invalid!");
             }
 
+            // JWT для регестрации 
 
-            builder.Services.AddControllers();
+            var jwtConfig = builder.Configuration.GetSection("JwtSettings");
+            var secretKey = jwtConfig["Key"];
+
+            builder.Services.Configure<JwtConfig>(jwtConfig);
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var key = Encoding.UTF8.GetBytes(secretKey);
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtConfig["Issuer"],
+                        ValidAudience = jwtConfig["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(key)
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            Console.WriteLine($"Authentication failed: {context.Exception}");
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            Console.WriteLine($"Token validated for {context.Principal.Identity.Name}");
+                            return Task.CompletedTask;
+                        }
+                    };
+
+                });
+
+
+            // Настройка авторизации через JWT
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "Введите токен в формате: Bearer {токен}",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+            });
+
+
+            // конвертер для LoginData
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new LoginDataConverter());
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -85,27 +164,31 @@ namespace WebAPI
 
             var app = builder.Build();
 
-
-            app.UseCors("AllowAll");
-
             if (app.Environment.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
-                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseAuthorization();
-            app.MapControllers();
 
+
+            app.UseRouting();
+
+            app.UseCors("AllowAll");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.MapControllers();
             app.MapGet("/", () => app.Configuration.AsEnumerable());
 
             app.Run();
-
-
-
 
         }
     }

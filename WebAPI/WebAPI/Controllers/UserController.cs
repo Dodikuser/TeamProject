@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application;
+using Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace WebAPI.Controllers
 {
@@ -6,14 +10,52 @@ namespace WebAPI.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
+        private readonly TokenService _tokenService;
+        private readonly AuthorizationService _authorizationService;
+        private readonly UserService _userService;
+
+        public UserController(AuthorizationService authorizationService, TokenService tokenService, UserService userService)
+        {
+            _authorizationService = authorizationService;
+            _tokenService = tokenService;
+            _userService = userService;
+        }
+
         [HttpPost("register")]
-        public IActionResult Register() => Ok();
+        public async Task<IActionResult> Register(LoginData loginData)
+        {
+            Entities.Result result = await _authorizationService.Register(loginData);
+
+            if (!result.Success)
+                return BadRequest(result.Error);
+            return Ok(new { message = "Регистрация прошла успешно" });
+        }
 
         [HttpPost("login")]
-        public IActionResult Login() => Ok();
+        public async Task<IActionResult> Login(LoginData loginData)
+        {
+            var result = await _authorizationService.LoginUser(loginData);
 
+            if (!result.Success)
+                return BadRequest(result.Error);
+
+            var token = await _tokenService.GenerateToken(loginData);
+            return Ok(new { token });
+        }
+
+
+        [Authorize]
         [HttpPost("incognito")]
-        public IActionResult SetIncognitoMode() => Ok();
+        public async Task<IActionResult> SetIncognitoMode(bool enabled)
+        {
+            int userId = Convert.ToInt32(User.FindFirst("UserId").Value);
+
+            Entities.Result result = await _userService.SetIncognito(userId, !enabled);
+
+            if (!result.Success)
+                return BadRequest(result.Error);
+            return Ok();
+        }
     }
 
 }
