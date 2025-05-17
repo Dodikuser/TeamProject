@@ -1,5 +1,4 @@
-// MapComponent.js
-import React from 'react';
+import React, { useState } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api'; 
 
 const mapContainerStyle = {
@@ -10,19 +9,31 @@ const mapContainerStyle = {
   left: '25%',
 };
 
-const center = {
+const defaultCenter = {
   lat: 50.4501,
   lng: 30.5234,
 };
 
 function MapComponent() {
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  const handleMapClick = (event) => {
+    setSelectedLocation({
+      lat: event.latLng.lat(),
+      lng: event.latLng.lng(),
+    });
+  };
+
   return (
     <GoogleMap
       mapContainerStyle={mapContainerStyle}
-      center={center}
+      center={selectedLocation || defaultCenter}
       zoom={10}
+      onClick={handleMapClick}
     >
-      <Marker position={center} />
+      {(selectedLocation || defaultCenter) && (
+        <Marker position={selectedLocation || defaultCenter} />
+      )}
     </GoogleMap>
   );
 }
