@@ -15,11 +15,11 @@ namespace Infrastructure.Repository
         //    _context = context;
         //    _env = env;
         //}
-        public PhotoRepository(MyDbContext context, string webRootPath)
-        {
-            _context = context;
-            WebRootPath = webRootPath;
-        }
+        //public PhotoRepository(MyDbContext context, string webRootPath)
+        //{
+        //    _context = context;
+        //    WebRootPath = webRootPath;
+        //}
         public async Task AddAsync(int placeId, IFormFile file)
         {
             if (file == null || file.Length == 0)
