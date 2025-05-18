@@ -27,7 +27,7 @@ namespace Infrastructure.Repository
         public async Task RemoveAsync(int searchId)
         {
             var search = await _context.Searches
-                .FirstOrDefaultAsync(s => s.SearchId == searchId);
+                .FirstOrDefaultAsync(s => s.Id == searchId);
 
             if (search != null)
             {

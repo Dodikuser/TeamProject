@@ -38,7 +38,7 @@ namespace Infrastructure
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasKey(e => e.UserId);
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Name);
                 entity.Property(e => e.Email);
@@ -57,20 +57,20 @@ namespace Infrastructure
 
             modelBuilder.Entity<Search>(entity =>
             {
-                entity.HasKey(e => e.SearchId);
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Text);
                 entity.Property(e => e.SearchDateTime).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasIndex(e => e.UserId);
-                //entity.Property(e => e.UserId);
+                //entity.Property(e => e.Id);
 
                 entity.HasOne(s => s.User).WithMany(u => u.Searches).HasForeignKey(s => s.UserId).OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Review>(entity =>
             {
-                entity.HasKey(e => e.ReviewId);
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Text);
                 entity.Property(e => e.Stars);
@@ -94,16 +94,16 @@ namespace Infrastructure
 
             modelBuilder.Entity<History>(entity =>
             {
-                entity.HasKey(e => e.HistoryId);
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.VisitDateTime).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.IsFromRecs);
 
                 entity.HasIndex(e => e.UserId);
-                //entity.Property(e => e.UserId);
+                //entity.Property(e => e.Id);
 
                 entity.HasIndex(e => e.PlaceId);
-                //entity.Property(e => e.PlaceId);
+                //entity.Property(e => e.Id);
 
                 entity.HasOne(h => h.User)
                     .WithMany(u => u.Histories)
@@ -119,15 +119,15 @@ namespace Infrastructure
 
             modelBuilder.Entity<Favorite>(entity =>
             {
-                entity.HasKey(e => e.FavoritesId);
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.FavoritedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasIndex(e => e.UserId);
-                //entity.Property(e => e.UserId);
+                //entity.Property(e => e.Id);
 
                 entity.HasIndex(e => e.PlaceId);
-                //entity.Property(e => e.PlaceId);
+                //entity.Property(e => e.Id);
 
                 entity.HasIndex(e => new { e.UserId, e.PlaceId }).IsUnique();
 
@@ -144,7 +144,7 @@ namespace Infrastructure
 
             modelBuilder.Entity<Place>(entity =>
             {
-                entity.HasKey(e => e.PlaceId);
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Name);
                 entity.Property(e => e.Description);
@@ -158,7 +158,7 @@ namespace Infrastructure
                 entity.HasIndex(e => e.GmapsPlaceId);
 
                 entity.HasIndex(e => e.UserId);
-                //entity.Property(e => e.UserId);
+                //entity.Property(e => e.Id);
 
                 entity.HasOne(p => p.User)
                     .WithMany(u => u.Places)
@@ -168,12 +168,12 @@ namespace Infrastructure
 
             modelBuilder.Entity<Photo>(entity =>
             {
-                entity.HasKey(e => e.PhotoId);
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Path);
 
                 entity.HasIndex(e => e.PlaceId);
-                //entity.Property(e => e.PlaceId);
+                //entity.Property(e => e.Id);
 
                 entity.HasOne(ph => ph.Place)
                     .WithMany(p => p.Photos)
@@ -183,7 +183,7 @@ namespace Infrastructure
 
             modelBuilder.Entity<Hashtag>(entity =>
             {
-                entity.HasKey(e => e.HashtagId);
+                entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Tag);
                 entity.Property(e => e.Price);

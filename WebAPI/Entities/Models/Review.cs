@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Entities.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entities.Models
 {
-    public class Review
+    public class Review : IDbEntity
     {
-        public int ReviewId { get; set; }
+        public int Id { get; set; }
         public string? Text { get; set; }
 
         [Range(1, 5)]

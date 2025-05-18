@@ -1,8 +1,10 @@
-﻿namespace Entities.Models
+﻿using Entities.Interfaces;
+
+namespace Entities.Models
 {
-    public class History
+    public class History : IDbEntity
     {
-        public int HistoryId { get; set; }
+        public int Id { get; set; }
         public DateTime VisitDateTime { get; set; }
         public bool IsFromRecs { get; set; }
 

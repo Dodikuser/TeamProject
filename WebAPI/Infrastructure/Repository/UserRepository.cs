@@ -48,7 +48,7 @@ namespace Infrastructure.Repository
         public async Task<List<User>> GetAllAsync(int skip = 0, int take = 100)
         {
             return await _context.Users
-                .OrderBy(u => u.UserId)
+                .OrderBy(u => u.Id)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();

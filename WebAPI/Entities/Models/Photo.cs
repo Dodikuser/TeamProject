@@ -1,8 +1,10 @@
-﻿namespace Entities.Models
+﻿using Entities.Interfaces;
+
+namespace Entities.Models
 {
-    public class Photo
+    public class Photo : IDbEntity
     {
-        public int PhotoId { get; set; }
+        public int Id { get; set; }
         public string Path { get; set; }
 
 

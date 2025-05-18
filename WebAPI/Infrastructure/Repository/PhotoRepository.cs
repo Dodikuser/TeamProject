@@ -71,7 +71,7 @@ namespace Infrastructure.Repository
         {
             return await _context.Photos
                 .Where(p => p.PlaceId == placeId)
-                .OrderByDescending(p => p.PhotoId)
+                .OrderByDescending(p => p.Id)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();

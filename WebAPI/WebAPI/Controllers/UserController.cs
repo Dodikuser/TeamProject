@@ -48,7 +48,7 @@ namespace WebAPI.Controllers
         [HttpPost("incognito")]
         public async Task<IActionResult> SetIncognitoMode(bool enabled)
         {
-            int userId = Convert.ToInt32(User.FindFirst("UserId")!.Value);
+            int userId = Convert.ToInt32(User.FindFirst("Id")!.Value);
 
             Entities.Result result = await _userService.SetIncognito(userId, !enabled);
 

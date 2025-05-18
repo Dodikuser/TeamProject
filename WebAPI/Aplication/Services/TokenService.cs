@@ -35,17 +35,17 @@ namespace Application.Services
             {
                 case StandardLoginData standard:
                     var userByEmail = await _userRepository.GetByEmailAsync(standard.Email);
-                    UserId = userByEmail?.UserId;
+                    UserId = userByEmail?.Id;
                     break;
 
                 case GoogleLoginData google:
                     var userByGoogle = await _userRepository.GetByGoogleIdAsync(google.GoogleId);
-                    UserId = userByGoogle?.UserId;
+                    UserId = userByGoogle?.Id;
                     break;
 
                 case FacebookLoginData facebook:
                     var userByFacebook = await _userRepository.GetByFacebookIdAsync(facebook.FacebookId);
-                    UserId = userByFacebook?.UserId;
+                    UserId = userByFacebook?.Id;
                     break;
 
                 default:
@@ -57,7 +57,7 @@ namespace Application.Services
                 throw new UnauthorizedAccessException("User not found");
             }
 
-            claims.Add(new Claim("UserId", UserId.Value.ToString()));
+            claims.Add(new Claim("Id", UserId.Value.ToString()));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -89,11 +89,11 @@ namespace Application.Services
                 ClockSkew = TimeSpan.Zero
             }, out SecurityToken validatedToken);
 
-            var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "UserId");
+            var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "Id");
 
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
-                throw new SecurityTokenException("UserId claim missing or invalid");
+                throw new SecurityTokenException("Id claim missing or invalid");
             }
 
             return userId;

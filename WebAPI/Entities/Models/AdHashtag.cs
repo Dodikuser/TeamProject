@@ -1,7 +1,10 @@
-﻿namespace Entities.Models
+﻿using Entities.Interfaces;
+
+namespace Entities.Models
 {
-    public class AdHashtag
+    public class AdHashtag : IDbEntity
     {
+        public int Id { get; set; }
         public int PromotionCount { get; set; }
 
 
@@ -12,5 +15,6 @@
 
         public virtual Place Place { get; set; } = null!;
         public virtual Hashtag Hashtag { get; set; } = null!;
+
     }
 }

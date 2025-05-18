@@ -1,8 +1,10 @@
-﻿namespace Entities.Models
+﻿using Entities.Interfaces;
+
+namespace Entities.Models
 {
-    public class Hashtag
+    public class Hashtag : IDbEntity
     {
-        public int HashtagId { get; set; }
+        public int Id { get; set; }
         public string Tag { get; set; }
         public int Price { get; set; }
 

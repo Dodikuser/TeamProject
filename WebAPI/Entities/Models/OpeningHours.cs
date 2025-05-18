@@ -1,6 +1,8 @@
-﻿namespace Entities.Models
+﻿using Entities.Interfaces;
+
+namespace Entities.Models
 {
-    public class OpeningHours
+    public class OpeningHours : IDbEntity
     {
         public int Id { get; set; }
         public TimeOnly Open { get; set; }

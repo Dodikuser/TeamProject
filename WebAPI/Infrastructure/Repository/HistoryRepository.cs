@@ -28,7 +28,7 @@ namespace Infrastructure.Repository
         public async Task RemoveAsync(int historyId)
         {
             var record = await _context.Histories
-                .FirstOrDefaultAsync(h => h.HistoryId == historyId);
+                .FirstOrDefaultAsync(h => h.Id == historyId);
 
             if (record != null)
             {

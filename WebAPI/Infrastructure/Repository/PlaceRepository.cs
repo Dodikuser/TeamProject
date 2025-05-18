@@ -88,7 +88,7 @@ namespace Infrastructure.Repository
         public async Task<List<Place>> GetAllAsync(int skip = 0, int take = 100)
         {
             return await _context.Places
-                .OrderBy(p => p.PlaceId)
+                .OrderBy(p => p.Id)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();

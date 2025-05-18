@@ -1,8 +1,10 @@
-﻿namespace Entities.Models
+﻿using Entities.Interfaces;
+
+namespace Entities.Models
 {
-    public class Favorite
+    public class Favorite : IDbEntity
     {
-        public int FavoritesId { get; set; }
+        public int Id { get; set; }
         public DateTime FavoritedAt { get; set; }
 
 
