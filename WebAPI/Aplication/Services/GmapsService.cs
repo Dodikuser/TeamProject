@@ -1,5 +1,5 @@
-﻿using Entities;
-using Entities.Models;
+﻿using Application.DTOs.GmapDTOs;
+using Entities;
 using Newtonsoft.Json;
 
 namespace Application.Services
@@ -24,8 +24,9 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-
-        public async Task<PlaceDetailsResult> GetPlaceDetailsAsync(string placeId)
+        /// <exception cref="HttpRequestException">If status code from map API is not Success code</exception>
+        /// <exception cref="Exception">If status code != OK</exception>
+        public async Task<GPlaceDetailsResult> GetPlaceDetailsAsync(string placeId)
         {
             var fields = "name,formatted_address,geometry,formatted_phone_number,opening_hours,rating,editorial_summary,website,photos,price_level";
             var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields={fields}&key={_googleMapsKey}";
@@ -34,107 +35,17 @@ namespace Application.Services
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<PlaceDetailsResponse>(json);
+            GPlaceDetailsResponse? result = JsonConvert.DeserializeObject<GPlaceDetailsResponse>(json);
 
-            if (result.Status == "OK")
+            if (result != null)
             {
+                if (result.Status != "OK")
+                    throw new Exception($"Error from Google Places API: {result.Status}");
+
                 return result.Result;
             }
-
-            throw new Exception($"Error from Google Places API: {result.Status}");
+            throw new Exception($"http response is not valid");
         }
-    }
-
-
-    public class PlaceDetailsResponse
-    {
-        [JsonProperty("result")]
-        public PlaceDetailsResult Result { get; set; }
-
-        [JsonProperty("status")]
-        public string Status { get; set; }
-    }
-
-    public class PlaceDetailsResult
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("formatted_address")]
-        public string Address { get; set; }
-
-        [JsonProperty("geometry")]
-        public Geometry Geometry { get; set; }
-
-        [JsonProperty("formatted_phone_number")]
-        public string PhoneNumber { get; set; }
-
-        [JsonProperty("opening_hours")]
-        public OpeningHours OpeningHours { get; set; }
-
-        [JsonProperty("rating")]
-        public double? Rating { get; set; }
-
-        [JsonProperty("editorial_summary")]
-        public EditorialSummary EditorialSummary { get; set; }
-
-        [JsonProperty("website")]
-        public string Website { get; set; }
-
-        [JsonProperty("photos")]
-        public List<Photo> Photos { get; set; }
-
-        [JsonProperty("price_level")]
-        public int? PriceLevel { get; set; }
-
-    }
-    public class Photo
-    {
-        [JsonProperty("photo_reference")]
-        public string PhotoReference { get; set; }
-
-        [JsonProperty("height")]
-        public int Height { get; set; }
-
-        [JsonProperty("width")]
-        public int Width { get; set; }
-
-        [JsonProperty("html_attributions")]
-        public List<string> HtmlAttributions { get; set; }
-
-        public string GetPhotoUrl(string apiKey)
-        {
-            return $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference={PhotoReference}&key={apiKey}";
-        }
-    }
-    public class Geometry
-    {
-        [JsonProperty("location")]
-        public Location Location { get; set; }
-    }
-
-    public class Location
-    {
-        [JsonProperty("lat")]
-        public double Lat { get; set; }
-
-        [JsonProperty("lng")]
-        public double Lng { get; set; }
-    }
-
-    public class OpeningHours
-    {
-        [JsonProperty("open_now")]
-        public bool? OpenNow { get; set; }
-
-        [JsonProperty("weekday_text")]
-        public List<string> WeekdayText { get; set; }
-    }
-
-    public class EditorialSummary
-    {
-        [JsonProperty("overview")]
-        public string Overview { get; set; }
     }
 
 

@@ -7,6 +7,7 @@ namespace Entities.Models
 
         public int PlaceId { get; set; }
         public string Name { get; set; }
+        public string Address { get; set; }
         public string? Description { get; set; }
 
         [RegularExpression(@"^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-]*)*$", ErrorMessage = "Invalid site URL format.")]
@@ -22,6 +23,10 @@ namespace Entities.Models
         public int? Radius { get; set; }
         public int? TokensAvailable { get; set; }
         public DateTime? LastPromotionDateTime { get; set; }
+
+        //тут будут доп поля которые есть на Гмапах но не было у нас
+        public bool? IsOpen { get; set; }
+        public ICollection<OpeningHours> OpeningHours { get; set; }
 
         //это не внешний ключ
         public string GmapsPlaceId { get; set; }

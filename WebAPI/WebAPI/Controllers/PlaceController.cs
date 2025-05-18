@@ -18,12 +18,14 @@ namespace WebAPI.Controllers
         public IActionResult GetMyPlaces() => Ok();
 
         /// <summary> Получить информацию о конкретном своем месте. </summary>
+        /// <exception cref="HttpRequestException">If status code from map API is not Success code</exception>
+        /// <exception cref="Exception">If status code != OK</exception>
         [HttpGet("info/")]
         public async Task<IActionResult> GetPlaceInfo(string placeId)
         {
             var placeInfo = await _gmapsService.GetPlaceDetailsAsync(placeId);
 
-            return Ok( new { placeInfo });
+            return Ok(new { placeInfo });
         }
 
         /// <summary> Обновить информацию о своем месте. </summary>
