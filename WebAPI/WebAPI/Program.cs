@@ -26,7 +26,7 @@ namespace WebAPI
             builder.Services.AddSingleton<Config>(mapSettings);
 
             string sqliteConnString = mapSettings.SQLiteConnectionString;
-            builder.Services.AddInfrastructure(builder.Configuration);
+            builder.Services.AddInfrastructure(sqliteConnString);
 
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<PlaceRepository>();

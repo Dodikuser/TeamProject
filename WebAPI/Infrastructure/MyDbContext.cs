@@ -9,8 +9,6 @@ namespace Infrastructure
 
         public MyDbContext(DbContextOptions<MyDbContext> options)
             : base(options) { }
-        public MyDbContext(DbContextOptions<MyDbContext> options, string connectionString)
-            : base(options) { }
 
         public virtual DbSet<AdHashtag> AdHashtags { get; set; }
         public virtual DbSet<Favorite> Favorites { get; set; }
@@ -21,6 +19,18 @@ namespace Infrastructure
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Search> Searches { get; set; }
         public virtual DbSet<Photo> Photos { get; set; }
+
+        //todo
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                var relativePath = Path.Combine("..", "Infrastructure", "DB_Storage", "app.db");
+                var fullPath = Path.GetFullPath(relativePath);
+
+                optionsBuilder.UseSqlite($"Data Source={fullPath}");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
