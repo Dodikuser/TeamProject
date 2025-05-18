@@ -19,7 +19,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAYKPr03PuapY_lftN5aieFXrn4Zg_pYZc" />
+            android:value="AIzaSyAnE3sfsbwYmNEhxAq_XFelrA6_BznVymc" />
 
         <!-- MainActivity теперь является главной активностью -->
         <activity
