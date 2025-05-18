@@ -1,0 +1,40 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Application.DTOs
+{
+    public class PlaceDTO
+    {
+        public string Name { get; set; }
+        public string? Description { get; set; }
+
+        [RegularExpression(@"^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-]*)*$", ErrorMessage = "Invalid site URL format.")]
+        public string? Site { get; set; }
+
+        [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format.")]
+        public string? PhoneNumber { get; set; }
+
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")]
+        public string? Email { get; set; }
+        public double Longitude { get; set; }
+        public double Latitude { get; set; }
+        public int? Radius { get; set; }
+        public int? TokensAvailable { get; set; }
+        public DateTime? LastPromotionDateTime { get; set; }
+
+        //это не внешний ключ
+        public string GmapsPlaceId { get; set; }
+
+
+
+        public int UserId { get; set; }
+
+        // Связь с User, Review, History, Favorite, Photo, AdHashtag
+
+        public virtual UserDTO User { get; set; } = null!;
+        public virtual ICollection<ReviewDTO> Reviews { get; set; } = new List<ReviewDTO>();
+        public virtual ICollection<HistoryDTO> Histories { get; set; } = new List<HistoryDTO>();
+        public virtual ICollection<FavoriteDTO> Favorites { get; set; } = new List<FavoriteDTO>();
+        public virtual ICollection<PhotoDTO> Photos { get; set; } = new List<PhotoDTO>();
+        public virtual ICollection<AdHashtagDTO> AdHashtags { get; set; } = new List<AdHashtagDTO>();
+    }
+}

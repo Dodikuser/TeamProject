@@ -1,14 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Entities.Models
+﻿namespace Entities.Models
 {
     public class User
     {
         public int UserId { get; set; }
         public string Name { get; set; }
 
-        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
         public string? PasswordHash { get; set; }
         public string? GoogleId { get; set; }
         public string? FacebookId { get; set; }
