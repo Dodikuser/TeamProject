@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
@@ -6,13 +7,24 @@ namespace WebAPI.Controllers
     [Route("api/[controller]")]
     public class PlaceController : ControllerBase
     {
+        private readonly GmapsService _gmapsService;
+        public PlaceController(GmapsService gmapsService)
+        {
+            _gmapsService = gmapsService;
+        }
+
         /// <summary> Получить список своих мест. </summary>
         [HttpGet("my")]
         public IActionResult GetMyPlaces() => Ok();
 
         /// <summary> Получить информацию о конкретном своем месте. </summary>
-        [HttpGet("my/{placeId}")]
-        public IActionResult GetPlaceInfo(int placeId) => Ok();
+        [HttpGet("info/")]
+        public async Task<IActionResult> GetPlaceInfo(string placeId)
+        {
+            var placeInfo = await _gmapsService.GetPlaceDetailsAsync(placeId);
+
+            return Ok( new { placeInfo });
+        }
 
         /// <summary> Обновить информацию о своем месте. </summary>
         [HttpPut("my/{placeId}/info")]

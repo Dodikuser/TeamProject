@@ -41,6 +41,7 @@ namespace WebAPI
             builder.Services.AddScoped<AuthorizationService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<TokenService>();
+            builder.Services.AddScoped<GmapsService>();
 
 
             //DeepSeek
