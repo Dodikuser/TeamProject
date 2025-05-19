@@ -65,7 +65,7 @@ namespace WebAPI.Controllers
         [HttpPost("info")]
         public async Task<IActionResult> GetUserInfo(UserDTOEnum dataType)
         {
-            int userId = Convert.ToInt32(User.FindFirst("UserId")!.Value);
+            int userId = Convert.ToInt32(User.FindFirst("Id")!.Value);
 
             if (!UserService._userDtoTypes.TryGetValue(dataType, out var expectedType))
             {

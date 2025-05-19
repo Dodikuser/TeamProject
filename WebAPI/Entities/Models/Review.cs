@@ -18,6 +18,8 @@ namespace Entities.Models
         public int Location { get; set; }
         [Range(1, 5)]
         public int Infrastructure { get; set; }
+        [Range(1, 5)]
+        public int Stars { get; set; } // пускай будет общая оценка тоже
         public DateTime ReviewDateTime { get; set; }
 
 

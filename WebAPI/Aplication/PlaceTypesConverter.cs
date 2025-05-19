@@ -5,7 +5,7 @@ namespace Application
 {
     public static class PlaceTypesConverter
     {
-        public static GPlaceDetailsResult ToPlaceDetailsResult(this PlaceDTO argument)
+        public static GPlaceDetailsResult ToPlaceDetailsResult(this PlaceDTOFull argument)
         {
 
             GPlaceDetailsResult result = new GPlaceDetailsResult()
@@ -45,9 +45,9 @@ namespace Application
             };
             return result;
         }
-        public static PlaceDTO ToPlace(this GPlaceDetailsResult argument)
+        public static PlaceDTOFull ToPlace(this GPlaceDetailsResult argument)
         {
-            PlaceDTO result = new PlaceDTO()
+            PlaceDTOFull result = new PlaceDTOFull()
             {
                 Name = argument.Name,
                 Address = argument.Address,

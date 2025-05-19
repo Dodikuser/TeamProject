@@ -103,7 +103,7 @@ namespace Application.Services
             var reviewDTOs = await Task.WhenAll(
             user.Reviews?.Select(async r => new ReviewDTO
             {
-                ReviewId = r.ReviewId,
+                ReviewId = r.Id,
                 Text = r.Text,
                 Stars = r.Stars,
                 ReviewDateTime = r.ReviewDateTime,
@@ -202,7 +202,7 @@ namespace Application.Services
                 Photos = place.Photos?
                     .Select(p => new PhotoDTO
                     {
-                        PhotoId = p.PhotoId,
+                        PhotoId = p.Id,
                         Path = p.Path,
                         PlaceId = p.PlaceId,
                     })
