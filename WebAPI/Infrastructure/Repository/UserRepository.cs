@@ -14,11 +14,76 @@ namespace Infrastructure.Repository
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+        
         }
-        public async Task<User?> GetByIdAsync(int userId)
+
+        // Только Searches
+        public async Task<User?> GetByUserIdWithSearchesAsync(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Searches)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+
+        // Только Reviews
+        public async Task<User?> GetByUserIdWithReviewsAsync(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Reviews)
+                    .ThenInclude(h => h.Place)
+                        .ThenInclude(p => p.Photos)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+
+        // Только Histories
+        public async Task<User?> GetUserDTOHistoryByIdAsync(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Histories)
+                    .ThenInclude(h => h.Place)
+                        .ThenInclude(p => p.Photos)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+
+
+
+
+        // Только Favorites
+        public async Task<User?> GetByUserIdWithFavoritesAsync(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Favorites)
+                    .ThenInclude(h => h.Place)
+                        .ThenInclude(p => p.Photos)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+
+        // Только Places
+        public async Task<User?> GetByUserIdWithPlacesAsync(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Places)
+                    .ThenInclude(p => p.Photos)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+
+        // Всё сразу
+        public async Task<User?> GetByUserIdWithAllAsync(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Searches)
+                .Include(u => u.Reviews)
+                .Include(u => u.Histories)
+                .Include(u => u.Favorites)
+                .Include(u => u.Places)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+
+        public async Task<User?> GetByIdMainAsync(int userId)
         {
             return await _context.Users.FindAsync(userId);
         }
+
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);

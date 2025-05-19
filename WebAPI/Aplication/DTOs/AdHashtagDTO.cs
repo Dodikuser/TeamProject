@@ -9,7 +9,7 @@
 
         // Связь с Place и Hashtag
 
-        public virtual PlaceDTO Place { get; set; } = null!;
+        public virtual PlaceDTOFull Place { get; set; } = null!;
         public virtual HashtagDTO Hashtag { get; set; } = null!;
     }
 }

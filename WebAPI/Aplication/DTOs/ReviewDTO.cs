@@ -19,7 +19,7 @@ namespace Application.DTOs
 
         // Связь с Place и User
 
-        public virtual PlaceDTO Place { get; set; } = null!;
-        public virtual UserDTO User { get; set; } = null!;
+        public virtual PlaceDTODefaultCard Place { get; set; } = null!;
+        public virtual UserDTOMain User { get; set; } = null!;
     }
 }

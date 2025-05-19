@@ -5,6 +5,6 @@
         public DateTime VisitDateTime { get; set; }
         public bool IsFromRecs { get; set; }
         public int PlaceId { get; set; }
-        public virtual PlaceDTO Place { get; set; } = null!;
+        public virtual PlaceDTODefaultCard Place { get; set; } = null!;
     }
 }

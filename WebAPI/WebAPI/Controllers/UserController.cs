@@ -1,7 +1,9 @@
 ﻿using Application;
 using Application.Services;
+using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 
 namespace WebAPI.Controllers
@@ -20,6 +22,8 @@ namespace WebAPI.Controllers
             _tokenService = tokenService;
             _userService = userService;
         }
+
+
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(LoginData loginData)
@@ -56,6 +60,39 @@ namespace WebAPI.Controllers
                 return BadRequest(result.Error);
             return Ok();
         }
+
+        [Authorize]
+        [HttpPost("info")]
+        public async Task<IActionResult> GetUserInfo(UserDTOEnum dataType)
+        {
+            int userId = Convert.ToInt32(User.FindFirst("UserId")!.Value);
+
+            if (!UserService._userDtoTypes.TryGetValue(dataType, out var expectedType))
+            {
+                return BadRequest($"Unknown DTO type for: {dataType}");
+            }
+
+            Type type = UserService._userDtoTypes[dataType];
+
+            var method = typeof(UserService)
+                .GetMethod("GetUserInfo")!
+                .MakeGenericMethod(type);
+
+            var task = (Task)method.Invoke(_userService, new object[] { userId, dataType })!;
+
+            await task.ConfigureAwait(false);
+
+            var resultProperty = task.GetType().GetProperty("Result");
+            dynamic result = resultProperty.GetValue(task);
+
+            if (result == null || result.GetType() != expectedType)
+            {
+                return StatusCode(500, $"Handler returned unexpected type: {result?.GetType().Name}, expected: {expectedType.Name}");
+            }
+
+            return Ok(new { userDTO = result });
+        }
+
     }
 
 }

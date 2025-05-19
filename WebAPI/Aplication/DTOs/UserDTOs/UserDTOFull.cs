@@ -2,7 +2,7 @@
 
 namespace Application.DTOs
 {
-    public class UserDTO
+    public class UserDTOFull
     {
         public string Name { get; set; }
 
@@ -18,6 +18,6 @@ namespace Application.DTOs
         public virtual ICollection<ReviewDTO> Reviews { get; set; } = new List<ReviewDTO>();
         public virtual ICollection<HistoryDTO> Histories { get; set; } = new List<HistoryDTO>();
         public virtual ICollection<FavoriteDTO> Favorites { get; set; } = new List<FavoriteDTO>();
-        public virtual ICollection<PlaceDTO> Places { get; set; } = new List<PlaceDTO>();
+        public virtual ICollection<PlaceDTODefaultCard> Places { get; set; } = new List<PlaceDTODefaultCard>();
     }
 }
