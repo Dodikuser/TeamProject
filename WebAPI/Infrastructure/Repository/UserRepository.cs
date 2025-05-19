@@ -22,7 +22,7 @@ namespace Infrastructure.Repository
         {
             return await _context.Users
                 .Include(u => u.Searches)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         // Только Reviews
@@ -32,7 +32,7 @@ namespace Infrastructure.Repository
                 .Include(u => u.Reviews)
                     .ThenInclude(h => h.Place)
                         .ThenInclude(p => p.Photos)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         // Только Histories
@@ -42,7 +42,7 @@ namespace Infrastructure.Repository
                 .Include(u => u.Histories)
                     .ThenInclude(h => h.Place)
                         .ThenInclude(p => p.Photos)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
 
@@ -55,7 +55,7 @@ namespace Infrastructure.Repository
                 .Include(u => u.Favorites)
                     .ThenInclude(h => h.Place)
                         .ThenInclude(p => p.Photos)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         // Только Places
@@ -64,7 +64,7 @@ namespace Infrastructure.Repository
             return await _context.Users
                 .Include(u => u.Places)
                     .ThenInclude(p => p.Photos)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         // Всё сразу
@@ -76,7 +76,7 @@ namespace Infrastructure.Repository
                 .Include(u => u.Histories)
                 .Include(u => u.Favorites)
                 .Include(u => u.Places)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public async Task<User?> GetByIdMainAsync(int userId)
