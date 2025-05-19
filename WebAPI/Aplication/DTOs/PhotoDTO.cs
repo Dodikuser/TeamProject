@@ -11,6 +11,6 @@
 
         // Связь с Place
 
-        public virtual PlaceDTO Place { get; set; } = null!;
+        public virtual PlaceDTOFull Place { get; set; } = null!;
     }
 }
