@@ -27,7 +27,7 @@ namespace Application.Services
         }
 
 
-        public async Task<string> GenerateToken(UserLoginDTO loginData)
+        public async Task<string?> GenerateToken(UserLoginDTO loginData)
         {
             List<Claim> claims = new();
             ulong? UserId = null;
@@ -48,7 +48,7 @@ namespace Application.Services
                 UserId = userByFacebook?.Id;
             }
             else
-                return LoginStatus.UnknownOathProvider.ToString();
+                return null;
 
 
             if (UserId == null)

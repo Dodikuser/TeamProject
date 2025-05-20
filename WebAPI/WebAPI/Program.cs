@@ -191,7 +191,7 @@ namespace WebAPI
 
             app.UseRouting();
 
-            app.UseCors("AllowAll");
+            app.UseCors("AllowReact");
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -4,7 +4,6 @@ namespace Application.DTOs
 {
     public class ReviewDTO
     {
-        public ulong Id { get; set; }
         public string? Text { get; set; }
 
         [Range(1, 5)]
@@ -23,5 +22,6 @@ namespace Application.DTOs
 
         public ulong PlaceId { get; set; }
         public ulong UserId { get; set; }
+        public string UserName { get; set; } = string.Empty;
     }
 }

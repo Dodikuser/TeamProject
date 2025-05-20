@@ -17,58 +17,58 @@ namespace Infrastructure.Repository
 
         }
 
-        // Только Searches
-        public async Task<User?> GetByUserIdWithSearchesAsync(ulong userId)
-        {
-            return await _context.Users
-                .Include(u => u.Searches)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-        }
+        //// Только Searches
+        //public async Task<User?> GetByUserIdWithSearchesAsync(ulong userId)
+        //{
+        //    return await _context.Users
+        //        .Include(u => u.Searches)
+        //        .FirstOrDefaultAsync(u => u.Id == userId);
+        //}
 
-        // Только Reviews
-        public async Task<User?> GetByUserIdWithReviewsAsync(ulong userId)
-        {
-            return await _context.Users
-                .Include(u => u.Reviews)
-                    .ThenInclude(h => h.Place)
-                        .ThenInclude(p => p.Photos)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-        }
+        //// Только Reviews
+        //public async Task<User?> GetByUserIdWithReviewsAsync(ulong userId)
+        //{
+        //    return await _context.Users
+        //        .Include(u => u.Reviews)
+        //            .ThenInclude(h => h.Place)
+        //                .ThenInclude(p => p.Photos)
+        //        .FirstOrDefaultAsync(u => u.Id == userId);
+        //}
 
-        // Только Histories
-        public async Task<User?> GetUserDTOHistoryByIdAsync(ulong userId)
-        {
-            return await _context.Users
-                .Include(u => u.Histories)
-                    .ThenInclude(h => h.Place)
-                        .ThenInclude(p => p.Photos)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-        }
-
-
+        //// Только Histories
+        //public async Task<User?> GetUserDTOHistoryByIdAsync(ulong userId)
+        //{
+        //    return await _context.Users
+        //        .Include(u => u.Histories)
+        //            .ThenInclude(h => h.Place)
+        //                .ThenInclude(p => p.Photos)
+        //        .FirstOrDefaultAsync(u => u.Id == userId);
+        //}
 
 
-        // Только Favorites
-        public async Task<User?> GetByUserIdWithFavoritesAsync(ulong userId)
-        {
-            return await _context.Users
-                .Include(u => u.Favorites)
-                    .ThenInclude(h => h.Place)
-                        .ThenInclude(p => p.Photos)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-        }
 
-        // Только Places
-        public async Task<User?> GetByUserIdWithPlacesAsync(ulong userId)
-        {
-            return await _context.Users
-                .Include(u => u.Places)
-                    .ThenInclude(p => p.Photos)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-        }
+
+        //// Только Favorites
+        //public async Task<User?> GetByUserIdWithFavoritesAsync(ulong userId)
+        //{
+        //    return await _context.Users
+        //        .Include(u => u.Favorites)
+        //            .ThenInclude(h => h.Place)
+        //                .ThenInclude(p => p.Photos)
+        //        .FirstOrDefaultAsync(u => u.Id == userId);
+        //}
+
+        //// Только Places
+        //public async Task<User?> GetByUserIdWithPlacesAsync(ulong userId)
+        //{
+        //    return await _context.Users
+        //        .Include(u => u.Places)
+        //            .ThenInclude(p => p.Photos)
+        //        .FirstOrDefaultAsync(u => u.Id == userId);
+        //}
 
         // Всё сразу
-        public async Task<User?> GetByUserIdWithAllAsync(ulong userId)
+        public async Task<User?> GetByIdAsync(ulong userId)
         {
             return await _context.Users
                 .Include(u => u.Searches)

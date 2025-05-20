@@ -7,7 +7,7 @@ namespace Application.DTOs
         public string Name { get; set; }
 
         [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool SearchHistoryOn { get; set; }
         public bool VisitHistoryOn { get; set; }
