@@ -38,13 +38,35 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<List<Place>> GetFavoritesForUserAsync(int userId)
+        public async Task<List<Favorite>> GetFavoritesForUserAsync(int userId, int skip = 0, int take = 10)
         {
             return await _context.Favorites
                 .Where(f => f.UserId == userId)
+                .OrderByDescending(f => f.FavoritedAt)
+                .Skip(skip)
+                .Take(take)
                 .Include(f => f.Place)
-                .Select(f => f.Place)
                 .ToListAsync();
         }
+        public async Task<List<Favorite>> SearchFavoritesAsync(int userId, string keyword, int skip = 0, int take = 10)
+        {
+            keyword = keyword.ToLower();
+
+            return await _context.Favorites
+                .Where(f => f.UserId == userId)
+                .Where(f =>
+                    f.Place.Name.ToLower().Contains(keyword) ||
+                    (f.Place.Description != null && f.Place.Description.ToLower().Contains(keyword)) ||
+                    (f.Place.Site != null && f.Place.Site.ToLower().Contains(keyword)) ||
+                    (f.Place.Address != null && f.Place.Address.ToLower().Contains(keyword)) ||
+                    (f.Place.PhoneNumber != null && f.Place.PhoneNumber.ToLower().Contains(keyword)))
+                .OrderByDescending(f => f.FavoritedAt)
+                .Skip(skip)
+                .Take(take)
+                .Include(f => f.Place)
+                .ToListAsync();
+        }
+
+
     }
 }

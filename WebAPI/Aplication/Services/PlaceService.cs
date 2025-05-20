@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entities.Models;
 
 namespace Application.Services
 {
@@ -33,6 +34,15 @@ namespace Application.Services
                 default:
                     break;
             }
+        }
+
+        public async Task<List<Favorite>> GetFavorites(int UserId, int skip = 0, int take = 10)
+        {
+            return await _favoritesRepository.GetFavoritesForUserAsync(UserId, skip, take);
+        }
+        public async Task<List<Favorite>> SearchFavorites(int UserId, string keyword, int skip = 0, int take = 10)
+        {
+            return await _favoritesRepository.SearchFavoritesAsync(UserId, keyword, skip, take);
         }
     }
 }
