@@ -76,11 +76,11 @@ namespace Infrastructure.Repository
         {
             return await _context.Places.FirstOrDefaultAsync(p => p.GmapsPlaceId == gmapsPlaceId);
         }
-        public async Task<int?> GetIdByGmapsPlaceIdAsync(string gmapsPlaceId)
+        public async Task<ulong?> GetIdByGmapsPlaceIdAsync(string gmapsPlaceId)
         {
             return await _context.Places
                 .Where(p => p.GmapsPlaceId == gmapsPlaceId)
-                .Select(p => (int?)p.Id)
+                .Select(p => (ulong?)p.Id)
                 .FirstOrDefaultAsync();
         }
 
@@ -101,7 +101,7 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
-        public async Task<List<Place>> GetByUserIdAsync(int userId, int skip = 0, int take = 50)
+        public async Task<List<Place>> GetByUserIdAsync(ulong userId, int skip = 0, int take = 50)
         {
             return await _context.Places
                 .Where(p => p.UserId == userId)
@@ -110,7 +110,7 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
-        public async Task<List<Place>> GetByPromoteHashtagAsync(int hashTagId, int skip = 0, int take = 50)
+        public async Task<List<Place>> GetByPromoteHashtagAsync(ulong hashTagId, int skip = 0, int take = 50)
         {
             return await _context.Places
                 .Where(p => p.AdHashtags.Any(a => a.HashtagId == hashTagId))

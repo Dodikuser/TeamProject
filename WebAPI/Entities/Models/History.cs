@@ -4,14 +4,14 @@ namespace Entities.Models
 {
     public class History : IDbEntity
     {
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public DateTime VisitDateTime { get; set; }
         public bool IsFromRecs { get; set; }
 
 
 
-        public int UserId { get; set; }
-        public int PlaceId { get; set; }
+        public ulong UserId { get; set; }
+        public ulong PlaceId { get; set; }
 
         // Связь с User и Place
 

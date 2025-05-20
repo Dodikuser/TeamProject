@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 
 namespace WebAPI
@@ -44,6 +45,11 @@ namespace WebAPI
             builder.Services.AddScoped<GmapsService>();
             builder.Services.AddScoped<PlaceService>();
 
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
 
             //DeepSeek
             string? DeepSeekKey = mapSettings.DeepSeekKey;

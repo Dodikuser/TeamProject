@@ -29,7 +29,7 @@ namespace Application.Services
         public async Task<string> GenerateToken(LoginData loginData)
         {
             List<Claim> claims = new();
-            int? UserId = null;
+            ulong? UserId = null;
 
             switch (loginData)
             {

@@ -10,7 +10,7 @@ namespace Infrastructure.Repository
         {
             _context = context;
         }
-        public async Task AddAsync(int userId, int placeId)
+        public async Task AddAsync(ulong userId, ulong placeId)
         {
             var favorite = new Favorite
             {
@@ -22,12 +22,12 @@ namespace Infrastructure.Repository
             _context.Favorites.Add(favorite);
             await _context.SaveChangesAsync();
         }
-        public async Task<bool> ExistsAsync(int userId, int placeId)
+        public async Task<bool> ExistsAsync(ulong userId, ulong placeId)
         {
             return await _context.Favorites
                 .AnyAsync(f => f.UserId == userId && f.PlaceId == placeId);
         }
-        public async Task RemoveAsync(int userId, int placeId)
+        public async Task RemoveAsync(ulong userId, ulong placeId)
         {
             var favorite = await _context.Favorites
                 .FirstOrDefaultAsync(f => f.UserId == userId && f.PlaceId == placeId);
@@ -38,17 +38,16 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<List<Favorite>> GetFavoritesForUserAsync(int userId, int skip = 0, int take = 10)
+        public async Task<List<Favorite>> GetFavoritesForUserAsync(ulong userId, int skip = 0, int take = 10)
         {
-            return await _context.Favorites
-                .Where(f => f.UserId == userId)
-                .OrderByDescending(f => f.FavoritedAt)
-                .Skip(skip)
-                .Take(take)
-                .Include(f => f.Place)
-                .ToListAsync();
+            var one = _context.Favorites.Where(f => f.UserId == userId);
+            var two = one.OrderByDescending(f => f.FavoritedAt).Skip(skip).Take(take);
+            var three = two
+            .Include(f => f.Place);
+            var four = await three.ToListAsync();
+            return four;
         }
-        public async Task<List<Favorite>> SearchFavoritesAsync(int userId, string keyword, int skip = 0, int take = 10)
+        public async Task<List<Favorite>> SearchFavoritesAsync(ulong userId, string keyword, int skip = 0, int take = 10)
         {
             keyword = keyword.ToLower();
 

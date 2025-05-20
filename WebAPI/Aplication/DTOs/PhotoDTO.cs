@@ -2,12 +2,12 @@
 {
     public class PhotoDTO
     {
-        public int PhotoId { get; set; }
+        public ulong PhotoId { get; set; }
         public string Path { get; set; }
 
 
 
-        public int PlaceId { get; set; }
+        public ulong PlaceId { get; set; }
 
         // Связь с Place
 

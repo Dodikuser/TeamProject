@@ -4,7 +4,7 @@ namespace Application.DTOs
 {
     public class ReviewDTO
     {
-        public int ReviewId { get; set; }
+        public ulong ReviewId { get; set; }
         public string? Text { get; set; }
 
         [Range(1, 5)]
@@ -14,8 +14,8 @@ namespace Application.DTOs
 
 
 
-        public int PlaceId { get; set; }
-        public int UserId { get; set; }
+        public ulong PlaceId { get; set; }
+        public ulong UserId { get; set; }
 
         // Связь с Place и User
 

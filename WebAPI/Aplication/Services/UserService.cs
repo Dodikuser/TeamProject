@@ -1,8 +1,7 @@
-﻿using Infrastructure.Repository;
-using Entities.Models;
-using Application.DTOs;
+﻿using Application.DTOs;
 using Entities;
-using System.Collections.Generic;
+using Entities.Models;
+using Infrastructure.Repository;
 
 namespace Application.Services
 {
@@ -12,7 +11,7 @@ namespace Application.Services
         private readonly UserRepository _userRepository;
 
 
-        private readonly Dictionary<UserDTOEnum, Func<int, Task<object>>> _userInfoHandlers;
+        private readonly Dictionary<UserDTOEnum, Func<ulong, Task<object>>> _userInfoHandlers;
         public static readonly Dictionary<UserDTOEnum, Type> _userDtoTypes = new()
         {
             [UserDTOEnum.Searches] = typeof(UserDTOSearches),
@@ -29,15 +28,15 @@ namespace Application.Services
             _authorizationService = authorizationService;
             _userRepository = userRepository;
 
-            _userInfoHandlers = new Dictionary<UserDTOEnum, Func<int, Task<object>>>
+            _userInfoHandlers = new Dictionary<UserDTOEnum, Func<ulong, Task<object>>>
             {
                 [UserDTOEnum.Searches] = async (id) => await GetUserDTOSearches(id),
-                [UserDTOEnum.Reviews]  = async (id) => await GetUserDTOReviews(id),
-                [UserDTOEnum.Histories]= async (id) => await GetUserDTOHistories(id),
-                [UserDTOEnum.Favorites]= async (id) => await GetUserDTOFavorites(id),
-                [UserDTOEnum.Places]   = async (id) => await GetUserDTOPlaces(id),
-                [UserDTOEnum.Full]     = async (id) => await GetUserDTOFull(id),
-                [UserDTOEnum.Main]     = async (id) => await GetUserDTOMain(id)
+                [UserDTOEnum.Reviews] = async (id) => await GetUserDTOReviews(id),
+                [UserDTOEnum.Histories] = async (id) => await GetUserDTOHistories(id),
+                [UserDTOEnum.Favorites] = async (id) => await GetUserDTOFavorites(id),
+                [UserDTOEnum.Places] = async (id) => await GetUserDTOPlaces(id),
+                [UserDTOEnum.Full] = async (id) => await GetUserDTOFull(id),
+                [UserDTOEnum.Main] = async (id) => await GetUserDTOMain(id)
             };
 
         }
@@ -53,7 +52,7 @@ namespace Application.Services
 
 
 
-        public async Task<T> GetUserInfo<T>(int userId, UserDTOEnum dataType)
+        public async Task<T> GetUserInfo<T>(ulong userId, UserDTOEnum dataType)
         {
             if (!_userInfoHandlers.TryGetValue(dataType, out var handler))
                 throw new ArgumentException($"Handler not found for {dataType}");
@@ -69,7 +68,7 @@ namespace Application.Services
         }
 
 
-        private async Task<UserDTOMain> GetUserDTOMain(int userId)
+        private async Task<UserDTOMain> GetUserDTOMain(ulong userId)
         {
             var user = await _userRepository.GetByIdMainAsync(userId);
             return new UserDTOMain
@@ -80,7 +79,7 @@ namespace Application.Services
             };
         }
 
-        private async Task<UserDTOSearches> GetUserDTOSearches(int userId)
+        private async Task<UserDTOSearches> GetUserDTOSearches(ulong userId)
         {
             var user = await _userRepository.GetByUserIdWithSearchesAsync(userId);
             return new UserDTOSearches
@@ -97,7 +96,7 @@ namespace Application.Services
             };
         }
 
-        private async Task<UserDTOReviews> GetUserDTOReviews(int userId)
+        private async Task<UserDTOReviews> GetUserDTOReviews(ulong userId)
         {
             var user = await _userRepository.GetByUserIdWithReviewsAsync(userId);
             var reviewDTOs = await Task.WhenAll(
@@ -122,7 +121,7 @@ namespace Application.Services
 
         }
 
-        private async Task<UserDTOHistory> GetUserDTOHistories(int userId)
+        private async Task<UserDTOHistory> GetUserDTOHistories(ulong userId)
         {
             User? user = await _userRepository.GetUserDTOHistoryByIdAsync(userId);
 
@@ -142,7 +141,7 @@ namespace Application.Services
             };
         }
 
-        private async Task<UserDTOFavorites> GetUserDTOFavorites(int userId)
+        private async Task<UserDTOFavorites> GetUserDTOFavorites(ulong userId)
         {
             var user = await _userRepository.GetByUserIdWithFavoritesAsync(userId);
 
@@ -159,7 +158,7 @@ namespace Application.Services
             };
         }
 
-        private async Task<UserDTOPlaces> GetUserDTOPlaces(int userId)
+        private async Task<UserDTOPlaces> GetUserDTOPlaces(ulong userId)
         {
             var user = await _userRepository.GetByUserIdWithPlacesAsync(userId);
 
@@ -172,7 +171,7 @@ namespace Application.Services
             };
         }
 
-        private async Task<UserDTOFull> GetUserDTOFull(int userId)
+        private async Task<UserDTOFull> GetUserDTOFull(ulong userId)
         {
             var user = await _userRepository.GetByIdMainAsync(userId);
             return new UserDTOFull

@@ -14,11 +14,11 @@ namespace Infrastructure.Repository
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-        
+
         }
 
         // Только Searches
-        public async Task<User?> GetByUserIdWithSearchesAsync(int userId)
+        public async Task<User?> GetByUserIdWithSearchesAsync(ulong userId)
         {
             return await _context.Users
                 .Include(u => u.Searches)
@@ -26,7 +26,7 @@ namespace Infrastructure.Repository
         }
 
         // Только Reviews
-        public async Task<User?> GetByUserIdWithReviewsAsync(int userId)
+        public async Task<User?> GetByUserIdWithReviewsAsync(ulong userId)
         {
             return await _context.Users
                 .Include(u => u.Reviews)
@@ -36,7 +36,7 @@ namespace Infrastructure.Repository
         }
 
         // Только Histories
-        public async Task<User?> GetUserDTOHistoryByIdAsync(int userId)
+        public async Task<User?> GetUserDTOHistoryByIdAsync(ulong userId)
         {
             return await _context.Users
                 .Include(u => u.Histories)
@@ -49,7 +49,7 @@ namespace Infrastructure.Repository
 
 
         // Только Favorites
-        public async Task<User?> GetByUserIdWithFavoritesAsync(int userId)
+        public async Task<User?> GetByUserIdWithFavoritesAsync(ulong userId)
         {
             return await _context.Users
                 .Include(u => u.Favorites)
@@ -59,7 +59,7 @@ namespace Infrastructure.Repository
         }
 
         // Только Places
-        public async Task<User?> GetByUserIdWithPlacesAsync(int userId)
+        public async Task<User?> GetByUserIdWithPlacesAsync(ulong userId)
         {
             return await _context.Users
                 .Include(u => u.Places)
@@ -68,7 +68,7 @@ namespace Infrastructure.Repository
         }
 
         // Всё сразу
-        public async Task<User?> GetByUserIdWithAllAsync(int userId)
+        public async Task<User?> GetByUserIdWithAllAsync(ulong userId)
         {
             return await _context.Users
                 .Include(u => u.Searches)
@@ -79,7 +79,7 @@ namespace Infrastructure.Repository
                 .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
-        public async Task<User?> GetByIdMainAsync(int userId)
+        public async Task<User?> GetByIdMainAsync(ulong userId)
         {
             return await _context.Users.FindAsync(userId);
         }

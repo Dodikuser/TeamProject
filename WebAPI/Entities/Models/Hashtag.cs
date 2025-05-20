@@ -4,7 +4,7 @@ namespace Entities.Models
 {
     public class Hashtag : IDbEntity
     {
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public string Tag { get; set; }
         public int Price { get; set; }
 

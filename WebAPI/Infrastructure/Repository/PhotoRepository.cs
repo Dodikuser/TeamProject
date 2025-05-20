@@ -20,7 +20,7 @@ namespace Infrastructure.Repository
         //    _context = context;
         //    WebRootPath = webRootPath;
         //}
-        public async Task AddAsync(int placeId, IFormFile file)
+        public async Task AddAsync(ulong placeId, IFormFile file)
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Invalid file.");
@@ -67,7 +67,7 @@ namespace Infrastructure.Repository
 
             return true;
         }
-        public async Task<List<Photo>> GetPagedAsync(int placeId, int skip = 0, int take = 50)
+        public async Task<List<Photo>> GetPagedAsync(ulong placeId, int skip = 0, int take = 50)
         {
             return await _context.Photos
                 .Where(p => p.PlaceId == placeId)
@@ -76,7 +76,7 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
-        public async Task<List<Photo>> GetAllByPlaceAsync(int placeId)
+        public async Task<List<Photo>> GetAllByPlaceAsync(ulong placeId)
         {
             return await _context.Photos
                 .Where(p => p.PlaceId == placeId)

@@ -4,12 +4,10 @@ namespace Entities.Models
 {
     public class Photo : IDbEntity
     {
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public string Path { get; set; }
 
-
-
-        public int PlaceId { get; set; }
+        public ulong PlaceId { get; set; }
 
         // Связь с Place
 

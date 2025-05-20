@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Entities;
-using Entities.Models;
+﻿using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
@@ -12,7 +11,7 @@ namespace Infrastructure.Repository
         {
             _context = context;
         }
-        public async Task AddAsync(int userId, int placeId, bool isFromRecs = false)
+        public async Task AddAsync(ulong userId, ulong placeId, bool isFromRecs = false)
         {
             var history = new History
             {
@@ -25,7 +24,7 @@ namespace Infrastructure.Repository
             _context.Histories.Add(history);
             await _context.SaveChangesAsync();
         }
-        public async Task RemoveAsync(int historyId)
+        public async Task RemoveAsync(ulong historyId)
         {
             var record = await _context.Histories
                 .FirstOrDefaultAsync(h => h.Id == historyId);
@@ -36,7 +35,7 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task RemoveAllAsync(int userId)
+        public async Task RemoveAllAsync(ulong userId)
         {
             var records = await _context.Histories
                 .Where(h => h.UserId == userId)
@@ -45,12 +44,12 @@ namespace Infrastructure.Repository
             _context.Histories.RemoveRange(records);
             await _context.SaveChangesAsync();
         }
-        public async Task<bool> WasVisitedAsync(int userId, int placeId)
+        public async Task<bool> WasVisitedAsync(ulong userId, ulong placeId)
         {
             return await _context.Histories
                 .AnyAsync(h => h.UserId == userId && h.PlaceId == placeId);
         }
-        public async Task<List<History>> GetHistoryPagedAsync(int userId, int skip = 0, int take = 50)
+        public async Task<List<History>> GetHistoryPagedAsync(ulong userId, int skip = 0, int take = 50)
         {
             return await _context.Histories
                 .Where(h => h.UserId == userId)

@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Entities;
-using Entities.Models;
+﻿using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
@@ -41,7 +40,7 @@ namespace Infrastructure.Repository
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<List<Place>> GetPlacesByHashtagAsync(int hashtagId)
+        public async Task<List<Place>> GetPlacesByHashtagAsync(ulong hashtagId)
         {
             return await _context.AdHashtags
                 .Where(ah => ah.HashtagId == hashtagId)

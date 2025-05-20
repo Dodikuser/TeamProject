@@ -4,12 +4,12 @@ namespace Entities.Models
 {
     public class Search : IDbEntity
     {
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public string Text { get; set; }
         public DateTime SearchDateTime { get; set; }
 
 
-        public int UserId { get; set; }
+        public ulong UserId { get; set; }
 
         // Связь с User
 

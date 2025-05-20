@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Entities;
-using Entities.Models;
+﻿using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
@@ -11,7 +10,7 @@ namespace Infrastructure.Repository
         {
             _context = context;
         }
-        public async Task AddAsync(int userId, int placeId, int stars, string? text)
+        public async Task AddAsync(ulong userId, ulong placeId, int stars, string? text)
         {
             var review = new Review() { UserId = userId, PlaceId = placeId, Stars = stars, Text = text, ReviewDateTime = DateTime.Now };
             _context.Reviews.Add(review);
@@ -27,13 +26,13 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<bool> WasReviedAsync(int userId, int placeId)
+        public async Task<bool> WasReviedAsync(ulong userId, ulong placeId)
         {
             return await _context.Reviews.AnyAsync(r => r.UserId == userId && r.PlaceId == placeId);
         }
-        public async Task<List<Review>> GetReviewsPagedAsync(int placeId, int skip = 0, int take = 50)
+        public async Task<List<Review>> GetReviewsPagedAsync(ulong placeId, int skip = 0, int take = 50)
         {
-            
+
             return await _context.Reviews
                 .Where(r => r.PlaceId == placeId)
                 .OrderByDescending(h => h.ReviewDateTime)
@@ -41,7 +40,7 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
-        public async Task<double> GetAvgStars(int placeId)
+        public async Task<double> GetAvgStars(ulong placeId)
         {
             return await _context.Reviews
                 .Where(r => r.PlaceId == placeId)

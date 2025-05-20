@@ -2,6 +2,6 @@
 {
     public interface IDbEntity
     {
-        int Id { get; set; }
+        ulong Id { get; set; }
     }
 }

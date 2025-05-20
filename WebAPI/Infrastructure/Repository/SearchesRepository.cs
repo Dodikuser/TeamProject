@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Entities;
-using Entities.Models;
+﻿using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
@@ -12,7 +11,7 @@ namespace Infrastructure.Repository
         {
             _context = context;
         }
-        public async Task AddAsync(int userId, string queryText)
+        public async Task AddAsync(ulong userId, string queryText)
         {
             var search = new Search
             {
@@ -24,7 +23,7 @@ namespace Infrastructure.Repository
             _context.Searches.Add(search);
             await _context.SaveChangesAsync();
         }
-        public async Task RemoveAsync(int searchId)
+        public async Task RemoveAsync(ulong searchId)
         {
             var search = await _context.Searches
                 .FirstOrDefaultAsync(s => s.Id == searchId);
@@ -35,7 +34,7 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task RemoveAllAsync(int userId)
+        public async Task RemoveAllAsync(ulong userId)
         {
             var searches = await _context.Searches
                 .Where(s => s.UserId == userId)
@@ -44,7 +43,7 @@ namespace Infrastructure.Repository
             _context.Searches.RemoveRange(searches);
             await _context.SaveChangesAsync();
         }
-        public async Task<List<Search>> GetSearchesPagedAsync(int userId, int skip = 0, int take = 50)
+        public async Task<List<Search>> GetSearchesPagedAsync(ulong userId, int skip = 0, int take = 50)
         {
             return await _context.Searches
                 .Where(h => h.UserId == userId)

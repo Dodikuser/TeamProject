@@ -4,12 +4,12 @@ namespace Entities.Models
 {
     public class AdHashtag : IDbEntity
     {
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public int PromotionCount { get; set; }
 
 
-        public int PlaceId { get; set; }
-        public int HashtagId { get; set; }
+        public ulong PlaceId { get; set; }
+        public ulong HashtagId { get; set; }
 
         // Связь с Place и Hashtag
 

@@ -6,7 +6,7 @@ namespace Entities.Models
     public class Place : IDbEntity
     {
 
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string? Description { get; set; }
@@ -34,7 +34,7 @@ namespace Entities.Models
 
 
 
-        public int UserId { get; set; }
+        public ulong UserId { get; set; }
 
         // Связь с User, Review, History, Favorite, Photo, AdHashtag
 

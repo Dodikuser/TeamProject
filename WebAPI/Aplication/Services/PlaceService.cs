@@ -1,11 +1,6 @@
 ﻿using Entities;
-using Infrastructure.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Entities.Models;
+using Infrastructure.Repository;
 
 namespace Application.Services
 {
@@ -14,14 +9,14 @@ namespace Application.Services
         private readonly FavoritesRepository _favoritesRepository;
         private readonly PlaceRepository _placeRepository;
 
-        public PlaceService(FavoritesRepository favoritesRepository, PlaceRepository placeRepository ) 
+        public PlaceService(FavoritesRepository favoritesRepository, PlaceRepository placeRepository)
         {
             _favoritesRepository = favoritesRepository;
             _placeRepository = placeRepository;
         }
-        public async Task FavoriteAction(int UserId, string gmapsPlaceId, FavoriteActionEnum action)
+        public async Task FavoriteAction(ulong UserId, string gmapsPlaceId, FavoriteActionEnum action)
         {
-            int placeId = (int)(await _placeRepository.GetIdByGmapsPlaceIdAsync(gmapsPlaceId));
+            ulong placeId = (await _placeRepository.GetIdByGmapsPlaceIdAsync(gmapsPlaceId)).Value;
 
             switch (action)
             {
@@ -36,11 +31,11 @@ namespace Application.Services
             }
         }
 
-        public async Task<List<Favorite>> GetFavorites(int UserId, int skip = 0, int take = 10)
+        public async Task<List<Favorite>> GetFavorites(ulong UserId, int skip = 0, int take = 10)
         {
             return await _favoritesRepository.GetFavoritesForUserAsync(UserId, skip, take);
         }
-        public async Task<List<Favorite>> SearchFavorites(int UserId, string keyword, int skip = 0, int take = 10)
+        public async Task<List<Favorite>> SearchFavorites(ulong UserId, string keyword, int skip = 0, int take = 10)
         {
             return await _favoritesRepository.SearchFavoritesAsync(UserId, keyword, skip, take);
         }

@@ -4,7 +4,7 @@ namespace Entities.Models
 {
     public class OpeningHours : IDbEntity
     {
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public TimeOnly Open { get; set; }
         public TimeOnly Close { get; set; }
 

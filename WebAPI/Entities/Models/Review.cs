@@ -5,7 +5,7 @@ namespace Entities.Models
 {
     public class Review : IDbEntity
     {
-        public int Id { get; set; }
+        public ulong Id { get; set; }
         public string? Text { get; set; }
 
         [Range(1, 5)]
@@ -25,8 +25,8 @@ namespace Entities.Models
 
 
 
-        public int PlaceId { get; set; }
-        public int UserId { get; set; }
+        public ulong PlaceId { get; set; }
+        public ulong UserId { get; set; }
 
         // Связь с Place и User
 
