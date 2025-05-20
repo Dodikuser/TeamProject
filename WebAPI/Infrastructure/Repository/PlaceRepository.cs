@@ -76,6 +76,14 @@ namespace Infrastructure.Repository
         {
             return await _context.Places.FirstOrDefaultAsync(p => p.GmapsPlaceId == gmapsPlaceId);
         }
+        public async Task<int?> GetIdByGmapsPlaceIdAsync(string gmapsPlaceId)
+        {
+            return await _context.Places
+                .Where(p => p.GmapsPlaceId == gmapsPlaceId)
+                .Select(p => (int?)p.Id)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<List<Place>> SearchAsync(string query, int skip = 0, int take = 50)
         {
             return await _context.Places
