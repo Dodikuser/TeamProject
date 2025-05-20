@@ -4,5 +4,6 @@
     {
         public string Text { get; set; }
         public DateTime SearchDateTime { get; set; }
+        public ulong UserId { get; set; }
     }
 }

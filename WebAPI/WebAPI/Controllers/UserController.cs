@@ -1,4 +1,4 @@
-﻿using Application;
+﻿using Application.DTOs.UserDTOs;
 using Application.Services;
 using Entities;
 using Microsoft.AspNetCore.Authorization;

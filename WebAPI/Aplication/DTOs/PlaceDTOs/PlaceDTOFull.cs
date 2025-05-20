@@ -29,14 +29,9 @@ namespace Application.DTOs
 
         //это не внешний ключ
         public string GmapsPlaceId { get; set; }
-
-
-
         public int UserId { get; set; }
 
         // Связь с User, Review, History, Favorite, Photo, AdHashtag
-
-        public virtual UserDTOFull User { get; set; } = null!;
         public virtual ICollection<ReviewDTO> Reviews { get; set; } = new List<ReviewDTO>();
         public virtual ICollection<HistoryDTO> Histories { get; set; } = new List<HistoryDTO>();
         public virtual ICollection<FavoriteDTO> Favorites { get; set; } = new List<FavoriteDTO>();

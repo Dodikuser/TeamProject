@@ -19,7 +19,7 @@ namespace Application.Services
             [UserDTOEnum.Histories] = typeof(UserDTOHistory),
             [UserDTOEnum.Favorites] = typeof(UserDTOFavorites),
             [UserDTOEnum.Places] = typeof(UserDTOPlaces),
-            [UserDTOEnum.Full] = typeof(UserDTOFull),
+            [UserDTOEnum.Full] = typeof(UserDTO),
             [UserDTOEnum.Main] = typeof(UserDTOMain)
         };
 
@@ -171,10 +171,10 @@ namespace Application.Services
             };
         }
 
-        private async Task<UserDTOFull> GetUserDTOFull(ulong userId)
+        private async Task<UserDTO> GetUserDTOFull(ulong userId)
         {
             var user = await _userRepository.GetByIdMainAsync(userId);
-            return new UserDTOFull
+            return new UserDTO
             {
                 Email = user.Email,
                 Name = user.Name,

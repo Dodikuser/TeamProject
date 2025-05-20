@@ -1,4 +1,5 @@
-﻿using Entities;
+﻿using Application.DTOs.UserDTOs;
+using Entities;
 using Infrastructure.Repository;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -26,31 +27,29 @@ namespace Application.Services
         }
 
 
-        public async Task<string> GenerateToken(LoginData loginData)
+        public async Task<string> GenerateToken(UserLoginDTO loginData)
         {
             List<Claim> claims = new();
             ulong? UserId = null;
 
-            switch (loginData)
+            if (loginData.Email != null)
             {
-                case StandardLoginData standard:
-                    var userByEmail = await _userRepository.GetByEmailAsync(standard.Email);
-                    UserId = userByEmail?.Id;
-                    break;
-
-                case GoogleLoginData google:
-                    var userByGoogle = await _userRepository.GetByGoogleIdAsync(google.GoogleId);
-                    UserId = userByGoogle?.Id;
-                    break;
-
-                case FacebookLoginData facebook:
-                    var userByFacebook = await _userRepository.GetByFacebookIdAsync(facebook.FacebookId);
-                    UserId = userByFacebook?.Id;
-                    break;
-
-                default:
-                    throw new ArgumentException("Unsupported login type");
+                var userByEmail = await _userRepository.GetByEmailAsync(loginData.Email);
+                UserId = userByEmail?.Id;
             }
+            if (loginData.GoogleId != null)
+            {
+                var userByGoogle = await _userRepository.GetByGoogleIdAsync(loginData.GoogleId);
+                UserId = userByGoogle?.Id;
+            }
+            if (loginData.FacebookId != null)
+            {
+                var userByFacebook = await _userRepository.GetByFacebookIdAsync(loginData.FacebookId);
+                UserId = userByFacebook?.Id;
+            }
+            else
+                return LoginStatus.UnknownOathProvider.ToString();
+
 
             if (UserId == null)
             {
