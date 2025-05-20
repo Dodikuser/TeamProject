@@ -3,6 +3,7 @@ import { Container, Form, FormControl, Button, Row, Col } from 'react-bootstrap'
 import FilterOffcanvas from '../Components/FilterOffcanvas';
 import SortOffcanvas from '../Components/SortOffcanvas';
 
+
 function Home() {
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
@@ -10,19 +11,36 @@ function Home() {
   return (
     <div className="bg-white py-3 px-4 mt-2">
       <Container fluid>
-        <Form className="d-flex">
-          <div className="position-relative" style={{ maxWidth: '320px', width: '100%' }}>
-            <FormControl
-              type="search"
-              placeholder="Запит"
-              className="bg-light border-0 rounded px-3 py-3"
-              style={{ height: '80px' }}
-            />
-            <span className="material-symbols-outlined position-absolute bottom-0 end-0 me-3 mb-2 text-secondary" style={{ cursor: 'pointer' }}>
-              mic
-            </span>
-          </div>
-        </Form>
+        <Form className="d-flex justify-content-start w-100 px-2">
+  <div
+    className="position-relative w-100"
+    style={{
+      maxWidth: '20%',
+    }}
+  >
+    <FormControl
+      type="search"
+      placeholder="Запит"
+      className="bg-light border-0 rounded px-3 py-3"
+      style={{
+        height: '60px',
+        paddingRight: '45px', 
+      }}
+    />
+    <span
+      className="material-symbols-outlined position-absolute"
+      style={{
+        bottom: '10px',
+        right: '15px',
+        color: '#6c757d',
+        cursor: 'pointer',
+      }}
+    >
+      mic
+    </span>
+  </div>
+</Form>
+
 
         <Row className="mt-3">
           <Col xs="auto">
