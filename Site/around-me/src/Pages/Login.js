@@ -1,96 +1,112 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
-import { useEffect } from 'react';
 
-const GoogleLoginForm = () => {
+
+
+
+const GoogleLoginForm = (isLogin) => {
+  const googleButtonRef = useRef(null); 
+
+  const GOOGLE_CLIENT_ID = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
+
+  const handleGoogleSignInCallback = (response) => {
+    console.log("Google Sign-In Response:", response);
+    const idToken = response.credential; 
+
+    if (idToken) {
+      console.log('ID TOKEN:', idToken);
+      sendToken(idToken, isLogin);
+    } else {
+      console.error('Google Sign-In не вернул ID токен.');
+    }
+  };
+
+  const sendToken = async (token, isLogin) => {
+
+        const SERVER_URL = 'https://localhost:7103/api/User';
+        const url = isLogin ? `${SERVER_URL}/login` : `${SERVER_URL}/register`;
+
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        googleJwtToken: token
+      })
+    })
+    .then(res => {
+  if (!res.ok) {
+    return res.text().then(text => {
+      throw new Error(`Ошибка регистрации: ${res.status} ${res.statusText}. Ответ сервера: ${text}`);
+    });
+  }
+  return res.text();
+})
+.then(async data => {
+
+  if (isLogin) {
+    localStorage.setItem('authToken', data.token);
+    const token = localStorage.getItem('authToken');
+    console.log('Token:', token);
+  } else {
+    await sendToken(token, true);
+  }
+})
+
+    .catch(err => {
+      console.error('Авторизация через Google провалилась:', err);
+      if (err.message.includes('UnregisteredGoogle')) {
+        sendToken(token, false);
+      }
+      else if (err.message.includes('EmailBusy')) {
+        sendToken(token, true);
+      }
+
+    });
+  };
+
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
-    document.body.appendChild(script);
-  }, []);
+    script.onload = () => {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignInCallback, 
+        });
 
- const handleGoogleLogin = () => {
-  const clientId = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
-  const redirectUri = 'http://localhost:3000';
-  const scope = 'email profile openid';
-
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-    `client_id=${clientId}` +
-    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-    `&response_type=token` +
-    `&scope=${encodeURIComponent(scope)}`;
-
-  const width = 600;
-  const height = 700;
-  const left = (window.innerWidth - width) / 2;
-  const top = (window.innerHeight - height) / 2;
-
-  const popup = window.open(
-    authUrl,
-    'googleLoginPopup',
-    `width=${width},height=${height},top=${top},left=${left}`
-  );
-
-  const interval = setInterval(() => {
-    try {
-      if (popup.location.href.includes(redirectUri)) {
-        const hash = popup.location.hash;
-        const params = new URLSearchParams(hash.substr(1));
-        const token = params.get('access_token');
-        console.log('TOKEN:', token);
-        handleCredentialResponse(token);
-        popup.close();
-        clearInterval(interval);
+        if (googleButtonRef.current) {
+          window.google.accounts.id.renderButton(
+            googleButtonRef.current, 
+            { theme: 'filled_blue', size: 'large', type: 'icon', text: 'signin_with' } 
+          );
+        }
+      } else {
+        console.error("Google Identity Services script loaded but 'google.accounts.id' not found.");
       }
-    } catch (err) {
+    };
+    script.onerror = () => {
+        console.error("Failed to load Google Identity Services script.");
     }
-  }, 1000);
-};
+    document.body.appendChild(script);
 
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []); 
 
-  const handleCredentialResponse = (token) => {
-    //const token = response.credential;
-
-    fetch('https://localhost:7103/api/user/register', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    name: '',
-    email: '',
-    password: '',
-    googleId: token,
-    facebookId: ''
-  })
-})
-  .then(res => {
-    if (!res.ok) throw new Error('Ошибка регистрации');
-    return res.text();
-  })
-  .then(data => {
-    console.log('Успешно зарегистрирован через Google:', data);
-  })
-  .catch(err => {
-    console.error('Регистрация через Google провалилась:', err);
-  });
-
-  };
 
   return (
     <Form>
       <Row className="justify-content-center gap-3">
         <Col xs="auto">
-          <i className="bi bi-facebook social-icon facebook"></i>
+          <i className="bi bi-facebook social-icon facebook"></i> 
         </Col>
         <Col xs="auto">
-          <i
-            className="bi bi-google social-icon google"
-            style={{ cursor: 'pointer' }}
-            onClick={handleGoogleLogin}
-          ></i>
+          <div ref={googleButtonRef}></div>
         </Col>
       </Row>
     </Form>
@@ -321,7 +337,7 @@ export default function LoginRegister() {
             <hr className="flex-grow-1" />
           </div>
 
-          <GoogleLoginForm />
+          <GoogleLoginForm isLogin />
         </Form>
 
         <style>
