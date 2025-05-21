@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("api/favorites")]
+    [Route("api/[controller]")]
     public class FavoritesController : ControllerBase
     {
         private readonly PlaceService _placeService;

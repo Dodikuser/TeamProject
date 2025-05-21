@@ -17,7 +17,7 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
-        public virtual async Task<T?> FindAsync(int Id)
+        public virtual async Task<T?> FindAsync(ulong Id)
         {
             return await _context.FindAsync<T>(Id);
         }
@@ -27,10 +27,18 @@ namespace Infrastructure.Repository
             if (result != null)
                 await _context.SaveChangesAsync();
         }
-        public virtual async Task RemoveByIdAsync(int Id)
+        public virtual async Task RemoveByIdAsync(ulong Id)
         {
             T? entity = await FindAsync(Id);
             await RemoveAsync(entity);
+        }
+        public virtual async Task Update(T? entity)
+        {
+            if (entity != null)
+            {
+                _context.Update(entity);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

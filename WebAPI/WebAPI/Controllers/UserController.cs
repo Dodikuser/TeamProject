@@ -52,7 +52,7 @@ namespace WebAPI.Controllers
         [HttpPost("incognito")]
         public async Task<IActionResult> SetIncognitoMode(bool enabled)
         {
-            int userId = Convert.ToInt32(User.FindFirst("Id")!.Value);
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
 
             Entities.Result result = await _userService.SetIncognito(userId, !enabled);
 
@@ -68,30 +68,6 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetUserInfo()
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
-
-            //if (!UserService._userDtoTypes.TryGetValue(dataType, out var expectedType))
-            //{
-            //    return BadRequest($"Unknown DTO type for: {dataType}");
-            //}
-
-            //Type type = UserService._userDtoTypes[dataType];
-
-            //var method = typeof(UserService)
-            //    .GetMethod("GetUserInfo")!
-            //    .MakeGenericMethod(type);
-
-            //var task = (Task)method.Invoke(_userService, new object[] { userId, dataType })!;
-
-            //await task.ConfigureAwait(false);
-
-            //var resultProperty = task.GetType().GetProperty("Result");
-            //dynamic result = resultProperty.GetValue(task);
-
-            //if (result == null || result.GetType() != expectedType)
-            //{
-            //    return StatusCode(500, $"Handler returned unexpected type: {result?.GetType().Name}, expected: {expectedType.Name}");
-            //}
-
             UserDTO? user = await _userService.GetUserDTOAsync(userId);
             return user == null ? NotFound() : Ok(user);
         }
@@ -102,30 +78,6 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetUserPublicInfo()
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
-
-            //if (!UserService._userDtoTypes.TryGetValue(dataType, out var expectedType))
-            //{
-            //    return BadRequest($"Unknown DTO type for: {dataType}");
-            //}
-
-            //Type type = UserService._userDtoTypes[dataType];
-
-            //var method = typeof(UserService)
-            //    .GetMethod("GetUserInfo")!
-            //    .MakeGenericMethod(type);
-
-            //var task = (Task)method.Invoke(_userService, new object[] { userId, dataType })!;
-
-            //await task.ConfigureAwait(false);
-
-            //var resultProperty = task.GetType().GetProperty("Result");
-            //dynamic result = resultProperty.GetValue(task);
-
-            //if (result == null || result.GetType() != expectedType)
-            //{
-            //    return StatusCode(500, $"Handler returned unexpected type: {result?.GetType().Name}, expected: {expectedType.Name}");
-            //}
-
             UserPublicDTO? user = await _userService.GetUserPublicDTO(userId);
             return user == null ? NotFound() : Ok(user);
         }

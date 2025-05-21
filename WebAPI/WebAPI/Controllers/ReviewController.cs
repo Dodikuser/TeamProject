@@ -1,22 +1,73 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.DTOs;
+using Application.Services;
+using Entities.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ReviewController : ControllerBase
+    public class ReviewController(ReviewService _reviewService) : ControllerBase
     {
-        [HttpPost("{placeId}")]
-        public IActionResult AddReview(int placeId, [FromBody] object reviewDto) => Ok();
 
-        [HttpGet("{placeId}")]
-        public IActionResult GetReviews(int placeId) => Ok();
+        [HttpPost("add")]
+        [Authorize]
+        public async Task<IActionResult> AddReview([FromBody] ReviewDTO review)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            if (userId == 0)
+                return Unauthorized();
 
-        [HttpPut("{reviewId}")]
-        public IActionResult EditReview(int reviewId, [FromBody] object reviewDto) => Ok();
+            review.UserId = userId;
+            review.ReviewDateTime = DateTime.UtcNow;
 
-        [HttpDelete("{reviewId}")]
-        public IActionResult DeleteReview(int reviewId) => Ok();
+            await _reviewService.AddAsync(review);
+            return Ok();
+        }
+
+        [HttpGet("get")]
+        [Authorize]
+        public async Task<IActionResult> GetReviews(ulong placeId, int skip = 0, int take = 10)
+        {
+            return Ok(await _reviewService.GetAsync(placeId, skip, take));
+        }
+
+        [HttpPut("edit")]
+        [Authorize]
+        public async Task<IActionResult> EditReview(ulong reviewId, ReviewDTO review)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            ReviewOperationResult result = await _reviewService.EditAsync(review, reviewId, userId);
+            switch (result)
+            {
+                case ReviewOperationResult.Success:
+                    return Ok();
+                case ReviewOperationResult.NotFound:
+                    return NotFound();
+                case ReviewOperationResult.AccessDenied:
+                    return Forbid();
+                default: return BadRequest();
+            }
+        }
+
+        [HttpDelete("remove")]
+        [Authorize]
+        public async Task<IActionResult> RemoveReview(ulong reviewId)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            ReviewOperationResult result = await _reviewService.RemoveAsync(reviewId, userId);
+            switch (result)
+            {
+                case ReviewOperationResult.Success:
+                    return Ok();
+                case ReviewOperationResult.NotFound:
+                    return NotFound();
+                case ReviewOperationResult.AccessDenied:
+                    return Forbid();
+                default: return BadRequest();
+            }
+        }
     }
 
 }

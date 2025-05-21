@@ -11,16 +11,6 @@ namespace Infrastructure.Repository
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
         }
-        public override async Task RemoveByIdAsync(int reviewId)
-        {
-            var record = await _context.Reviews.FindAsync(reviewId);
-
-            if (record != null)
-            {
-                _context.Reviews.Remove(record);
-                await _context.SaveChangesAsync();
-            }
-        }
         public async Task<bool> WasReviedAsync(ulong userId, ulong placeId)
         {
             return await _context.Reviews.AnyAsync(r => r.UserId == userId && r.PlaceId == placeId);
@@ -30,6 +20,7 @@ namespace Infrastructure.Repository
 
             return await _context.Reviews
                 .Where(r => r.PlaceId == placeId)
+                .Include(r => r.User)
                 .OrderByDescending(h => h.ReviewDateTime)
                 .Skip(skip)
                 .Take(take)

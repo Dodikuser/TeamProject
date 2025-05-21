@@ -3,7 +3,7 @@
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("api/data")]
+    [Route("api/[controller]")]
     public class DataController : ControllerBase
     {
         [HttpPost]

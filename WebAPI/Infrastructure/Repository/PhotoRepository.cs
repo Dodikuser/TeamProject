@@ -49,7 +49,7 @@ namespace Infrastructure.Repository
             _context.Photos.Add(photo);
             await _context.SaveChangesAsync();
         }
-        public override async Task<bool> RemoveByIdAsync(int photoId)
+        public override async Task<bool> RemoveByIdAsync(ulong photoId)
         {
             var photo = await _context.Photos.FindAsync(photoId);
 

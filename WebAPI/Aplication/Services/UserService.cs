@@ -30,7 +30,7 @@ namespace Application.Services
 
         }
 
-        public async Task<Entities.Result> SetIncognito(int userId, bool enabled)
+        public async Task<Entities.Result> SetIncognito(ulong userId, bool enabled)
         {
             await _userRepository.SetVisitHistoryAsync(userId, enabled);
             await _userRepository.SetSearchHistoryAsync(userId, enabled);
