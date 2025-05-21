@@ -37,9 +37,9 @@ namespace Application.Services
                 var userByEmail = await _userRepository.GetByEmailAsync(loginData.Email);
                 UserId = userByEmail?.Id;
             }
-            if (loginData.GoogleId != null)
+            if (loginData.googleJwtToken != null)
             {
-                var userByGoogle = await _userRepository.GetByGoogleIdAsync(loginData.GoogleId);
+                var userByGoogle = await _userRepository.GetByGoogleIdAsync(loginData.googleJwtToken);
                 UserId = userByGoogle?.Id;
             }
             if (loginData.FacebookId != null)
