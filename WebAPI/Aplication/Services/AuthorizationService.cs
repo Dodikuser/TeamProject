@@ -5,6 +5,9 @@ using Infrastructure.Repository;
 using System.Security.Cryptography;
 using System.Text;
 
+using Google.Apis.Auth;
+using System.Threading.Tasks;
+
 
 namespace Application.Services
 {
@@ -23,8 +26,8 @@ namespace Application.Services
 
             if (loginData.FacebookId != null)
                 return await RegisterUserFacebook(loginData.FacebookId);
-            else if (loginData.GoogleId != null)
-                return await RegisterUserGoogle(loginData.GoogleId);
+            else if (loginData.googleJwtToken != null)
+                return await RegisterUserGoogle(loginData.googleJwtToken);
             else if (loginData.Password != null)
                 return await RegisterUserDefault(loginData.Name, loginData.Name, loginData.Email, loginData.Password);
 
@@ -52,16 +55,30 @@ namespace Application.Services
 
             return RegisterStatus.Success;
         }
-        private async Task<RegisterStatus> RegisterUserGoogle(string googleId)
+        private async Task<RegisterStatus> RegisterUserGoogle(string googleJTWToken)
         {
+            GoogleJsonWebSignature.Payload payload;
+
+            try
+            {
+                payload = await GoogleJsonWebSignature.ValidateAsync(googleJTWToken, new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { "490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com" } // потом перенести в секреты 
+                });
+            }
+            catch (InvalidJwtException)
+            {
+                return RegisterStatus.InvalidToken;
+            }
+
+            string googleId = payload.Subject;
+            string email = payload.Email;
+            string name = payload.Name;
+
             if (await _userRepository.GetByGoogleIdAsync(googleId) != null)
                 return RegisterStatus.EmailBusy;
 
-            // нужно вытянуть из googleId 
-            string name = "";
-            string email = "";
-
-            User user = new User()
+            User user = new User
             {
                 Name = name,
                 Email = email,
@@ -72,9 +89,9 @@ namespace Application.Services
             };
 
             await _userRepository.AddAsync(user);
-
             return RegisterStatus.Success;
         }
+
         private async Task<RegisterStatus> RegisterUserFacebook(string facebookId)
         {
             if (await _userRepository.GetByGoogleIdAsync(facebookId) != null)
@@ -106,8 +123,8 @@ namespace Application.Services
 
 
 
-            if (loginData.GoogleId != null)
-                return await LoginUserGoogle(loginData.GoogleId);
+            if (loginData.googleJwtToken != null)
+                return await LoginUserGoogle(loginData.googleJwtToken);
             else if (loginData.FacebookId != null)
                 return await LoginUserFacebook(loginData.FacebookId);
             else if (loginData.PasswordHash != null)
@@ -133,8 +150,23 @@ namespace Application.Services
                 ? LoginStatus.Success
                 : LoginStatus.IncorrectPassword;
         }
-        private async Task<LoginStatus> LoginUserGoogle(string googleId)
+        private async Task<LoginStatus> LoginUserGoogle(string googleJwtToken)
         {
+            GoogleJsonWebSignature.Payload payload;
+
+            try
+            {
+                payload = await GoogleJsonWebSignature.ValidateAsync(googleJwtToken, new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { "490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com" } // потом перенести в секреты 
+                });
+            }
+            catch (InvalidJwtException)
+            {
+                return LoginStatus.InvalidToken;
+            }
+
+            string googleId = payload.Subject;
             if (await _userRepository.GetByGoogleIdAsync(googleId) == null)
                 return LoginStatus.UnregisteredGoogle;
 

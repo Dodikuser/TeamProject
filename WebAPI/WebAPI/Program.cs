@@ -151,12 +151,12 @@ namespace WebAPI
             });
 
 
-            // конвертер для LoginData
-            builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new LoginDataConverter());
-            });
+            //// конвертер для LoginData
+            //builder.Services.AddControllers()
+            //.AddJsonOptions(options =>
+            //{
+            //    options.JsonSerializerOptions.Converters.Add(new LoginDataConverter());
+            //});
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

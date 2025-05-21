@@ -4,6 +4,7 @@
     {
         Success = 200,
         EmailBusy,
-        UnknownOathProvider = 403
+        UnknownOathProvider = 403,
+        InvalidToken = 401,
     }
 }

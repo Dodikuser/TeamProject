@@ -7,6 +7,7 @@
         IncorrectPassword,
         UnregisteredGoogle,
         UnregisteredFacebook,
-        UnknownOathProvider = 403
+        UnknownOathProvider = 403,
+        InvalidToken
     }
 }
