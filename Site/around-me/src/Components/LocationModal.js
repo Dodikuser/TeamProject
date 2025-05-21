@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
+import ReviewsModal from './ReviewsModal';
+import RatingModal from './RatingModal';
+
+
 
 const LocationModal = ({ show, onHide, place }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+
+  const [showReviews, setShowReviews] = useState(false);
+
+const dummyReviews = [
+  { name: 'Ім’я Прізвище', date: '5 днів тому', stars: 4, text: 'Гарний заклад!' },
+  { name: 'Марія Іваненко', date: '2 роки тому', stars: 5, text: 'Все сподобалося!' },
+  { name: 'Олег Сидоренко', date: 'рік тому', stars: 3, text: 'Могло бути краще.' },
+];
+
   const ScheduleInfo = ({ hours, schedule }) => {
   const [open, setOpen] = useState(false);
 
@@ -297,11 +311,16 @@ const LocationModal = ({ show, onHide, place }) => {
                   </div>
 
                   <div className="d-flex justify-content-center gap-3 flex-wrap">
-                    <button className="review-button">
-                      <span className="material-symbols-outlined">add</span>
-                      Залишити відгук
-                    </button>
-                    <button className="review-button">Переглянути відгуки</button>
+                    <button className="review-button" onClick={() => setShowRatingModal(true)}>
+                    <span className="material-symbols-outlined">add</span>
+                    Залишити відгук
+                  </button>
+
+                                      <button className="review-button" onClick={() => setShowReviews(true)}>
+                    <span className="material-symbols-outlined">reviews</span>
+                    Переглянути відгуки
+                  </button>
+
                   </div>
                 </Col>
               </Row>
@@ -315,6 +334,22 @@ const LocationModal = ({ show, onHide, place }) => {
             </Button>
           </Modal.Footer>
         </div>
+        <ReviewsModal
+        show={showReviews}
+        onHide={() => setShowReviews(false)}
+        reviews={dummyReviews}
+        rating={4.0}
+      />
+      <RatingModal
+        show={showRatingModal}
+        onHide={() => setShowRatingModal(false)}
+        placeName={place.title}
+        onSubmit={(rating) => {
+          console.log('Оцінка:', rating);
+          // Тут можно добавить API-запрос или обновление состояния
+        }}
+/>
+
       </Modal>
     </>
   );

@@ -3,11 +3,12 @@ import { GoogleMap, Marker } from '@react-google-maps/api';
 
 const mapContainerStyle = {
   width: '75%',
-  height: 'calc(100vh - 56px)',
+  height: '100vh',
   position: 'absolute',
-  top: '63px',
   left: '25%',
+  top: 0,
 };
+
 
 const defaultCenter = {
   lat: 50.4501,

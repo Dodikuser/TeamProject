@@ -24,28 +24,7 @@ export default function Favorites() {
       rating: 4,
       distance: '3.4 км',
     },
-    {
-      image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
-      title: 'Ресторан "Гармонія"',
-      locationText: 'пл. Ринок, 5',
-      rating: 3,
-      distance: '0.9 км',
-    },
-    {
-      image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
-      title: 'Ресторан "Гармонія"',
-      locationText: 'пл. Ринок, 5',
-      rating: 3,
-      distance: '0.9 км',
-    },
-    {
-      image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
-      title: 'Ресторан "Гармонія"',
-      locationText: 'пл. Ринок, 5',
-      rating: 3,
-      distance: '0.9 км',
-    },
-
+   
   ];
 
   const handleDelete = (idx) => {

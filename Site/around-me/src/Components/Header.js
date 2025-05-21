@@ -11,7 +11,7 @@ function Header() {
 const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 
   return (
-    <Navbar expand="lg" className="shadow-sm bg-white py-2">
+    <Navbar expand="lg" className="shadow-sm bg-white py-2 sticky-top">
       <Container fluid>
         <Navbar.Brand
           as={Link}

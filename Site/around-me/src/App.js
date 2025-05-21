@@ -11,6 +11,7 @@ import Favorites from './Pages/Favorites';
 import Recommendations from './Pages/Recommendations';
 import History from './Pages/History';
 import Login from './Pages/Login';
+import Account from './Pages/Account';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/recommendations" element={<Recommendations />} />
           <Route path="/history" element={<History />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/account" element={<Account />} />
         </Routes>
       </Router>
     </LoadScript>
