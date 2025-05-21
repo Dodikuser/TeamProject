@@ -3,13 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class HashtagRepository
+    public class HashtagRepository(MyDbContext _context) : GenericRepository<Hashtag>(_context)
     {
-        private readonly MyDbContext _context;
-        public HashtagRepository(MyDbContext context)
-        {
-            _context = context;
-        }
         public async Task<Hashtag> AddAsync(string tag, int price)
         {
             var hashtag = new Hashtag

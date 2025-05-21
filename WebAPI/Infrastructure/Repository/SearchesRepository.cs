@@ -4,13 +4,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Repository
 {
 
-    public class SearchesRepository
+    public class SearchesRepository(MyDbContext _context) : GenericRepository<Search>(_context)
     {
-        private readonly MyDbContext _context;
-        public SearchesRepository(MyDbContext context)
-        {
-            _context = context;
-        }
         public async Task AddAsync(ulong userId, string queryText)
         {
             var search = new Search

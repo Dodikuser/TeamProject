@@ -3,18 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class PlaceRepository
+    public class PlaceRepository(MyDbContext _context) : GenericRepository<Place>(_context)
     {
-        private readonly MyDbContext _context;
-        public PlaceRepository(MyDbContext context)
-        {
-            _context = context;
-        }
-        public async Task AddAsync(Place place)
-        {
-            _context.Places.Add(place);
-            await _context.SaveChangesAsync();
-        }
         public async Task UpdateAllowedFieldsAsync(int placeId, string? name, string? description, string? site, string? phoneNumber, string? email, int? radius)
         {
             var existing = await _context.Places.FindAsync(placeId);

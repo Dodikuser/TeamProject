@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class AdHashtagRepository(MyDbContext _context)
+    public class AdHashtagRepository(MyDbContext _context) : GenericRepository<AdHashtag>(_context)
     {
 
         public async Task AddHashtagToPlaceAd(ulong placeId, ulong hashTagId)

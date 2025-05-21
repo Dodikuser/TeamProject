@@ -3,13 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class UserRepository
+    public class UserRepository(MyDbContext _context) : GenericRepository<User>(_context)
     {
-        private readonly MyDbContext _context;
-        public UserRepository(MyDbContext context)
-        {
-            _context = context;
-        }
         public async Task AddAsync(User user)
         {
             _context.Users.Add(user);

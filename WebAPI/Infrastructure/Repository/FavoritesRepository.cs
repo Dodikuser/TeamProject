@@ -3,13 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class FavoritesRepository
+    public class FavoritesRepository(MyDbContext _context) : GenericRepository<Favorite>(_context)
     {
-        private readonly MyDbContext _context;
-        public FavoritesRepository(MyDbContext context)
-        {
-            _context = context;
-        }
+
         public async Task AddAsync(ulong userId, ulong placeId)
         {
             var favorite = new Favorite

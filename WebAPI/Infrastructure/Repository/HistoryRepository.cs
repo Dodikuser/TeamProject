@@ -4,13 +4,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Repository
 {
 
-    public class HistoryRepository
+    public class HistoryRepository(MyDbContext _context) : GenericRepository<History>(_context)
     {
-        private readonly MyDbContext _context;
-        public HistoryRepository(MyDbContext context)
-        {
-            _context = context;
-        }
         public async Task AddAsync(ulong userId, ulong placeId, bool isFromRecs = false)
         {
             var history = new History

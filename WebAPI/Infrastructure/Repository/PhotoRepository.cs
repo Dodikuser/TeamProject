@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class PhotoRepository
+    public class PhotoRepository(MyDbContext _context) : GenericRepository<Photo>(_context)
     {
         //todo
         private readonly MyDbContext _context;
@@ -49,7 +49,7 @@ namespace Infrastructure.Repository
             _context.Photos.Add(photo);
             await _context.SaveChangesAsync();
         }
-        public async Task<bool> RemoveAsync(int photoId)
+        public override async Task<bool> RemoveByIdAsync(int photoId)
         {
             var photo = await _context.Photos.FindAsync(photoId);
 

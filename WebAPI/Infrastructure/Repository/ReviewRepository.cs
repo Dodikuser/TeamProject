@@ -3,20 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class ReviewRepository
+    public class ReviewRepository(MyDbContext _context) : GenericRepository<Review>(_context)
     {
-        private readonly MyDbContext _context;
-        public ReviewRepository(MyDbContext context)
-        {
-            _context = context;
-        }
         public async Task AddAsync(ulong userId, ulong placeId, int stars, string? text)
         {
             var review = new Review() { UserId = userId, PlaceId = placeId, Stars = stars, Text = text, ReviewDateTime = DateTime.Now };
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
         }
-        public async Task RemoveAsync(int reviewId)
+        public override async Task RemoveByIdAsync(int reviewId)
         {
             var record = await _context.Reviews.FindAsync(reviewId);
 
