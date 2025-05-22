@@ -43,6 +43,7 @@ namespace WebAPI
             builder.Services.AddScoped<TokenService>();
             builder.Services.AddScoped<GmapsService>();
             builder.Services.AddScoped<PlaceService>();
+            builder.Services.AddScoped<HistoryService>();
 
             builder.Services.AddControllers()
             .AddJsonOptions(options =>
