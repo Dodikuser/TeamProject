@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import RecommendationsCard from '../Components/RecommendationsCard';
 
@@ -7,13 +7,15 @@ const categories = [
   'Для дітей', 'Тихі місця', 'Романтика', 'Екзотика', 'Екстрим','Розваги', 'Банк', 'Місця поруч', 'Архітектура'
 ];
 
-
 export default function Recommendations() {
   const scrollRef = useRef(null);
 
+  // Добавляем состояние для поиска
+  const [searchTerm, setSearchTerm] = useState('');
+
   const recommendations = new Array(6).fill(null).map((_, i) => ({
     image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
-    title: `Назва місця`,
+    title: `Назва місця ${i + 1}`, // Чтобы было различие в названиях
     location: 'м. Київ',
     rating: 4,
     distance: '100 км',
@@ -29,30 +31,37 @@ export default function Recommendations() {
     }
   };
 
+  // Фильтруем рекомендации по названию с учетом регистра
+  const filteredRecommendations = recommendations.filter(rec =>
+    rec.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', minHeight: '100vh' }}>
       
       {/* Пошук */}
       <Row className="mb-4">
-  <Col xs={12}>
-    <div className="bg-white p-3 rounded-3 shadow-sm d-flex justify-content-end">
-      <div className="position-relative" style={{ width: '100%', maxWidth: '500px' }}>
-        <Form.Control
-          type="search"
-          placeholder="Пошук"
-          className="ps-3 pe-5"
-          style={{ borderRadius: '8px' }}
-        />
-        <span
-          className="material-symbols-outlined position-absolute end-0 top-50 translate-middle-y me-3 text-muted"
-          style={{ pointerEvents: 'none' }}
-        >
-          search
-        </span>
-      </div>
-    </div>
-  </Col>
-</Row>
+        <Col xs={12}>
+          <div className="bg-white p-3 rounded-3 shadow-sm d-flex justify-content-end">
+            <div className="position-relative" style={{ width: '100%', maxWidth: '500px' }}>
+              <Form.Control
+                type="search"
+                placeholder="Пошук"
+                className="ps-3 pe-5"
+                style={{ borderRadius: '8px' }}
+                value={searchTerm} // привязываем к состоянию
+                onChange={e => setSearchTerm(e.target.value)} // обновляем по вводу
+              />
+              <span
+                className="material-symbols-outlined position-absolute end-0 top-50 translate-middle-y me-3 text-muted"
+                style={{ pointerEvents: 'none' }}
+              >
+                search
+              </span>
+            </div>
+          </div>
+        </Col>
+      </Row>
 
       {/* Категорії зі стрілками */}
       <div className="position-relative mb-5">
@@ -94,11 +103,17 @@ export default function Recommendations() {
 
       {/* Карточки рекомендацій */}
       <Row>
-        {recommendations.map((rec, idx) => (
-          <Col key={idx} xs={12} sm={6} md={4} lg={3} className="mb-4">
-            <RecommendationsCard {...rec} />
+        {filteredRecommendations.length === 0 ? (
+          <Col xs={12} className="text-center py-5 text-muted fs-6">
+            Рекомендацій не знайдено
           </Col>
-        ))}
+        ) : (
+          filteredRecommendations.map((rec, idx) => (
+            <Col key={idx} xs={12} sm={6} md={4} lg={3} className="mb-4">
+              <RecommendationsCard {...rec} />
+            </Col>
+          ))
+        )}
       </Row>
 
       <style>

@@ -12,6 +12,9 @@ import Recommendations from './Pages/Recommendations';
 import History from './Pages/History';
 import Login from './Pages/Login';
 import Account from './Pages/Account';
+import MyPlaces from './Pages/MyPlaces'; 
+
+
 
 function App() {
   return (
@@ -26,6 +29,8 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/login" element={<Login />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/my-places" element={<MyPlaces />} />
+
         </Routes>
       </Router>
     </LoadScript>

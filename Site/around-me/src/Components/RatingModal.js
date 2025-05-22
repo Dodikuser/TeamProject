@@ -3,11 +3,11 @@ import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 
 const modalDialogStyle = {
   position: 'fixed',
-  bottom: '10px',  // отступ снизу
-  right: '20px',   // отступ справа
+  bottom: '10px',  
+  right: '20px',  
   margin: 0,
-   width: '700px',      // НЕ maxWidth, а именно width
-  maxWidth: '100%',    // можно подстроить ширину
+   width: '700px',     
+  maxWidth: '100%',   
 };
 
 const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubmit }) => {
@@ -29,9 +29,9 @@ const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubm
     <Modal
       show={show}
       onHide={onHide}
-      // Убираем centered, чтобы не было центрирования по вертикали
+     
       dialogClassName="custom-modal-dialog"
-      // size можно оставить или убрать, зависит от ваших предпочтений
+      
     >
       <Modal.Dialog style={modalDialogStyle}>
         <Modal.Header closeButton>
