@@ -1,4 +1,5 @@
-﻿using Entities;
+﻿using Application.DTOs;
+using Entities;
 using Entities.Models;
 using Infrastructure.Repository;
 
@@ -31,13 +32,53 @@ namespace Application.Services
             }
         }
 
-        public async Task<List<Favorite>> GetFavorites(ulong UserId, int skip = 0, int take = 10)
+        public async Task<List<FavoriteDTO>> GetFavorites(ulong UserId, int skip = 0, int take = 10)
         {
-            return await _favoritesRepository.GetFavoritesForUserAsync(UserId, skip, take);
+            return (await _favoritesRepository
+                .GetFavoritesForUserAsync(UserId, skip, take))
+                .Select(FavoriteToDTO)
+                .ToList();
         }
-        public async Task<List<Favorite>> SearchFavorites(ulong UserId, string keyword, int skip = 0, int take = 10)
+        public async Task<List<FavoriteDTO>> SearchFavorites(ulong UserId, string keyword, int skip = 0, int take = 10)
         {
-            return await _favoritesRepository.SearchFavoritesAsync(UserId, keyword, skip, take);
+            return (await _favoritesRepository
+                .SearchFavoritesAsync(UserId, keyword, skip, take))
+                .Select(FavoriteToDTO)
+                .ToList();
         }
+
+
+        public static FavoriteDTO FavoriteToDTO(Favorite favorite)
+        {
+            if (favorite == null)
+                throw new ArgumentNullException(nameof(favorite));
+
+            var place = favorite.Place;
+
+            return new FavoriteDTO
+            {
+                FavoritedAt = favorite.FavoritedAt,
+                placeDTO = new PlaceDTODefaultCard
+                {
+                    Name = place.Name,
+                    Longitude = place.Longitude,
+                    Latitude = place.Latitude,
+                    Radius = place.Radius,
+                    GmapsPlaceId = place.GmapsPlaceId,
+                    Stars = place.Reviews?.Any() == true
+                        ? (int)Math.Round(place.Reviews.Average(r => r.Stars))
+                        : 0,
+                    Photo = place.Photos != null && place.Photos.Any()
+                        ? new PhotoDTO
+                        {
+                            Path = place.Photos.First().Path,
+                            PlaceId = place.Photos.First().PlaceId
+                        }
+                        : null
+                }
+            };
+        }
+
+
     }
 }

@@ -193,24 +193,24 @@ namespace Application.Services
         //    };
         //}
         //a pochemu eto ne v PlaceService??
-        private PlaceDTODefaultCard MapPlaceToDefaultCard(Place place)
-        {
-            return new PlaceDTODefaultCard
-            {
-                Name = place.Name,
-                Longitude = place.Longitude,
-                Latitude = place.Latitude,
-                Radius = place.Radius,
-                GmapsPlaceId = place.GmapsPlaceId,
-                Photos = place.Photos?
-                    .Select(p => new PhotoDTO
-                    {
-                        Path = p.Path,
-                        PlaceId = p.PlaceId,
-                    })
-                    .ToList() ?? new List<PhotoDTO>(),
-            };
-        }
+        //private PlaceDTODefaultCard MapPlaceToDefaultCard(Place place)
+        //{
+        //    return new PlaceDTODefaultCard
+        //    {
+        //        Name = place.Name,
+        //        Longitude = place.Longitude,
+        //        Latitude = place.Latitude,
+        //        Radius = place.Radius,
+        //        GmapsPlaceId = place.GmapsPlaceId,
+        //        Photos = place.Photos?
+        //            .Select(p => new PhotoDTO
+        //            {
+        //                Path = p.Path,
+        //                PlaceId = p.PlaceId,
+        //            })
+        //            .ToList() ?? new List<PhotoDTO>(),
+        //    };
+        //}
 
     }
 }

@@ -37,12 +37,12 @@ namespace Application.Services
                 var userByEmail = await _userRepository.GetByEmailAsync(loginData.Email);
                 UserId = userByEmail?.Id;
             }
-            if (loginData.googleJwtToken != null)
+            else if(loginData.googleJwtToken != null)
             {
                 var userByGoogle = await _userRepository.GetByGoogleIdAsync(loginData.googleJwtToken);
                 UserId = userByGoogle?.Id;
             }
-            if (loginData.FacebookId != null)
+            else if(loginData.FacebookId != null)
             {
                 var userByFacebook = await _userRepository.GetByFacebookIdAsync(loginData.FacebookId);
                 UserId = userByFacebook?.Id;

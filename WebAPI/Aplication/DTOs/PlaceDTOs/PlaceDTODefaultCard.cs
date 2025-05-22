@@ -7,9 +7,8 @@
         public double Latitude { get; set; }
         public int? Radius { get; set; }
         public string GmapsPlaceId { get; set; }
-        public virtual ICollection<PhotoDTO> Photos { get; set; } = new List<PhotoDTO>();
-
-        //сука рейтинга нет и всей остальной лабуды
+        public PhotoDTO Photo { get; set; }
+        public int Stars { get; set; }
 
     }
 }
