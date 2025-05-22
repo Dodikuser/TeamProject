@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.DTOs;
+using Application.Services;
+using Entities.Enums;
+using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
@@ -6,20 +11,45 @@ namespace WebAPI.Controllers
     [Route("api/history/places")]
     public class HistoryPlacesController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetAll() => Ok();
 
+        private readonly HistoryService _historyService;
+        public HistoryPlacesController(HistoryService historyService)
+        {
+            _historyService = historyService;
+        }
+
+        [Authorize]
+        [HttpPost("get")]
+        public async Task<IActionResult> GetHistory(int skip = 0, int take = 10)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            List<HistoryPlaceResponseDTO> histoires = await _historyService.GetPlaceHistory(userId, skip, take);
+
+            return Ok(new { histoires });
+        }
+
+        [Authorize]
         [HttpPost("search")]
-        public IActionResult Search([FromBody] object filters) => Ok();
+        public async Task<IActionResult> Search(string keyword, int skip = 0, int take = 10)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            List<HistoryPlaceResponseDTO> histoires = await _historyService.SearchPlaceHistory(userId, keyword, skip, take);
 
-        [HttpPost("add")]
-        public IActionResult Add([FromBody] object place) => Ok();
+            return Ok(new { histoires });
+        }
 
-        [HttpDelete("delete/{id}")]
-        public IActionResult Delete(int id) => Ok();
+        [Authorize]
+        [HttpPost("action")]
+        public async Task<IActionResult> HistoryAction(HistoryActionEnum historyAction, HistoryPlaceRequestDTO placeHistoryDTO)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
 
-        [HttpDelete("clear")]
-        public IActionResult Clear() => Ok();
+            HistoryOperationResult result = await _historyService.HistoryAction(userId, placeHistoryDTO, historyAction);
+
+            if (result != HistoryOperationResult.Success)
+                return BadRequest(result.ToString());
+            return Ok(result.ToString());
+        }
     }
 
 }

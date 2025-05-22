@@ -43,9 +43,9 @@ namespace WebAPI.Controllers
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
 
-            SearchOperationResult result = await _historyService.SearchAction(userId, searchDTO, historyAction);
+            HistoryOperationResult result = await _historyService.SearchAction(userId, searchDTO, historyAction);
 
-            if (result != SearchOperationResult.Success)
+            if (result != HistoryOperationResult.Success)
                 return BadRequest(result.ToString());
             return Ok(result.ToString());
         }
