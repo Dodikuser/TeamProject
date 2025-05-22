@@ -1,5 +1,6 @@
 ﻿using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
 
 namespace Infrastructure.Repository
 {
@@ -53,7 +54,5 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
-
-
     }
 }

@@ -1,10 +1,12 @@
 ﻿using Application.DTOs;
 using Application.DTOs.GmapDTOs;
+using Entities.Models;
 
 namespace Application
 {
     public static class PlaceTypesConverter
     {
+
         public static GPlaceDetailsResult ToPlaceDetailsResult(this PlaceDTOFull argument)
         {
 
@@ -67,5 +69,85 @@ namespace Application
             };
             return result;
         }
+
+        public static Place ConvertFromGPlace(GPlaceDetailsResult gPlace, ulong userId, string gmapsPlaceId, string googleApiKey)
+        {
+            var place = new Place
+            {
+                Name = gPlace.Name,
+                Address = gPlace.Address,
+                Latitude = gPlace.Geometry?.Location?.Lat ?? 0,
+                Longitude = gPlace.Geometry?.Location?.Lng ?? 0,
+                PhoneNumber = gPlace.PhoneNumber,
+                Site = gPlace.Website,
+                Description = gPlace.EditorialSummary?.Overview,
+                IsOpen = gPlace.OpeningHours?.OpenNow,
+                GmapsPlaceId = gmapsPlaceId,
+                UserId = userId,
+
+                OpeningHours = ParseOpeningHours(gPlace.OpeningHours?.WeekdayText),
+
+                Photos = gPlace.Photos?.Select(p => new Photo
+                {
+                    Path = p.GetPhotoUrl(googleApiKey),
+                }).ToList() ?? new List<Photo>(),
+
+                Reviews = new List<Review>(),
+                Histories = new List<History>(),
+                Favorites = new List<Favorite>(),
+                AdHashtags = new List<AdHashtag>()
+            };
+
+            return place;
+        }
+
+        private static ICollection<OpeningHours> ParseOpeningHours(List<string>? weekdayText)
+        {
+            if (weekdayText == null)
+                return new List<OpeningHours>();
+
+            var result = new List<OpeningHours>();
+
+            foreach (var entry in weekdayText)
+            {
+                var parts = entry.Split(": ", 2);
+                if (parts.Length != 2) continue;
+
+                var times = parts[1].Split(" – ");
+                if (times.Length != 2) continue;
+
+                if (TryParseTime(times[0], out var open) && TryParseTime(times[1], out var close))
+                {
+                    result.Add(new OpeningHours
+                    {
+                        Open = open,
+                        Close = close
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        private static bool TryParseTime(string input, out TimeOnly time)
+        {
+            input = input.Replace(" ", "").Trim();
+
+            if (TimeOnly.TryParseExact(input, new[] { "h:mmtt", "hh:mmtt", "h:mm tt", "hh:mm tt" },
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out time))
+            {
+                return true;
+            }
+
+            if (TimeOnly.TryParse(input, out time))
+            {
+                return true;
+            }
+
+            time = default;
+            return false;
+        }
+
     }
 }

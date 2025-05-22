@@ -10,8 +10,7 @@ namespace Application.Services
         private readonly HttpClient _httpClient;
         public GmapsService(Config config)
         {
-            //_googleMapsKey = config.GoogleMapsKey;
-            _googleMapsKey = "AIzaSyCUsLj0t6zzykl9q2CgjBCU-sXxyJnuv5s";
+            _googleMapsKey = config.GoogleMapsKey;
             _httpClient = new HttpClient();
         }
 

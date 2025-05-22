@@ -1,7 +1,9 @@
 ﻿using Application.DTOs;
+using Application.DTOs.GmapDTOs;
 using Entities;
 using Entities.Models;
 using Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -9,14 +11,30 @@ namespace Application.Services
     {
         private readonly FavoritesRepository _favoritesRepository;
         private readonly PlaceRepository _placeRepository;
+        private readonly GmapsService _gmapsService;
+        private readonly string _googleMapsKey;
 
-        public PlaceService(FavoritesRepository favoritesRepository, PlaceRepository placeRepository)
+
+        public PlaceService(FavoritesRepository favoritesRepository, PlaceRepository placeRepository, GmapsService gmapsService, Config config)
         {
             _favoritesRepository = favoritesRepository;
             _placeRepository = placeRepository;
+            _gmapsService=gmapsService;
+            _googleMapsKey = config.GoogleMapsKey;
         }
+
         public async Task FavoriteAction(ulong UserId, string gmapsPlaceId, FavoriteActionEnum action)
         {
+            bool exists = await _placeRepository.ExistsAsync(gmapsPlaceId);
+
+            if (!exists) // регаем место если его нет в базе
+            {
+                GPlaceDetailsResult gPlaceDetailsResult = await _gmapsService.GetPlaceDetailsAsync(gmapsPlaceId);
+                Place place = PlaceTypesConverter.ConvertFromGPlace(gPlaceDetailsResult, 2, gmapsPlaceId, _googleMapsKey);
+
+                await _placeRepository.AddAsync(place);
+            }
+
             ulong placeId = (await _placeRepository.GetIdByGmapsPlaceIdAsync(gmapsPlaceId)).Value;
 
             switch (action)

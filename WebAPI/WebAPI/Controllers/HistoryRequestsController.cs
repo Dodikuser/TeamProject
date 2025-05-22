@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
@@ -6,20 +8,29 @@ namespace WebAPI.Controllers
     [Route("api/history/requests")]
     public class HistoryRequestsController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetAll() => Ok();
+        [Authorize]
+        [HttpPost("get")]
+        public IActionResult GetHistory(int skip = 0, int take = 10)
+        {
 
+            return Ok();
+        }
+
+        [Authorize]
         [HttpPost("search")]
-        public IActionResult Search([FromBody] object filters) => Ok();
+        public IActionResult Search(string keyword, int skip = 0, int take = 10)
+        {
 
-        [HttpPost("add")]
-        public IActionResult Add([FromBody] object request) => Ok();
+            return Ok();
+        }
 
-        [HttpDelete("delete/{id}")]
-        public IActionResult Delete(int id) => Ok();
+        [Authorize]
+        [HttpPost("action")]
+        public IActionResult HistoryAction(HistoryActionEnum historyAction)
+        {
 
-        [HttpDelete("clear")]
-        public IActionResult Clear() => Ok();
+           return Ok();
+        }
     }
 
 }
