@@ -1,7 +1,105 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
+import { useEffect } from 'react';
+
+const GoogleLoginForm = () => {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+  }, []);
+
+ const handleGoogleLogin = () => {
+  const clientId = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
+  const redirectUri = 'http://localhost:3000';
+  const scope = 'email profile openid';
+
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${clientId}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    `&response_type=token` +
+    `&scope=${encodeURIComponent(scope)}`;
+
+  const width = 600;
+  const height = 700;
+  const left = (window.innerWidth - width) / 2;
+  const top = (window.innerHeight - height) / 2;
+
+  const popup = window.open(
+    authUrl,
+    'googleLoginPopup',
+    `width=${width},height=${height},top=${top},left=${left}`
+  );
+
+  const interval = setInterval(() => {
+    try {
+      if (popup.location.href.includes(redirectUri)) {
+        const hash = popup.location.hash;
+        const params = new URLSearchParams(hash.substr(1));
+        const token = params.get('access_token');
+        console.log('TOKEN:', token);
+        handleCredentialResponse(token);
+        popup.close();
+        clearInterval(interval);
+      }
+    } catch (err) {
+    }
+  }, 1000);
+};
+
+
+  const handleCredentialResponse = (token) => {
+    //const token = response.credential;
+
+    fetch('https://localhost:7103/api/user/register', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    name: '',
+    email: '',
+    password: '',
+    googleId: token,
+    facebookId: ''
+  })
+})
+  .then(res => {
+    if (!res.ok) throw new Error('Ошибка регистрации');
+    return res.text();
+  })
+  .then(data => {
+    console.log('Успешно зарегистрирован через Google:', data);
+  })
+  .catch(err => {
+    console.error('Регистрация через Google провалилась:', err);
+  });
+
+  };
+
+  return (
+    <Form>
+      <Row className="justify-content-center gap-3">
+        <Col xs="auto">
+          <i className="bi bi-facebook social-icon facebook"></i>
+        </Col>
+        <Col xs="auto">
+          <i
+            className="bi bi-google social-icon google"
+            style={{ cursor: 'pointer' }}
+            onClick={handleGoogleLogin}
+          ></i>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
+
 
 export default function LoginRegister() {
+  
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -223,14 +321,7 @@ export default function LoginRegister() {
             <hr className="flex-grow-1" />
           </div>
 
-          <Row className="justify-content-center gap-3">
-            <Col xs="auto">
-              <i className="bi bi-facebook social-icon facebook"></i>
-            </Col>
-            <Col xs="auto">
-              <i className="bi bi-google social-icon google"></i>
-            </Col>
-          </Row>
+          <GoogleLoginForm />
         </Form>
 
         <style>
