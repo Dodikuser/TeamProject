@@ -53,7 +53,7 @@ export default function Favorites() {
   );
 
   return (
-    <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', minHeight: '90vh' }}>
+    <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', minHeight: '91vh' }}>
       <Row className="mb-4">
         <Col xs={12}>
           <div className="bg-white p-3 rounded-3 shadow-sm d-flex flex-wrap justify-content-between align-items-center gap-3">

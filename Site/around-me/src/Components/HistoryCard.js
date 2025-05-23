@@ -15,7 +15,7 @@ export default function HistoryCard({
   const toggleFavorite = () => {
     if (!isFavorite) {
       setAnimating(true);
-      setTimeout(() => setAnimating(false), 500); // длина анимации
+      setTimeout(() => setAnimating(false), 500); 
     }
     setIsFavorite(!isFavorite);
   };
@@ -26,7 +26,7 @@ export default function HistoryCard({
         variant="top"
         src={image}
         className="rounded-top"
-        style={{ height: '180px', objectFit: 'cover' }}
+        style={{ height: '150px', objectFit: 'cover' }}
         alt={title}
       />
       <Card.Body className="d-flex flex-column justify-content-between">

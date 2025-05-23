@@ -95,8 +95,8 @@ export default function History() {
   );
 
   return (
-    <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', height: '90vh', display: 'flex', flexDirection: 'column' }}>
-      <Row className="mb-4 flex-shrink-0" style={{ height: '90px' }}>
+    <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', height: '91vh', display: 'flex', flexDirection: 'column' }}>
+      <Row className="mb-4 flex-shrink-0" style={{ height: '70px' }}>
         <Col xs={12}>
           <div className="bg-white p-3 rounded-3 shadow-sm d-flex flex-wrap justify-content-between align-items-center h-100">
             <div className="d-flex gap-2 mb-2 mb-md-0 align-items-center">

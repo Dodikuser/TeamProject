@@ -149,12 +149,12 @@ const [showConfirmModal, setShowConfirmModal] = useState(false);
             <Col key={idx} xs={12} md={6} lg={4} xl={3} className="mb-4">
               <div onClick={() => handleEditPlace(idx)} style={{ cursor: 'pointer' }}>
                <MyPlaceCard
-  {...place}
-  onDelete={() => {
-    setDeleteIndex(idx);
-    setShowConfirmModal(true);
-  }}
-/>
+                {...place}
+                onDelete={() => {
+                    setDeleteIndex(idx);
+                    setShowConfirmModal(true);
+                }}
+                />
 
               </div>
             </Col>
@@ -180,7 +180,7 @@ const [showConfirmModal, setShowConfirmModal] = useState(false);
 
       <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
   <Modal.Body className="text-center py-4">
-    <p className="fs-5 mb-4">Ви дійсно хочете видалити улюблене?</p>
+    <p className="fs-5 mb-4">Ви дійсно хочете видалити місце?</p>
     <div className="d-flex justify-content-center gap-3">
       <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
         Скасувати
