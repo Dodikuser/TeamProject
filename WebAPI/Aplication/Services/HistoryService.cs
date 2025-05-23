@@ -1,8 +1,8 @@
-﻿using Infrastructure.Repository;
-using Entities.Models;
-using Application.DTOs;
+﻿using Application.DTOs;
 using Entities;
 using Entities.Enums;
+using Entities.Models;
+using Infrastructure.Repository;
 
 namespace Application.Services
 {
@@ -133,7 +133,6 @@ namespace Application.Services
                     Name = history.Place.Name,
                     Longitude = history.Place.Longitude,
                     Latitude = history.Place.Latitude,
-                    Radius = history.Place.Radius,
                     GmapsPlaceId = history.Place.GmapsPlaceId,
                     Stars = history.Place.Reviews?.Any() == true
                                 ? (int)Math.Round(history.Place.Reviews.Average(r => r.Stars))

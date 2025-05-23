@@ -3,14 +3,13 @@ using Application.DTOs.GmapDTOs;
 using Entities;
 using Entities.Models;
 using Infrastructure.Repository;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
-    public class PlaceService(FavoritesRepository _favoritesRepository, PlaceRepository _placeRepository, GmapsService _gmapsService, Config _config)
+    public class PlaceService(FavoritesRepository _favoritesRepository, PlaceRepository _placeRepository, GmapsService _gmapsService, Config _config, ReviewRepository _reviewRepository)
     {
 
-        private readonly string _googleMapsKey { get { return _config.GoogleMapsKey; } };
+        private string _googleMapsKey { get { return _config.GoogleMapsKey; } }
 
         public async Task FavoriteAction(ulong UserId, string gmapsPlaceId, FavoriteActionEnum action)
         {
