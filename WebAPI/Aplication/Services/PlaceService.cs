@@ -7,21 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
-    public class PlaceService
+    public class PlaceService(FavoritesRepository _favoritesRepository, PlaceRepository _placeRepository, GmapsService _gmapsService, Config _config)
     {
-        private readonly FavoritesRepository _favoritesRepository;
-        private readonly PlaceRepository _placeRepository;
-        private readonly GmapsService _gmapsService;
-        private readonly string _googleMapsKey;
 
-
-        public PlaceService(FavoritesRepository favoritesRepository, PlaceRepository placeRepository, GmapsService gmapsService, Config config)
-        {
-            _favoritesRepository = favoritesRepository;
-            _placeRepository = placeRepository;
-            _gmapsService=gmapsService;
-            _googleMapsKey = config.GoogleMapsKey;
-        }
+        private readonly string _googleMapsKey { get { return _config.GoogleMapsKey; } };
 
         public async Task FavoriteAction(ulong UserId, string gmapsPlaceId, FavoriteActionEnum action)
         {
@@ -81,7 +70,6 @@ namespace Application.Services
                     Name = place.Name,
                     Longitude = place.Longitude,
                     Latitude = place.Latitude,
-                    Radius = place.Radius,
                     GmapsPlaceId = place.GmapsPlaceId,
                     Stars = place.Reviews?.Any() == true
                         ? (int)Math.Round(place.Reviews.Average(r => r.Stars))
@@ -96,7 +84,26 @@ namespace Application.Services
                 }
             };
         }
+        public async Task<List<PlaceDTODefaultCard>> GetByUserIdAsync(ulong userId, int skip, int take)
+        {
+            List<Place> rawPlaces = await _placeRepository.GetByUserIdAsync(userId, skip, take);
+            List<PlaceDTODefaultCard> result = new List<PlaceDTODefaultCard>();
 
+            foreach (Place place in rawPlaces)
+            {
+                result.Add(
+                    new PlaceDTODefaultCard()
+                    {
+                        Name = place.Name,
+                        Longitude = place.Longitude,
+                        Latitude = place.Latitude,
+                        GmapsPlaceId = place.GmapsPlaceId,
+                        Stars = (int)Double.Round(await _reviewRepository.GetAvgStarsAsync(place.Id))
+                    }
+                );
+            }
+            return result;
+        }
 
     }
 }
