@@ -70,7 +70,7 @@ namespace Application
             return result;
         }
 
-        public static Place ConvertFromGPlace(GPlaceDetailsResult gPlace, ulong userId, string gmapsPlaceId, string googleApiKey)
+        public static Place ConvertFromGPlace(GPlaceDetailsResult gPlace, string gmapsPlaceId, string googleApiKey)
         {
             var place = new Place
             {
@@ -83,7 +83,6 @@ namespace Application
                 Description = gPlace.EditorialSummary?.Overview,
                 IsOpen = gPlace.OpeningHours?.OpenNow,
                 GmapsPlaceId = gmapsPlaceId,
-                UserId = userId,
 
                 OpeningHours = ParseOpeningHours(gPlace.OpeningHours?.WeekdayText),
 

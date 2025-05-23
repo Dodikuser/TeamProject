@@ -11,17 +11,21 @@ namespace Application.Services
 
         private string _googleMapsKey { get { return _config.GoogleMapsKey; } }
 
+
+        public async Task RegisterPlace(string gmapsPlaceId)
+        {
+            GPlaceDetailsResult gPlaceDetailsResult = await _gmapsService.GetPlaceDetailsAsync(gmapsPlaceId);
+            Place place = PlaceTypesConverter.ConvertFromGPlace(gPlaceDetailsResult, gmapsPlaceId, _googleMapsKey);
+
+            await _placeRepository.AddAsync(place);
+        }
+
         public async Task FavoriteAction(ulong UserId, string gmapsPlaceId, FavoriteActionEnum action)
         {
             bool exists = await _placeRepository.ExistsAsync(gmapsPlaceId);
 
             if (!exists) // регаем место если его нет в базе
-            {
-                GPlaceDetailsResult gPlaceDetailsResult = await _gmapsService.GetPlaceDetailsAsync(gmapsPlaceId);
-                Place place = PlaceTypesConverter.ConvertFromGPlace(gPlaceDetailsResult, 2, gmapsPlaceId, _googleMapsKey);
-
-                await _placeRepository.AddAsync(place);
-            }
+                await RegisterPlace(gmapsPlaceId);
 
             ulong placeId = (await _placeRepository.GetIdByGmapsPlaceIdAsync(gmapsPlaceId)).Value;
 

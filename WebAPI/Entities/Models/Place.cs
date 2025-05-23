@@ -34,7 +34,7 @@ namespace Entities.Models
 
 
 
-        public ulong UserId { get; set; }
+        public ulong? UserId { get; set; }
 
         // Связь с User, Review, History, Favorite, Photo, AdHashtag
 
