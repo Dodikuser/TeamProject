@@ -1,6 +1,5 @@
-package com.example.maps1.history;
+package com.example.maps1.Favorites;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,36 +14,34 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.maps1.R;
 
-
 import java.util.List;
 
-public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
+public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavoritesViewHolder> {
 
     public interface OnItemClickListener {
-        void onItemClick(HistoryItem item);
+        void onItemClick(FavoritesItem item);
+        void onRemoveClick(FavoritesItem item);
     }
 
-    private List<HistoryItem> items;
+    private List<FavoritesItem> items;
     private OnItemClickListener listener;
 
-    public HistoryAdapter(List<HistoryItem> items, OnItemClickListener listener) {
+    public FavoritesAdapter(List<FavoritesItem> items, OnItemClickListener listener) {
         this.items = items;
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FavoritesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_history, parent, false);
-        return new HistoryViewHolder(view);
+                .inflate(R.layout.item_favorites, parent, false);
+        return new FavoritesViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
-        Log.d("HistoryAdapter", "Binding item at position: " + position);
-
-        HistoryItem item = items.get(position);
+    public void onBindViewHolder(@NonNull FavoritesViewHolder holder, int position) {
+        FavoritesItem item = items.get(position);
 
         holder.name.setText(item.getName());
         holder.address.setText(item.getAddress());
@@ -62,6 +59,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         }
 
         holder.btnGo.setOnClickListener(v -> listener.onItemClick(item));
+        holder.btnRemove.setOnClickListener(v -> listener.onRemoveClick(item));
     }
 
     @Override
@@ -69,22 +67,24 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         return items.size();
     }
 
-    static class HistoryViewHolder extends RecyclerView.ViewHolder {
+    static class FavoritesViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
         TextView name;
         TextView address;
         TextView description;
         RatingBar rating;
         Button btnGo;
+        Button btnRemove;
 
-        public HistoryViewHolder(@NonNull View itemView) {
+        public FavoritesViewHolder(@NonNull View itemView) {
             super(itemView);
-            image = itemView.findViewById(R.id.history_item_image);
-            name = itemView.findViewById(R.id.history_item_name);
-            address = itemView.findViewById(R.id.history_item_address);
-            description = itemView.findViewById(R.id.history_item_description);
-            rating = itemView.findViewById(R.id.history_item_rating);
-            btnGo = itemView.findViewById(R.id.history_item_btn_go);
+            image = itemView.findViewById(R.id.favorites_item_image);
+            name = itemView.findViewById(R.id.favorites_item_name);
+            address = itemView.findViewById(R.id.favorites_item_address);
+            description = itemView.findViewById(R.id.favorites_item_description);
+            rating = itemView.findViewById(R.id.favorites_item_rating);
+            btnGo = itemView.findViewById(R.id.favorites_item_btn_go);
+            btnRemove = itemView.findViewById(R.id.favorites_item_btn_remove);
         }
     }
 }

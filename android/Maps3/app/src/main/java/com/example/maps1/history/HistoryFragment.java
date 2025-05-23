@@ -1,7 +1,10 @@
 package com.example.maps1.history;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +20,15 @@ import com.example.maps1.R;
 import com.example.maps1.history.HistoryItem;
 
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class HistoryFragment extends Fragment {
 
@@ -35,10 +45,10 @@ public class HistoryFragment extends Fragment {
         // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.history_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true); // Додайте цей рядок
 
-        // Create adapter with empty list for now
+        // Create adapter
         adapter = new HistoryAdapter(filteredItems, item -> {
-            // Handle item click - open PlaceDetailsActivity
             Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
             intent.putExtra("place_id", item.getId());
             startActivity(intent);
@@ -60,15 +70,60 @@ public class HistoryFragment extends Fragment {
             }
         });
 
-        // Load history items (in real app this would come from cache/database)
-        loadHistoryItems();
+        // Load history items
+        testloadHistoryItems();
 
         return view;
     }
-
     private void loadHistoryItems() {
-        // TODO: Replace with actual data loading from cache/database
-        // For now we'll add some dummy data
+        SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        String token = prefs.getString("auth_token", null);
+
+        if (token == null) {
+            // User not logged in
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:7103/api/History");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+                conn.setDoInput(true);
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream is = conn.getInputStream();
+                    String response = new Scanner(is).useDelimiter("\\A").next();
+                    JSONArray jsonArray = new JSONArray(response);
+
+                    historyItems.clear();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject item = jsonArray.getJSONObject(i);
+                        historyItems.add(new HistoryItem(
+                                item.getString("id"),
+                                item.getString("name"),
+                                item.getString("address"),
+                                item.getString("description"),
+                                (float) item.getDouble("rating"),
+                                item.getString("imageUrl")
+                        ));
+                    }
+
+                    requireActivity().runOnUiThread(() -> {
+                        filteredItems.clear();
+                        filteredItems.addAll(historyItems);
+                        adapter.notifyDataSetChanged();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+    private void testloadHistoryItems() {
         historyItems.clear();
         historyItems.add(new HistoryItem("1", "Ресторан 'Український'",
                 "вул. Хрещатик, 15", "Традиційна українська кухня", 4.5f, ""));
@@ -80,6 +135,9 @@ public class HistoryFragment extends Fragment {
         filteredItems.clear();
         filteredItems.addAll(historyItems);
         adapter.notifyDataSetChanged();
+
+        // Додайте логування для перевірки
+        Log.d("HistoryFragment", "Loaded items: " + filteredItems.size());
     }
 
     private void filterHistoryItems(String query) {

@@ -10,4 +10,8 @@
     <string name="last_name">Прізвище</string>
     <string name="email">Email</string>
     <string name="password">Пароль</string>
+    <string name="place_photo">Фото місця</string>
+    <string name="save">Зберегти</string>
+    <string name="route">Маршрут</string>
+    <string name="reviews">Відгуки</string>
 </resources>

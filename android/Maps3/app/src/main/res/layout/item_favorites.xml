@@ -17,7 +17,7 @@
 
         <!-- Зображення -->
         <ImageView
-            android:id="@+id/history_item_image"
+            android:id="@+id/favorites_item_image"
             android:layout_width="0dp"
             android:layout_height="160dp"
             android:layout_marginTop="8dp"
@@ -29,7 +29,7 @@
 
         <!-- Назва ресторану -->
         <TextView
-            android:id="@+id/history_item_name"
+            android:id="@+id/favorites_item_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -39,11 +39,11 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_image" />
+            app:layout_constraintTop_toBottomOf="@id/favorites_item_image" />
 
         <!-- Адреса -->
         <TextView
-            android:id="@+id/history_item_address"
+            android:id="@+id/favorites_item_address"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -52,26 +52,28 @@
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_name" />
+            app:layout_constraintTop_toBottomOf="@id/favorites_item_name" />
 
-        <!-- Рейтинг з чорними зірками -->
+        <!-- Рейтинг -->
         <RatingBar
-            android:id="@+id/history_item_rating"
+            android:id="@+id/favorites_item_rating"
             style="@style/Widget.AppCompat.RatingBar.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:isIndicator="true"
             android:numStars="5"
-            android:progressTint="@android:color/black"
             android:rating="4.5"
             android:stepSize="0.1"
+            android:progressTint="@android:color/black"
+            android:secondaryProgressTint="@android:color/black"
+            android:progressBackgroundTint="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_address" />
+            app:layout_constraintTop_toBottomOf="@id/favorites_item_address" />
 
         <!-- Опис -->
         <TextView
-            android:id="@+id/history_item_description"
+            android:id="@+id/favorites_item_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -82,23 +84,45 @@
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_rating" />
+            app:layout_constraintTop_toBottomOf="@id/favorites_item_rating" />
 
-        <!-- Кнопка Перейти -->
-        <Button
-            android:id="@+id/history_item_btn_go"
-            android:layout_width="wrap_content"
+        <!-- Кнопки -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_button"
-            android:textColor="@android:color/white"
-            android:textAllCaps="false"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:text="Перейти"
-            android:textSize="14sp"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:spacing="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_description" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/favorites_item_description">
+
+            <Button
+                android:id="@+id/favorites_item_btn_remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button_outline"
+                android:textColor="#626FC2"
+                android:textAllCaps="false"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="Видалити"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/favorites_item_btn_go"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="Перейти"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

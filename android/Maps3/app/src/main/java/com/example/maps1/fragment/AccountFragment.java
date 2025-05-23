@@ -1,4 +1,4 @@
-package fragment;
+package com.example.maps1.fragment;
 
 import android.content.Context;
 import android.content.Intent;
