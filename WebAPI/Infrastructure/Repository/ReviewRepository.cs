@@ -26,7 +26,7 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
-        public async Task<double> GetAvgStars(ulong placeId)
+        public async Task<double> GetAvgStarsAsync(ulong placeId)
         {
             return await _context.Reviews
                 .Where(r => r.PlaceId == placeId)

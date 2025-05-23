@@ -10,25 +10,14 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController(AuthorizationService _authorizationService, TokenService _tokenService, UserService _userService) : ControllerBase
     {
-        private readonly TokenService _tokenService;
-        private readonly AuthorizationService _authorizationService;
-        private readonly UserService _userService;
-
-        public UserController(AuthorizationService authorizationService, TokenService tokenService, UserService userService)
-        {
-            _authorizationService = authorizationService;
-            _tokenService = tokenService;
-            _userService = userService;
-        }
-
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserRegisterDTO loginData)
+        public async Task<IActionResult> Register(UserRegisterDTO registerData)
         {
-            RegisterStatus result = await _authorizationService.Register(loginData);
+            RegisterStatus result = await _authorizationService.Register(registerData);
 
             if (result != RegisterStatus.Success)
                 return BadRequest(result.ToString());
@@ -61,25 +50,55 @@ namespace WebAPI.Controllers
             return Ok();
         }
 
-        [Authorize]
+
         [HttpPost("get")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetUserInfo()
+        public async Task<IActionResult> GetUser()
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
             UserDTO? user = await _userService.GetUserDTOAsync(userId);
             return user == null ? NotFound() : Ok(user);
         }
-        [Authorize]
+
         [HttpPost("get-public")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetUserPublicInfo()
+        public async Task<IActionResult> GetUserPublic()
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
             UserPublicDTO? user = await _userService.GetUserPublicDTO(userId);
             return user == null ? NotFound() : Ok(user);
+        }
+
+        [HttpPatch("edit")]
+        [Authorize]
+        public async Task<IActionResult> EditUser(UserDTO userDTO)
+        {
+            if (/*userDTO.Name == null ||*/ userDTO.Name == "")
+                return BadRequest();
+
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            await _userService.EditUser(userId, userDTO);
+            return Ok();
+        }
+
+        [HttpPatch("delete")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUser(ulong userToBanId)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            UserDeleteStatus result = await _userService.DeleteUser(userId, userToBanId);
+            switch (result)
+            {
+                case UserDeleteStatus.UserNotExists:
+                    return NotFound();
+                case UserDeleteStatus.CantbanUsers:
+                    return Forbid();
+            }
+            return Ok();
         }
     }
 

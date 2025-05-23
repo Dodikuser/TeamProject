@@ -1,21 +1,22 @@
 ﻿using Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PlaceController : ControllerBase
+    public class PlaceController(PlaceService _placeService, GmapsService _gmapsService) : ControllerBase
     {
-        private readonly GmapsService _gmapsService;
-        public PlaceController(GmapsService gmapsService)
-        {
-            _gmapsService = gmapsService;
-        }
 
         /// <summary> Получить список своих мест. </summary>
         [HttpGet("my")]
-        public IActionResult GetMyPlaces() => Ok();
+        [Authorize]
+        public IActionResult GetMyPlaces(int skip = 0, int take = 50)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            return Ok(_placeService.GetByUserIdAsync(userId, skip, take));
+        }
 
         /// <summary> Получить информацию о конкретном своем месте. </summary>
         /// <exception cref="HttpRequestException">If status code from map API is not Success code</exception>

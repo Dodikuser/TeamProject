@@ -16,8 +16,6 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> AddReview([FromBody] ReviewDTO review)
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
-            if (userId == 0)
-                return Unauthorized();
 
             review.UserId = userId;
             review.ReviewDateTime = DateTime.UtcNow;

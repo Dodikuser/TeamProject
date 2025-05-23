@@ -6,7 +6,7 @@
         public double Longitude { get; set; }
         public double Latitude { get; set; }
         public string GmapsPlaceId { get; set; }
-        public PhotoDTO Photo { get; set; }
+        public PhotoDTO Photos { get; set; }
         public int Stars { get; set; }
 
     }

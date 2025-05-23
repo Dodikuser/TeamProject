@@ -5,7 +5,7 @@ using Infrastructure.Repository;
 
 namespace Application.Services
 {
-    public class ReviewService(ReviewRepository _reviewRepository)
+    public class ReviewService(ReviewRepository _reviewRepository, PhotoRepository _photoRepository)
     {
         public async Task AddAsync(ReviewDTO DTO)
         {
@@ -51,9 +51,11 @@ namespace Application.Services
         public async Task<List<ReviewDTO>> GetAsync(ulong placeId, int skip, int take)
         {
             List<Review> rawReviews = await _reviewRepository.GetReviewsPagedAsync(placeId, skip, take);
+            List<Photo> photos = await _photoRepository.GetFirstAsync(rawReviews.Select(r => r.Id).ToList());
             List<ReviewDTO> reviewDTOs = new List<ReviewDTO>();
             foreach (var review in rawReviews)
             {
+                Photo photo = photos.First(p => p.PlaceId == review.PlaceId);
                 reviewDTOs.Add(new ReviewDTO()
                 {
                     Text = review.Text,
@@ -67,6 +69,11 @@ namespace Application.Services
                     PlaceId = review.PlaceId,
                     UserId = review.UserId,
                     UserName = review.User.Name,
+                    Photo = new PhotoDTO()
+                    {
+                        PlaceId = review.PlaceId,
+                        Path = photo.Path,
+                    }
                 });
             }
             return reviewDTOs;
