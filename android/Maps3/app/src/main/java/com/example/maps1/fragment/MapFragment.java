@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.maps1.MainActivity;
 import com.example.maps1.PlaceDetailsActivity;
 import com.example.maps1.R;
 import com.example.maps1.places.MyPlace;
@@ -45,7 +46,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private boolean isMapReady = false;
 
     public MapFragment() {
-        super(R.layout.fragment_map); // layout з SupportMapFragment з id map_fragment
+        super(R.layout.fragment_map);
+
     }
 
     @Override
@@ -93,7 +95,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             );
         }
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).showSearchField(true);
+        }
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).showSearchField(false);
+        }
+    }
     @SuppressLint("MissingPermission")
     private void showUserLocation() {
         fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {

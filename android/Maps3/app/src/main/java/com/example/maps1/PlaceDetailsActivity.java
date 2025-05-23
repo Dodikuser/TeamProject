@@ -28,6 +28,7 @@ public class PlaceDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_details);
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(this::handleNavigationItemSelected);
         MyPlace place = getIntent().getParcelableExtra("place");
@@ -70,6 +71,7 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         });
 
     }
+
     private boolean handleNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
