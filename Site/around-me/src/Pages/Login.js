@@ -74,6 +74,7 @@ export default function LoginRegister() {
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
       minHeight: '100vh',
+      
     }}
   >
     <Container

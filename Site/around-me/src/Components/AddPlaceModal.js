@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 
+import StatisticsModal from './StatisticsModal';
+
+
+
 const AddPlaceModal = ({ show, onHide, onSave, newPlace, setNewPlace }) => {
+const [showStats, setShowStats] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewPlace(prev => ({ ...prev, [name]: value }));
@@ -98,7 +103,7 @@ const AddPlaceModal = ({ show, onHide, onSave, newPlace, setNewPlace }) => {
            <div className="mt-3 text-center">
   <Button
     style={{ backgroundColor: '#626FC2', borderColor: '#626FC2' }}
-    onClick={() => alert('Тут буде статистика :)')}
+    onClick={() => setShowStats(true)}
   >
     Показати статистику
   </Button>
@@ -280,6 +285,7 @@ const AddPlaceModal = ({ show, onHide, onSave, newPlace, setNewPlace }) => {
     Зберегти зміни
   </Button>
 </Modal.Footer>
+<StatisticsModal show={showStats} onHide={() => setShowStats(false)} />
 
     </Modal>
   );

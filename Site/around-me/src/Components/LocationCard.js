@@ -67,7 +67,7 @@ const LocationCard = ({
   onClick={(e) => {
     e.stopPropagation();
     setIsAnimating(true);
-    onToggleFavorite(); // Меняет isFavorite
+    onToggleFavorite(); 
     setTimeout(() => setIsAnimating(false), 200);
   }}
 >
