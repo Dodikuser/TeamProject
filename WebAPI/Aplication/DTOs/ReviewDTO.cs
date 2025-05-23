@@ -23,6 +23,8 @@ namespace Application.DTOs
 
         public ulong PlaceId { get; set; }
         public ulong UserId { get; set; }
+        // поля которые заполняются только если дто полетит ОТ апи
         public string? UserName { get; set; }
+        public PhotoDTO? Photo { get; set; }
     }
 }

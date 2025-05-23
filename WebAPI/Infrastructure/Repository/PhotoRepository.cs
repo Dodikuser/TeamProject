@@ -8,18 +8,8 @@ namespace Infrastructure.Repository
     {
         //todo
         private readonly MyDbContext _context;
-        //private readonly IWebHostEnvironment _env;
         private readonly string WebRootPath;
-        //public PhotoRepository(MyDbContext context, IWebHostEnvironment env)
-        //{
-        //    _context = context;
-        //    _env = env;
-        //}
-        //public PhotoRepository(MyDbContext context, string webRootPath)
-        //{
-        //    _context = context;
-        //    WebRootPath = webRootPath;
-        //}
+
         public async Task AddAsync(ulong placeId, IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -75,6 +65,14 @@ namespace Infrastructure.Repository
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();
+        }
+        public async Task<List<Photo>> GetFirstAsync(List<ulong> placesId)
+        {
+            return await _context.Photos
+               .Where(p => placesId.Contains(p.PlaceId))
+               .GroupBy(p => p.PlaceId)
+               .Select(g => g.OrderByDescending(p => p.Id).First())
+               .ToListAsync();
         }
         public async Task<List<Photo>> GetAllByPlaceAsync(ulong placeId)
         {

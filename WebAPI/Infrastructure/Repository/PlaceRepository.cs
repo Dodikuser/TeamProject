@@ -95,6 +95,7 @@ namespace Infrastructure.Repository
         {
             return await _context.Places
                 .Where(p => p.UserId == userId)
+                .Include(p => p.Photos)
                 .OrderByDescending(p => p.Name)
                 .Skip(skip)
                 .Take(take)

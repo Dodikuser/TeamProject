@@ -1,19 +1,12 @@
-﻿using Entities;
+﻿using Application.DTOs;
+using Entities;
 using Entities.Models;
 using Infrastructure.Repository;
 
 namespace Application.Services
 {
-    public class PlaceService
+    public class PlaceService(FavoritesRepository _favoritesRepository, PlaceRepository _placeRepository, ReviewRepository _reviewRepository)
     {
-        private readonly FavoritesRepository _favoritesRepository;
-        private readonly PlaceRepository _placeRepository;
-
-        public PlaceService(FavoritesRepository favoritesRepository, PlaceRepository placeRepository)
-        {
-            _favoritesRepository = favoritesRepository;
-            _placeRepository = placeRepository;
-        }
         public async Task FavoriteAction(ulong UserId, string gmapsPlaceId, FavoriteActionEnum action)
         {
             ulong placeId = (await _placeRepository.GetIdByGmapsPlaceIdAsync(gmapsPlaceId)).Value;
@@ -29,6 +22,28 @@ namespace Application.Services
                 default:
                     break;
             }
+        }
+
+        public async Task<List<PlaceDTODefaultCard>> GetByUserIdAsync(ulong userId, int skip, int take)
+        {
+            List<Place> rawPlaces = await _placeRepository.GetByUserIdAsync(userId, skip, take);
+            List<PlaceDTODefaultCard> result = new List<PlaceDTODefaultCard>();
+
+            foreach (Place place in rawPlaces)
+            {
+                result.Add(
+                    new PlaceDTODefaultCard()
+                    {
+                        Name = place.Name,
+                        Longitude = place.Longitude,
+                        Latitude = place.Latitude,
+                        Radius = place.Radius,
+                        GmapsPlaceId = place.GmapsPlaceId,
+                        Stars = (int)Double.Round(await _reviewRepository.GetAvgStarsAsync(place.Id))
+                    }
+                );
+            }
+            return result;
         }
 
         public async Task<List<Favorite>> GetFavorites(ulong UserId, int skip = 0, int take = 10)

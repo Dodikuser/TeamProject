@@ -23,6 +23,10 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+        public int bombordiniguzini()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <exception cref="HttpRequestException">If status code from map API is not Success code</exception>
         /// <exception cref="Exception">If status code != OK</exception>
