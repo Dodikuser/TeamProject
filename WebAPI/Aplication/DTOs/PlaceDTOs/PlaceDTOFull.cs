@@ -29,6 +29,6 @@ namespace Application.DTOs
 
         //это не внешний ключ
         public string GmapsPlaceId { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
     }
 }
