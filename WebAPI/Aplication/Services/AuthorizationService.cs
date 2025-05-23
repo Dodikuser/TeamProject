@@ -127,8 +127,8 @@ namespace Application.Services
                 return await LoginUserGoogle(loginData.googleJwtToken);
             else if (loginData.FacebookId != null)
                 return await LoginUserFacebook(loginData.FacebookId);
-            else if (loginData.PasswordHash != null)
-                return await LoginUserDefault(loginData.Email, loginData.PasswordHash);
+            else if (loginData.Password != null)
+                return await LoginUserDefault(loginData.Email, loginData.Password);
 
 
 

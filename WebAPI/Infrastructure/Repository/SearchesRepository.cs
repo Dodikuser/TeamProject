@@ -47,6 +47,25 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
+        public async Task<List<Search>> SearchByKeywordForUserAsync(ulong userId, string keyword, int skip = 0, int take = 10)
+        {
+            return await _context.Searches
+                .Where(s => s.UserId == userId && EF.Functions.Like(s.Text.ToLower(), $"%{keyword.ToLower()}%"))
+                .OrderByDescending(s => s.SearchDateTime)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
+        public async Task<ulong?> GetSearchIdByTextAndDateAsync(string text, DateTime searchDateTime)
+        {
+            var search = await _context.Searches
+                .Where(s => s.Text == text && s.SearchDateTime == searchDateTime)
+                .FirstOrDefaultAsync();
+
+            return search?.Id;
+        }
+
+
     }
 
 

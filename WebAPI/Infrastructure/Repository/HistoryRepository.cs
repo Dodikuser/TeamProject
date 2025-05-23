@@ -1,5 +1,6 @@
 ﻿using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
 
 namespace Infrastructure.Repository
 {
@@ -51,9 +52,42 @@ namespace Infrastructure.Repository
                 .OrderByDescending(h => h.VisitDateTime)
                 .Skip(skip)
                 .Take(take)
+                .Include(h => h.Place)
+                    .ThenInclude(p => p.Photos)
                 .ToListAsync();
         }
 
+        public async Task<List<History>> SearchUserHistoryByKeywordAsync(ulong userId, string keyword, int skip = 0, int take = 10)
+        {
+            keyword = keyword.ToLower();
+
+            return await _context.Histories
+                .Include(h => h.Place)
+                .Where(h => h.UserId == userId && (
+                    h.Place.Name.ToLower().Contains(keyword) ||
+                    h.Place.Address.ToLower().Contains(keyword) ||
+                    (h.Place.Description != null && h.Place.Description.ToLower().Contains(keyword)) ||
+                    (h.Place.Site != null && h.Place.Site.ToLower().Contains(keyword)) ||
+                    (h.Place.PhoneNumber != null && h.Place.PhoneNumber.ToLower().Contains(keyword)) ||
+                    (h.Place.Email != null && h.Place.Email.ToLower().Contains(keyword))
+                ))
+                .Skip(skip)
+                .Take(take)
+                .Include(h => h.Place)
+                    .ThenInclude(p => p.Photos)
+                .ToListAsync();
+        }
+
+        public async Task<ulong?> GetHistoryIdByVisitDateAndGmapsPlaceIdAsync(DateTime visitDateTime, string gmapsPlaceId)
+        {
+            var history = await _context.Histories
+                .Include(h => h.Place)
+                .Where(h => h.VisitDateTime == visitDateTime && h.Place.GmapsPlaceId == gmapsPlaceId)
+                .Select(h => (ulong?)h.Id)
+                .FirstOrDefaultAsync();
+
+            return history;
+        }
 
     }
 }

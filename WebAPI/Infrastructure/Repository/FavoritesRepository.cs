@@ -39,7 +39,8 @@ namespace Infrastructure.Repository
             var one = _context.Favorites.Where(f => f.UserId == userId);
             var two = one.OrderByDescending(f => f.FavoritedAt).Skip(skip).Take(take);
             var three = two
-            .Include(f => f.Place);
+            .Include(f => f.Place)
+                .ThenInclude(p => p.Photos);
             var four = await three.ToListAsync();
             return four;
         }
@@ -59,6 +60,7 @@ namespace Infrastructure.Repository
                 .Skip(skip)
                 .Take(take)
                 .Include(f => f.Place)
+                    .ThenInclude(p => p.Photos)
                 .ToListAsync();
         }
 
