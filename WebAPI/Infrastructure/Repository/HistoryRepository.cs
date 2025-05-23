@@ -80,21 +80,9 @@ namespace Infrastructure.Repository
 
         public async Task<ulong?> GetHistoryIdByVisitDateAndGmapsPlaceIdAsync(DateTime visitDateTime, string gmapsPlaceId)
         {
-            var fromDate = new DateTime(
-                visitDateTime.Year,
-                visitDateTime.Month,
-                visitDateTime.Day,
-                visitDateTime.Hour,
-                visitDateTime.Minute,
-                visitDateTime.Second);
-
-            var toDate = fromDate.AddSeconds(1);
-
             var history = await _context.Histories
                 .Include(h => h.Place)
-                .Where(h => h.VisitDateTime >= fromDate
-                            && h.VisitDateTime < toDate
-                            && h.Place.GmapsPlaceId == gmapsPlaceId)
+                .Where(h => h.VisitDateTime == visitDateTime && h.Place.GmapsPlaceId == gmapsPlaceId)
                 .Select(h => (ulong?)h.Id)
                 .FirstOrDefaultAsync();
 
