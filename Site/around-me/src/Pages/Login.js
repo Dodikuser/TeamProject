@@ -1,7 +1,121 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
 
+
+
+
+const GoogleLoginForm = (isLogin) => {
+  const googleButtonRef = useRef(null); 
+
+  const GOOGLE_CLIENT_ID = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
+
+  const handleGoogleSignInCallback = (response) => {
+    console.log("Google Sign-In Response:", response);
+    const idToken = response.credential; 
+
+    if (idToken) {
+      console.log('ID TOKEN:', idToken);
+      sendToken(idToken, isLogin);
+    } else {
+      console.error('Google Sign-In не вернул ID токен.');
+    }
+  };
+
+  const sendToken = async (token, isLogin) => {
+
+        const SERVER_URL = 'https://localhost:7103/api/User';
+        const url = isLogin ? `${SERVER_URL}/login` : `${SERVER_URL}/register`;
+
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        googleJwtToken: token
+      })
+    })
+    .then(res => {
+  if (!res.ok) {
+    return res.text().then(text => {
+      throw new Error(`Ошибка регистрации: ${res.status} ${res.statusText}. Ответ сервера: ${text}`);
+    });
+  }
+  return res.text();
+})
+.then(async data => {
+
+  if (isLogin) {
+    localStorage.setItem('authToken', data.token);
+    const token = localStorage.getItem('authToken');
+    console.log('Token:', token);
+  } else {
+    await sendToken(token, true);
+  }
+})
+
+    .catch(err => {
+      console.error('Авторизация через Google провалилась:', err);
+      if (err.message.includes('UnregisteredGoogle')) {
+        sendToken(token, false);
+      }
+      else if (err.message.includes('EmailBusy')) {
+        sendToken(token, true);
+      }
+
+    });
+  };
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignInCallback, 
+        });
+
+        if (googleButtonRef.current) {
+          window.google.accounts.id.renderButton(
+            googleButtonRef.current, 
+            { theme: 'filled_blue', size: 'large', type: 'icon', text: 'signin_with' } 
+          );
+        }
+      } else {
+        console.error("Google Identity Services script loaded but 'google.accounts.id' not found.");
+      }
+    };
+    script.onerror = () => {
+        console.error("Failed to load Google Identity Services script.");
+    }
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []); 
+
+
+  return (
+    <Form>
+      <Row className="justify-content-center gap-3">
+        <Col xs="auto">
+          <i className="bi bi-facebook social-icon facebook"></i> 
+        </Col>
+        <Col xs="auto">
+          <div ref={googleButtonRef}></div>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
+
+
 export default function LoginRegister() {
+  
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -223,14 +337,7 @@ export default function LoginRegister() {
             <hr className="flex-grow-1" />
           </div>
 
-          <Row className="justify-content-center gap-3">
-            <Col xs="auto">
-              <i className="bi bi-facebook social-icon facebook"></i>
-            </Col>
-            <Col xs="auto">
-              <i className="bi bi-google social-icon google"></i>
-            </Col>
-          </Row>
+          <GoogleLoginForm isLogin />
         </Form>
 
         <style>
