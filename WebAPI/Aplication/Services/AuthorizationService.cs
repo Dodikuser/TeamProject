@@ -1,12 +1,10 @@
 ﻿using Application.DTOs.UserDTOs;
 using Entities;
 using Entities.Models;
+using Google.Apis.Auth;
 using Infrastructure.Repository;
 using System.Security.Cryptography;
 using System.Text;
-
-using Google.Apis.Auth;
-using System.Threading.Tasks;
 
 
 namespace Application.Services
@@ -61,10 +59,7 @@ namespace Application.Services
 
             try
             {
-                payload = await GoogleJsonWebSignature.ValidateAsync(googleJTWToken, new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = new[] { "490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com" } // потом перенести в секреты 
-                });
+                payload = await GetGooglePatloadAsync(googleJTWToken);
             }
             catch (InvalidJwtException)
             {
@@ -116,7 +111,13 @@ namespace Application.Services
             return RegisterStatus.Success;
 
         }
-
+        public async Task<GoogleJsonWebSignature.Payload> GetGooglePatloadAsync(string JwtToken)
+        {
+            return await GoogleJsonWebSignature.ValidateAsync(JwtToken, new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new[] { "490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com" } // потом перенести в секреты 
+            });
+        }
         public async Task<LoginStatus> LoginUser(UserLoginDTO loginData)
         {
 
@@ -156,10 +157,7 @@ namespace Application.Services
 
             try
             {
-                payload = await GoogleJsonWebSignature.ValidateAsync(googleJwtToken, new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = new[] { "490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com" } // потом перенести в секреты 
-                });
+                payload = await GetGooglePatloadAsync(googleJwtToken);
             }
             catch (InvalidJwtException)
             {

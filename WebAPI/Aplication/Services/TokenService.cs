@@ -17,13 +17,15 @@ namespace Application.Services
         private readonly string _issuer;
         private readonly string _audience;
         private readonly UserRepository _userRepository;
+        private readonly AuthorizationService _authorizationService;
 
-        public TokenService(IOptions<JwtConfig> config, UserRepository userRepository)
+        public TokenService(IOptions<JwtConfig> config, UserRepository userRepository, AuthorizationService authorizationService)
         {
             _secretKey = config.Value.Key;
             _issuer = config.Value.Issuer;
             _audience = config.Value.Audience;
             _userRepository = userRepository;
+            _authorizationService = authorizationService;
         }
 
 
@@ -37,12 +39,13 @@ namespace Application.Services
                 var userByEmail = await _userRepository.GetByEmailAsync(loginData.Email);
                 UserId = userByEmail?.Id;
             }
-            else if(loginData.googleJwtToken != null)
+            else if (loginData.googleJwtToken != null)
             {
-                var userByGoogle = await _userRepository.GetByGoogleIdAsync(loginData.googleJwtToken);
+                string Id = (await _authorizationService.GetGooglePatloadAsync(loginData.googleJwtToken)).Subject;
+                var userByGoogle = await _userRepository.GetByGoogleIdAsync(Id);
                 UserId = userByGoogle?.Id;
             }
-            else if(loginData.FacebookId != null)
+            else if (loginData.FacebookId != null)
             {
                 var userByFacebook = await _userRepository.GetByFacebookIdAsync(loginData.FacebookId);
                 UserId = userByFacebook?.Id;
