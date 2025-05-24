@@ -24,7 +24,6 @@ export default function Favorites() {
 
   // Function to get auth token (adjust based on your auth implementation)
   const getAuthToken = () => {
-    // Replace this with your actual token retrieval logic
     return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
   };
 

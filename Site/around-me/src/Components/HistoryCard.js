@@ -1,24 +1,61 @@
 import React, { useState } from 'react';
 import { Card, Button } from 'react-bootstrap';
+import axios from "axios";
 
 export default function HistoryCard({
+  id,
   image,
   title = 'Назва місця',
   locationText = 'Адреса закладу',
   dateVisited = '10 травня 2025',
+  initialFavorite = false,
   onClear,
   onGoTo,
 }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [animating, setAnimating] = useState(false);
 
-  const toggleFavorite = () => {
-    if (!isFavorite) {
-      setAnimating(true);
-      setTimeout(() => setAnimating(false), 500); 
+  const getAuthToken = () => {
+  return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+};
+
+const toggleFavorite = async () => {
+  const action = isFavorite ? "Remove" : "Add";
+  const token = getAuthToken();
+
+  if (!token) {
+    console.error("Токен авторизации не найден.");
+    return;
+  }
+
+  try {
+    setAnimating(true);
+ 
+    const url = new URL("https://localhost:7103/api/Favorites/action");
+    url.searchParams.append("gmapsPlaceId", id);
+    url.searchParams.append("action", action);
+
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+      body: null, // пустое тело
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Ошибка ${response.status}: ${errorText}`);
     }
+
     setIsFavorite(!isFavorite);
-  };
+  } catch (error) {
+    console.error("Ошибка при запросе избранного:", error);
+  } finally {
+    setTimeout(() => setAnimating(false), 500);
+  }
+};
+
 
   return (
     <Card className="shadow-sm border-0 h-100 rounded-3">
