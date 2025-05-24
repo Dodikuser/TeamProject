@@ -14,4 +14,6 @@
     <string name="save">Зберегти</string>
     <string name="route">Маршрут</string>
     <string name="reviews">Відгуки</string>
+    <string name="your_account">Твій аккаунт</string>
+    <string name="welcome_to_aroundme">Ласкаво просимо до AroundMe</string>
 </resources>

@@ -5,4 +5,9 @@
         <item name="exampleColor">@color/light_blue_400</item>
         <item name="android:fontFamily">@font/roboto_regular</item>
     </style>
+    <style name="CustomCircleImageView" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item> <!-- Круглая форма -->
+    </style>
+
 </resources>
