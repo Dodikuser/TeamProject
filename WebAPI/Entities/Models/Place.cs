@@ -24,6 +24,7 @@ namespace Entities.Models
         public int? Radius { get; set; }
         public int? TokensAvailable { get; set; }
         public DateTime? LastPromotionDateTime { get; set; }
+        public double Stars { get; set; }
 
         //тут будут доп поля которые есть на Гмапах но не было у нас
         public bool? IsOpen { get; set; }

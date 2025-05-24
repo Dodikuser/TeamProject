@@ -74,9 +74,11 @@ namespace Application.Services
                     Longitude = place.Longitude,
                     Latitude = place.Latitude,
                     GmapsPlaceId = place.GmapsPlaceId,
-                    Stars = place.Reviews?.Any() == true
-                        ? (int)Math.Round(place.Reviews.Average(r => r.Stars))
-                        : 0,
+                    Address = place.Address,
+                    Stars = place.Stars,
+                    //Stars = place.Reviews?.Any() == true
+                    //    ? (int)Math.Round(place.Reviews.Average(r => r.Stars))
+                    //    : 0,
                     Photo = place.Photos != null && place.Photos.Any()
                         ? new PhotoDTO
                         {

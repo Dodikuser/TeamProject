@@ -83,6 +83,7 @@ namespace Application
                 Description = gPlace.EditorialSummary?.Overview,
                 IsOpen = gPlace.OpeningHours?.OpenNow,
                 GmapsPlaceId = gmapsPlaceId,
+                Stars = gPlace.Rating ?? 0,
 
                 OpeningHours = ParseOpeningHours(gPlace.OpeningHours?.WeekdayText),
 
