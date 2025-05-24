@@ -10,11 +10,4 @@ namespace Application.DTOs.GmapDTOs
         [JsonProperty("weekday_text")]
         public List<string> WeekdayText { get; set; }
     }
-
-
-
-    //TO-DO
-    //сделать запрос с фильтрами: текст, радиус, категории
-    //получить координаты по гмапс айди
-    //получить всю инфу про место по айди
 }

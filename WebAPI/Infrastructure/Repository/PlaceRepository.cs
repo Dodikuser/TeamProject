@@ -54,10 +54,6 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<bool> ExistsAsync(string gmapsPlaceId)
-        {
-            return await _context.Places.AnyAsync(p => p.GmapsPlaceId == gmapsPlaceId);
-        }
         public async Task<Place?> GetByIdAsync(int placeId)
         {
             return await _context.Places.FindAsync(placeId);
@@ -109,5 +105,15 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
+
+        //Добавить свзять между местом и типом мест
+        public async Task AddPlaceTypeToPlace(ulong placeId, ulong placeTypeId)
+        {
+            throw new NotImplementedException();
+        }
+
+        //добавить место с проверкой
+
+
     }
 }

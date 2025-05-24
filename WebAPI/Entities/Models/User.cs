@@ -15,6 +15,7 @@ namespace Entities.Models
         public string? OauthProvider { get; set; }
         public bool SearchHistoryOn { get; set; }
         public bool VisitHistoryOn { get; set; }
+        public int TokensAvailable { get; set; }
         public bool IsAdmin { get; set; }
 
 

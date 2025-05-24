@@ -10,11 +10,4 @@ namespace Application.DTOs.GmapDTOs
         [JsonProperty("lng")]
         public double Lng { get; set; }
     }
-
-
-
-    //TO-DO
-    //сделать запрос с фильтрами: текст, радиус, категории
-    //получить координаты по гмапс айди
-    //получить всю инфу про место по айди
 }

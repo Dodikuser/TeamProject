@@ -5,39 +5,34 @@ namespace Application.DTOs.GmapDTOs
     public class GPlaceDetailsResult
     {
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonProperty("formatted_address")]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [JsonProperty("geometry")]
-        public GGeometry Geometry { get; set; }
+        public GGeometry? Geometry { get; set; }
 
         [JsonProperty("formatted_phone_number")]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [JsonProperty("opening_hours")]
-        public GOpeningHours OpeningHours { get; set; }
+        public GOpeningHours? OpeningHours { get; set; }
 
         [JsonProperty("rating")]
         public double? Rating { get; set; }
 
         [JsonProperty("editorial_summary")]
-        public GEditorialSummary EditorialSummary { get; set; }
+        public GEditorialSummary? EditorialSummary { get; set; }
 
         [JsonProperty("website")]
-        public string Website { get; set; }
+        public string? Website { get; set; }
 
         [JsonProperty("photos")]
-        public List<GPhoto> Photos { get; set; }
+        public List<GPhoto>? Photos { get; set; }
 
         [JsonProperty("price_level")]
         public int? PriceLevel { get; set; }
 
     }
-
-    //TO-DO
-    //сделать запрос с фильтрами: текст, радиус, категории
-    //получить координаты по гмапс айди
-    //получить всю инфу про место по айди
 }

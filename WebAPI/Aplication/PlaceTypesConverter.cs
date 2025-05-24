@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Application.DTOs.GmapDTOs;
+using Entities.Models;
 
 namespace Application
 {

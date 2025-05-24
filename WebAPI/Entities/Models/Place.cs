@@ -44,5 +44,7 @@ namespace Entities.Models
         public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
         public virtual ICollection<Photo> Photos { get; set; } = new List<Photo>();
         public virtual ICollection<AdHashtag> AdHashtags { get; set; } = new List<AdHashtag>();
+        //public virtual ICollection<PlaceType> PlaceTypes { get; set; } = new List<PlaceType>();
+
     }
 }

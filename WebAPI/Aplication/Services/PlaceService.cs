@@ -39,5 +39,6 @@ namespace Application.Services
         {
             return await _favoritesRepository.SearchFavoritesAsync(UserId, keyword, skip, take);
         }
+
     }
 }
