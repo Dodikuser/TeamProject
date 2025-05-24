@@ -29,12 +29,19 @@ namespace Application.Services
 
             ulong placeId = (await _placeRepository.GetIdByGmapsPlaceIdAsync(gmapsPlaceId)).Value;
 
+            bool existsFavorite = await _favoritesRepository.ExistsAsync(UserId, placeId);
+
+
             switch (action)
             {
                 case FavoriteActionEnum.Add:
+                    if (existsFavorite)
+                        return;
                     await _favoritesRepository.AddAsync(UserId, placeId);
                     break;
                 case FavoriteActionEnum.Remove:
+                    if (!existsFavorite)
+                        return;
                     await _favoritesRepository.RemoveAsync(UserId, placeId);
                     break;
                 default:

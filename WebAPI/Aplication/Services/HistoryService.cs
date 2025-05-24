@@ -134,9 +134,11 @@ namespace Application.Services
                     Longitude = history.Place.Longitude,
                     Latitude = history.Place.Latitude,
                     GmapsPlaceId = history.Place.GmapsPlaceId,
-                    Stars = history.Place.Reviews?.Any() == true
-                                ? (int)Math.Round(history.Place.Reviews.Average(r => r.Stars))
-                                : 0,
+                    Stars = history.Place.Stars,
+                    Address = history.Place.Address,
+                    //Stars = history.Place.Reviews?.Any() == true
+                    //            ? (int)Math.Round(history.Place.Reviews.Average(r => r.Stars))
+                    //            : 0,
                     Photo = mainPhoto != null
                                 ? new PhotoDTO
                                 {
