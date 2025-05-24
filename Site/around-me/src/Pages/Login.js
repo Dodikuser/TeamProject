@@ -46,9 +46,12 @@ const GoogleLoginForm = (isLogin) => {
 .then(async data => {
 
   if (isLogin) {
-    localStorage.setItem('authToken', data.token);
-    const token = localStorage.getItem('authToken');
-    console.log('Token:', token);
+      const parsed = JSON.parse(data);
+      console.log('data:', parsed);
+      console.log('data.token:', parsed.token);
+    localStorage.setItem('authToken', String(parsed.token));
+    const token_ = localStorage.getItem('authToken');
+    console.log('Token:', token_);
   } else {
     await sendToken(token, true);
   }
