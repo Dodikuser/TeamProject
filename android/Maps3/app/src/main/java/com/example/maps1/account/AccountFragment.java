@@ -1,7 +1,6 @@
-package com.example.maps1.fragment;
+package com.example.maps1.account;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.maps1.MainActivity;
 import com.example.maps1.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -34,7 +32,7 @@ public class AccountFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_account, container, false);
+        View view = inflater.inflate(R.layout.account_activity, container, false);
 
         MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.toggleGroup);
         MaterialButton btnSubmit = view.findViewById(R.id.btnSubmit);
@@ -132,6 +130,35 @@ public class AccountFragment extends Fragment {
     private void sendLoginRequest(String email, String password) {
         new Thread(() -> {
             try {
+                // Імітуємо успішний вхід, оскільки сервер не підключено
+                requireActivity().runOnUiThread(() -> {
+                    // Зберігаємо фейковий токен
+                    SharedPreferences prefs = requireActivity()
+                            .getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+                    prefs.edit()
+                            .putString("auth_token", "fake_token")
+                            .apply();
+
+                    Toast.makeText(getContext(), "Успішний вхід!", Toast.LENGTH_SHORT).show();
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new MainAccount())
+                            .commit();
+                });
+
+                Thread.sleep(1000); // Імітація затримки мережі
+            } catch (Exception e) {
+                e.printStackTrace();
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getContext(),
+                                "Помилка підключення: " + e.getMessage(),
+                                Toast.LENGTH_LONG).show()
+                );
+            }
+        }).start();
+    }
+        /*new Thread(() -> {
+
+            try {
                 URL url = new URL("http://10.0.2.2:7103/api/User/login");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
@@ -169,15 +196,20 @@ public class AccountFragment extends Fragment {
 
                     requireActivity().runOnUiThread(() -> {
                         Toast.makeText(getContext(), "Успішний вхід!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getContext(), MainActivity.class);
-                        startActivity(intent);
-                        requireActivity().finish();
+                        // Замінюємо поточний фрагмент на MainAccountFragment
+                        getParentFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, new MainAccount())
+                                .commit();
                     });
                 } else {
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new MainAccount())
+                            .commit();
+                    /*
                     requireActivity().runOnUiThread(() ->
-                            Toast.makeText(getContext(),
-                                    "Помилка входу: " + response,
+                            Toast.makeText(getContext(), "Помилка входу: " + response,
                                     Toast.LENGTH_LONG).show()
+
                     );
                 }
             } catch (Exception e) {
@@ -188,6 +220,6 @@ public class AccountFragment extends Fragment {
                                 Toast.LENGTH_LONG).show()
                 );
             }
-        }).start();
+        }).start();*/
     }
-}
+

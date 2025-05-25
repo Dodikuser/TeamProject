@@ -2,70 +2,105 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:layout_margin="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:backgroundTint="#FAFAFA">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="12dp">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
-        <!-- Такий самий дизайн як у item_favorites, але без кнопки видалити -->
+        <!-- Зображення -->
         <ImageView
             android:id="@+id/recommendation_image"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="0dp"
+            android:layout_height="160dp"
+            android:layout_marginTop="8dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_placeholder" />
+            android:src="@drawable/ic_placeholder"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Назва ресторану -->
+        <TextView
+            android:id="@+id/recommendation_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/recommendation_image"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical">
+            android:layout_marginTop="12dp"
+            android:text="Ресторан 'Український'"
+            android:textColor="#333333"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recommendation_image" />
 
-            <!-- Назва місця -->
-            <TextView
-                android:id="@+id/recommendation_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Назва місця"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+        <!-- Адреса -->
+        <TextView
+            android:id="@+id/recommendation_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="вул. Хрещатик, 15"
+            android:textColor="#555555"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recommendation_name" />
 
-            <!-- Адреса -->
-            <TextView
-                android:id="@+id/recommendation_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Адреса"
-                android:textSize="14sp" />
+        <!-- Рейтинг -->
+        <RatingBar
+            android:id="@+id/recommendation_rating"
+            style="@style/Widget.AppCompat.RatingBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:isIndicator="true"
+            android:numStars="5"
+            android:rating="4.5"
+            android:stepSize="0.1"
+            android:progressTint="@android:color/black"
+            android:secondaryProgressTint="@android:color/black"
+            android:progressBackgroundTint="@android:color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recommendation_address" />
 
-            <!-- Рейтинг -->
-            <RatingBar
-                android:id="@+id/recommendation_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:isIndicator="true"
-                android:numStars="5"
-                android:rating="4.5"
-                android:stepSize="0.1" />
+        <!-- Опис -->
+        <TextView
+            android:id="@+id/recommendation_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:text="Традиційна українська кухня з домашньою атмосферою та смачними стравами"
+            android:textColor="#666666"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recommendation_rating" />
 
-            <!-- Кнопка "Перейти" -->
-            <Button
-                android:id="@+id/recommendation_btn_go"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="@color/primary_light"
-                android:text="Перейти"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
-    </RelativeLayout>
+        <!-- Кнопка -->
+        <Button
+            android:id="@+id/recommendation_btn_go"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_button"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="Перейти"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recommendation_description" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

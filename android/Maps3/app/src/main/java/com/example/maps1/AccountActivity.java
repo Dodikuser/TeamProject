@@ -59,7 +59,6 @@ public class AccountActivity extends AppCompatActivity {
             }
         });
 
-        // Обработчик нажатия кнопки входа/регистрации
         btnSubmit.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();

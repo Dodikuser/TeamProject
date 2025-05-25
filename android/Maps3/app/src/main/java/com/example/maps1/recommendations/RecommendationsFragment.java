@@ -1,5 +1,108 @@
 package com.example.maps1.recommendations;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.SearchView;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.maps1.PlaceDetailsActivity;
+import com.example.maps1.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class RecommendationsFragment extends Fragment {
+    private RecyclerView recyclerView;
+    private RecommendationsAdapter adapter;
+    private List<RecommendationsItem> recommendationsItems = new ArrayList<>();
+    private List<RecommendationsItem> filteredItems = new ArrayList<>();
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_recommendations, container, false);
+
+        recyclerView = view.findViewById(R.id.recommendationsRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+
+        adapter = new RecommendationsAdapter(filteredItems, item -> {
+            // Open place details
+            Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
+            intent.putExtra("place_id", item.getId());
+            startActivity(intent);
+        });
+        recyclerView.setAdapter(adapter);
+
+        // Setup search view
+        SearchView searchView = view.findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterRecommendationsItems(newText);
+                return true;
+            }
+        });
+
+        loadRecommendationsItems();
+
+        return view;
+    }
+
+    private void loadRecommendationsItems() {
+        recommendationsItems.clear();
+
+        // Тестові дані для рекомендацій
+        recommendationsItems.add(new RecommendationsItem("101", "Ресторан 'Смачний'",
+                "вул. Головна, 10", "Європейська кухня", 4.7f, "",
+                50.4501, 30.5234));
+        recommendationsItems.add(new RecommendationsItem("102", "Кафе 'Аромат'",
+                "вул. Лісова, 5", "Кава та десерти", 4.5f, "",
+                50.4478, 30.5132));
+        recommendationsItems.add(new RecommendationsItem("103", "Піцерія 'Італія'",
+                "вул. Італійська, 15", "Справжня італійська піца", 4.3f, "",
+                50.4556, 30.3658));
+        recommendationsItems.add(new RecommendationsItem("104", "Бар 'Ретро'",
+                "вул. Стародавня, 22", "Коктейлі та музика", 4.8f, "",
+                50.4532, 30.5123));
+
+        filteredItems.clear();
+        filteredItems.addAll(recommendationsItems);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void filterRecommendationsItems(String query) {
+        filteredItems.clear();
+
+        if (query.isEmpty()) {
+            filteredItems.addAll(recommendationsItems);
+        } else {
+            String lowerCaseQuery = query.toLowerCase();
+            for (RecommendationsItem item : recommendationsItems) {
+                if (item.getName().toLowerCase().contains(lowerCaseQuery) ||
+                        item.getAddress().toLowerCase().contains(lowerCaseQuery) ||
+                        item.getDescription().toLowerCase().contains(lowerCaseQuery)) {
+                    filteredItems.add(item);
+                }
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+}
+
+/*
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,7 +136,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
+/*
 public class RecommendationsFragment extends Fragment {
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
@@ -255,7 +358,7 @@ public class RecommendationsFragment extends Fragment {
         intent.putExtra("place", myPlace);
         startActivity(intent);
     }
-*/
+
     private MyPlace convertToMyPlace(Place place) {
         return new MyPlace(
                 place.getId(),
@@ -283,4 +386,4 @@ public class RecommendationsFragment extends Fragment {
             }
         }
     }
-}
+}*/

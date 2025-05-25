@@ -17,7 +17,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.maps1.fragment.AccountFragment;
+import com.example.maps1.account.AccountFragment;
 import com.example.maps1.Favorites.FavoritesFragment;
 import com.example.maps1.history.HistoryFragment;
 import com.example.maps1.fragment.MapFragment;
@@ -220,10 +220,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 place.getAddress(),
                 "Опис відсутній",
                 place.getRating(),
-                null, // phone
-                null, // hours
-                null, // website
-                new ArrayList<>(), // photos
+                null,
+                null,
+                null,
+                new ArrayList<>(),
                 place.getLatLng()
         );
     }
