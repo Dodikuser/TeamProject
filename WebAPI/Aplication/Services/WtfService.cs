@@ -150,6 +150,7 @@ namespace Application.Services
                 GooglePlaceIds = googlePlaceIds,
                 IsSpecifiedQuery = false
             };
+
         }
 
 

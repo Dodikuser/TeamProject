@@ -110,11 +110,14 @@ namespace Application
                 Latitude = place.Latitude,
                 GmapsPlaceId = place.GmapsPlaceId,
                 Stars = place.Stars,
-                Photo = place.Photos.Select(photo => new PhotoDTO
+                Photo = place.Photos.Any()
+                ? place.Photos.Select(photo => new PhotoDTO
                 {
                     Path = photo.Path,
                     PlaceId = photo.PlaceId
-                }).First(),
+                }).First()
+                : null,
+
             };
         }
 

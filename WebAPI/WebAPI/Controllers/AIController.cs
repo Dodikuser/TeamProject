@@ -36,7 +36,18 @@ namespace WebAPI.Controllers
                 Console.WriteLine("------------------------------------------------------------------" + x);
             }
 
-            return Ok(dto);
+            var resultList = new List<PlaceDTODefaultCard>();
+
+            foreach (var placeId in dto.GooglePlaceIds)
+            {
+                Place place = await _placeService.RegisterPlaceIfNotExist(placeId);
+
+                PlaceDTODefaultCard placeInfo = PlaceTypesConverter.ToDTODefault(place);
+
+                resultList.Add(placeInfo);
+            }
+
+            return Ok(resultList);
         }
 
         [HttpGet("recommend")]
