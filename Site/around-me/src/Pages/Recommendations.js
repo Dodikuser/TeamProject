@@ -1,25 +1,133 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import RecommendationsCard from '../Components/RecommendationsCard';
+import RecommendationService from '../services/RecommendationService';
+import FavoriteService from '../services/FavoriteService';
 
 const categories = [
   'Туризм', 'Їжа', 'Природа', 'Шопінг', 'Історія', 'Спорт',
-  'Для дітей', 'Тихі місця', 'Романтика', 'Екзотика', 'Екстрим','Розваги', 'Банк', 'Місця поруч', 'Архітектура'
+  'Для дітей', 'Тихі місця', 'Романтика', 'Екзотика', 'Екстрим', 'Розваги', 'Банк', 'Місця поруч', 'Архітектура'
 ];
+
+// Error boundary component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error in recommendations:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="text-center py-5 text-danger">
+          Щось пішло не так. Спробуйте оновити сторінку.
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 export default function Recommendations() {
   const scrollRef = useRef(null);
-
-  // Добавляем состояние для поиска
   const [searchTerm, setSearchTerm] = useState('');
+  const [recommendations, setRecommendations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [favorites, setFavorites] = useState(new Set());
 
-  const recommendations = new Array(6).fill(null).map((_, i) => ({
-    image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
-    title: `Назва місця ${i + 1}`, // Чтобы было различие в названиях
-    location: 'м. Київ',
-    rating: 4,
-    distance: '100 км',
-  }));
+  // Add fetchFavorites function
+  const fetchFavorites = async () => {
+    try {
+      const response = await FavoriteService.getFavorites({ skip: 0, take: 1000 });
+      const favoriteIds = new Set(response.favorites.$values.map(fav => fav.placeDTO.gmapsPlaceId));
+      setFavorites(favoriteIds);
+      return favoriteIds;
+    } catch (err) {
+      console.error('Error fetching favorites:', err);
+      return new Set();
+    }
+  };
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const data = await RecommendationService.getRecommendations({
+          hashTagId: 8,
+          radius: 10000,
+          latitude: 47.81052,
+          longitude: 35.18286
+        });
+        
+        const favoritesSet = await fetchFavorites();
+        
+        // Transform API data and include isFavorite flag
+        const transformedPlaces = Array.isArray(data) ? data.map(item => ({
+          id: item.gmapsPlaceId || item.id,
+          originalItem: item,
+          image: item.photo?.path || item.photos?.[0]?.path || 'https://cdn-icons-png.flaticon.com/512/2966/2966959.png',
+          title: item.title || item.name || 'Без назви',
+          location: item.location || item.address || 'Місцезнаходження невідоме',
+          rating: parseFloat(item.rating || item.stars || 4),
+          distance: item.distance || item.distanceText || '100 км',
+          isFavorite: favoritesSet.has(item.gmapsPlaceId || item.id)
+        })) : [];
+
+        setRecommendations(transformedPlaces);
+      } catch (err) {
+        console.error('Error fetching recommendations:', err);
+        setError(`Помилка при завантаженні рекомендацій: ${err.message}`);
+        setRecommendations([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
+
+  // Add handleToggleFavorite function
+  const handleToggleFavorite = async (placeId) => {
+    try {
+      const isFavorite = favorites.has(placeId);
+      const action = isFavorite ? "Remove" : "Add";
+      
+      await FavoriteService.toggleFavorite(placeId, action);
+      
+      setFavorites(prev => {
+        const newFavorites = new Set(prev);
+        if (isFavorite) {
+          newFavorites.delete(placeId);
+        } else {
+          newFavorites.add(placeId);
+        }
+        return newFavorites;
+      });
+
+      // Update the recommendation's isFavorite status
+      setRecommendations(prev => prev.map(rec => {
+        if (rec.id === placeId) {
+          return { ...rec, isFavorite: !isFavorite };
+        }
+        return rec;
+      }));
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      setError("Помилка при зміні статусу обраного місця");
+    }
+  };
 
   const scrollCategories = (direction) => {
     const scrollAmount = 200;
@@ -31,14 +139,33 @@ export default function Recommendations() {
     }
   };
 
- 
-  const filteredRecommendations = recommendations.filter(rec =>
-    rec.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Ensure recommendations is always an array before filtering
+  const filteredRecommendations = Array.isArray(recommendations) 
+    ? recommendations.filter(rec => {
+        // Логируем структуру каждого элемента для отладки
+        if (!rec) {
+          console.log('Empty recommendation item:', rec);
+          return false;
+        }
+        
+        // Проверяем разные возможные поля для названия
+        const title = rec.title || rec.name || rec.placeName || rec.Title || rec.Name;
+        if (!title) {
+          console.log('No title found in recommendation:', rec);
+          return false;
+        }
+        
+        return title.toLowerCase().includes(searchTerm.toLowerCase());
+      })
+    : [];
 
-  return (
+  // Добавим логирование для отладки
+  console.log('Total recommendations:', recommendations.length);
+  console.log('Filtered recommendations:', filteredRecommendations.length);
+  console.log('Search term:', searchTerm);
+
+  const content = (
     <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', minHeight: '100vh' }}>
-      
       {/* Пошук */}
       <Row className="mb-4">
         <Col xs={12}>
@@ -49,8 +176,8 @@ export default function Recommendations() {
                 placeholder="Пошук"
                 className="ps-3 pe-5"
                 style={{ borderRadius: '8px' }}
-                value={searchTerm} // привязываем к состоянию
-                onChange={e => setSearchTerm(e.target.value)} // обновляем по вводу
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
               />
               <span
                 className="material-symbols-outlined position-absolute end-0 top-50 translate-middle-y me-3 text-muted"
@@ -64,7 +191,7 @@ export default function Recommendations() {
       </Row>
 
       {/* Категорії зі стрілками */}
-      <div className="position-relative mb-5">
+      <div className="position-relative mb-4">
         <Button
           variant="light"
           className="position-absolute top-50 start-0 translate-middle-y shadow-none border-0 p-1"
@@ -103,14 +230,36 @@ export default function Recommendations() {
 
       {/* Карточки рекомендацій */}
       <Row>
-        {filteredRecommendations.length === 0 ? (
+        {loading ? (
+          <Col xs={12} className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Завантаження...</span>
+            </div>
+          </Col>
+        ) : error ? (
+          <Col xs={12} className="text-center py-5 text-danger">
+            {error}
+            <div className="mt-3">
+              <Button 
+                variant="outline-primary" 
+                onClick={() => window.location.reload()}
+              >
+                Спробувати знову
+              </Button>
+            </div>
+          </Col>
+        ) : filteredRecommendations.length === 0 ? (
           <Col xs={12} className="text-center py-5 text-muted fs-6">
-            Рекомендацій не знайдено
+            {searchTerm ? 'За вашим запитом нічого не знайдено' : 'Рекомендацій не знайдено'}
           </Col>
         ) : (
           filteredRecommendations.map((rec, idx) => (
-            <Col key={idx} xs={12} sm={6} md={4} lg={3} className="mb-4">
-              <RecommendationsCard {...rec} />
+            <Col key={rec.id || idx} xs={12} sm={6} md={4} lg={3} className="mb-4">
+              <RecommendationsCard 
+                {...rec}
+                isFavorite={favorites.has(rec.id)}
+                onToggleFavorite={() => handleToggleFavorite(rec.id)}
+              />
             </Col>
           ))
         )}
@@ -140,5 +289,11 @@ export default function Recommendations() {
         `}
       </style>
     </Container>
+  );
+
+  return (
+    <ErrorBoundary>
+      {content}
+    </ErrorBoundary>
   );
 }

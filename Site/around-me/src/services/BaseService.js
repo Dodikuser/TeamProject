@@ -27,7 +27,13 @@ class BaseService {
             throw new Error(`Помилка сервера: ${response.status}`);
         }
 
-        return response.json();
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            const text = await response.text();
+            return text ? JSON.parse(text) : null;
+        }
+        
+        return null;
     }
 }
 

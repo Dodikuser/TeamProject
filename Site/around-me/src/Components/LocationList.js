@@ -4,8 +4,7 @@ import LocationModal from './LocationModal'; // импортируй модал�
 import { Container } from 'react-bootstrap';
 
 const sampleData = [
-  { id: 1, title: 'Назва ', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '100 км' },
-  { id: 2, title: 'Назва ', image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg', distance: '100 км' },
+
 ];
 
 function LocationList() {

@@ -12,7 +12,7 @@ class HistoryService extends BaseService {
     async getVisitHistory(params = {}) {
         const { skip = 0, take = 10 } = params;
         return this.makeRequest(`/history/places/get?skip=${skip}&take=${take}`, {
-            method: 'GET'
+            method: 'POST'
         });
     }
 
