@@ -4,6 +4,8 @@ import FilterOffcanvas from '../Components/FilterOffcanvas';
 import SortOffcanvas from '../Components/SortOffcanvas';
 import VisitHistory from '../Components/VisitHistory';
 import SearchHistory from '../Components/SearchHistory';
+import HistoryService from '../services/HistoryService';
+import { useNavigate } from 'react-router-dom';
 
 export default function History() {
   const [showFilters, setShowFilters] = useState(false);
@@ -23,49 +25,33 @@ export default function History() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState(() => () => {});
   const [confirmText, setConfirmText] = useState('');
+  const [favorites, setFavorites] = useState(new Set());
 
-  // Helper function to get auth token
-  const getAuthToken = () => {
-    return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-  };
+  const navigate = useNavigate();
 
-const [favorites, setFavorites] = useState(new Set());
+  // API call to get user's favorites
+  const fetchFavorites = async () => {
+    try {
+      const response = await fetch('https://localhost:7103/api/Favorites/get?skip=0&take=1000', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${HistoryService.getAuthToken()}`
+        }
+      });
 
-// API call to get user's favorites
-const fetchFavorites = async () => {
-  try {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-
-    const response = await fetch('https://localhost:7103/api/Favorites/get?skip=0&take=1000', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      const favoriteIds = new Set(data.favorites.$values.map(fav => fav.placeDTO.gmapsPlaceId));
+      setFavorites(favoriteIds);
+      return favoriteIds;
+    } catch (err) {
+      console.error('Error fetching favorites:', err);
     }
-
-    const data = await response.json();
-    
-    // Extract gmapsPlaceId from favorites.$values array
-    const favoriteIds = new Set(data.favorites.$values.map(fav => fav.placeDTO.gmapsPlaceId));
-    setFavorites(favoriteIds);
-    return favoriteIds;
-    
-  } catch (err) {
-    console.error('Error fetching favorites:', err);
-  }
-};
-
-// useEffect(() => {
-//   fetchFavorites();
-// }, []);
+  };
 
   // API call for visit history
   const fetchVisitHistory = async (skipCount = 0, takeCount = 10, append = false) => {
@@ -73,30 +59,13 @@ const fetchFavorites = async () => {
     setError(null);
     
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      const response = await fetch(`https://localhost:7103/api/history/places/get?skip=${skipCount}&take=${takeCount}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
+      const data = await HistoryService.getVisitHistory({ skip: skipCount, take: takeCount });
       const favoritesSet = await fetchFavorites();
+      
       // Transform API data to match component structure
       const transformedPlaces = data.histoires.$values.map(item => ({
         id: item.placeDTO.gmapsPlaceId,
-        originalItem: item, // Store original item for deletion
+        originalItem: item,
         image: item.placeDTO.photo?.path || 'https://via.placeholder.com/300x150',
         title: item.placeDTO.name,
         locationText: item.placeDTO.address,
@@ -117,10 +86,8 @@ const fetchFavorites = async () => {
         setHistoryPlaces(transformedPlaces);
       }
 
-      // Check if there are more items to load
       setHasMore(transformedPlaces.length === takeCount);
       setSkip(skipCount + transformedPlaces.length);
-      
     } catch (err) {
       console.error('Error fetching visit history:', err);
       setError(err.message);
@@ -135,29 +102,12 @@ const fetchFavorites = async () => {
     setError(null);
     
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      const response = await fetch(`https://localhost:7103/api/history/requests/get?skip=${skipCount}&take=${takeCount}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await HistoryService.getSearchHistory({ skip: skipCount, take: takeCount });
       
       // Transform API data to match component structure
       const transformedSearches = data.searches.$values.map(item => ({
         id: item.$id,
-        originalItem: item, // Store original item for deletion
+        originalItem: item,
         query: item.text,
         date: new Date(item.searchDateTime).toLocaleDateString('uk-UA', {
           day: 'numeric',
@@ -178,7 +128,6 @@ const fetchFavorites = async () => {
       }
 
       setHasMore(transformedSearches.length === takeCount);
-      
     } catch (err) {
       console.error('Error fetching search history:', err);
       setError(err.message);
@@ -193,29 +142,12 @@ const fetchFavorites = async () => {
     setError(null);
     
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      // Create HistoryPlaceRequestDTO from the original item
       const placeHistoryDTO = {
         gmapsPlaceId: place.originalItem.placeDTO.gmapsPlaceId,
         visitDateTime: place.originalItem.visitDateTime
       };
 
-      const response = await fetch('https://localhost:7103/api/history/places/action?historyAction=Remove', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(placeHistoryDTO)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await HistoryService.deleteVisitHistoryItem(placeHistoryDTO);
 
       // Remove item from local state
       setHistoryPlaces(prev =>
@@ -223,8 +155,6 @@ const fetchFavorites = async () => {
           !(item.id === place.id && item.dateVisited === place.dateVisited)
         )
       );
-
-      
     } catch (err) {
       console.error('Error deleting visit history item:', err);
       setError(err.message);
@@ -239,33 +169,15 @@ const fetchFavorites = async () => {
     setError(null);
     
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      // Create SearchDTO from the original item
       const searchDTO = {
         text: searchItem.originalItem.text,
         searchDateTime: searchItem.originalItem.searchDateTime
       };
 
-      const response = await fetch('https://localhost:7103/api/history/requests/action?historyAction=Remove', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(searchDTO)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await HistoryService.deleteSearchHistoryItem(searchDTO);
 
       // Remove item from local state
       setSearchHistory(prev => prev.filter(item => item.id !== searchItem.id));
-      
     } catch (err) {
       console.error('Error deleting search history item:', err);
       setError(err.message);
@@ -280,35 +192,12 @@ const fetchFavorites = async () => {
     setError(null);
     
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      // For clear action, we can send empty DTO
-      const placeHistoryDTO = {
-        gmapsPlaceId: '',
-        visitDateTime: new Date().toISOString()
-      };
-
-      const response = await fetch('https://localhost:7103/api/history/places/action?historyAction=Clear', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(placeHistoryDTO)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await HistoryService.clearVisitHistory();
 
       // Clear local state
       setHistoryPlaces([]);
       setSkip(0);
       setHasMore(false);
-      
     } catch (err) {
       console.error('Error clearing visit history:', err);
       setError(err.message);
@@ -323,35 +212,12 @@ const fetchFavorites = async () => {
     setError(null);
     
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      // For clear action, we can send empty DTO
-      const searchDTO = {
-        text: '',
-        searchDateTime: new Date().toISOString()
-      };
-
-      const response = await fetch('https://localhost:7103/api/history/requests/action?historyAction=Clear', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(searchDTO)
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await HistoryService.clearSearchHistory();
 
       // Clear local state
       setSearchHistory([]);
       setSkip(0);
       setHasMore(false);
-      
     } catch (err) {
       console.error('Error clearing search history:', err);
       setError(err.message);
@@ -396,9 +262,9 @@ const fetchFavorites = async () => {
   const handleGoToVisit = (idx) => {
     const place = historyPlaces[idx];
     if (place) {
-      // You can navigate to the place details or open in maps
-      const mapsUrl = `https://www.google.com/maps/place/?q=place_id:${place.id}`;
-      window.open(mapsUrl, '_blank');
+      navigate("/");
+      localStorage.setItem("openPlace", `${place.id}`);
+      alert(`Перейти до місця: ${place.title}`);
     }
   };
 
@@ -410,7 +276,6 @@ const fetchFavorites = async () => {
   };
 
   const handleGoToSearch = (query) => {
-    // Implement search functionality
     alert(`Пошук за запитом: "${query}"`);
   };
 

@@ -4,10 +4,13 @@ import { Container, Row, Col, Button, Form, Modal, Spinner, Alert } from 'react-
 import FilterOffcanvas from '../Components/FilterOffcanvas';
 import SortOffcanvas from '../Components/SortOffcanvas';
 import FavoritesCard from '../Components/Cards/FavoritesCard';
+import {useNavigate} from "react-router-dom";
 
 const API_BASE_URL = 'https://localhost:7103/api';
 
 export default function Favorites() {
+  const navigate = useNavigate();
+
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const [favoritePlaces, setFavoritePlaces] = useState([]);
@@ -60,7 +63,7 @@ export default function Favorites() {
       }
 
       const response = await fetch(`${API_BASE_URL}/Favorites/get?skip=${skipCount}&take=${take}`, {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -156,6 +159,8 @@ export default function Favorites() {
 
   const handleGoTo = (idx) => {
     const place = filteredPlaces[idx];
+    navigate("/");
+    localStorage.setItem("openPlace", `${place.id}`);
     // Here you would typically navigate to the place details or map
     alert(`Перейти до місця: ${place.title}`);
   };

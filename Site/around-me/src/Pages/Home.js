@@ -1,19 +1,50 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Container, Form, FormControl, Row, Col } from 'react-bootstrap';
 import FilterOffcanvas from '../Components/FilterOffcanvas';
 import SortOffcanvas from '../Components/SortOffcanvas';
+import LocationModal from '../Components/LocationModal';
+import PlaceService from '../services/PlaceService';
 
 function Home() {
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Function to load place details from API
+  const loadPlaceDetails = async (placeId) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await PlaceService.getPlaceById(placeId);
+      setSelectedPlace(data);
+      setShowModal(true);
+    } catch (err) {
+      console.error('Error loading place details:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      // Clear the openPlace from localStorage after attempting to load
+      localStorage.removeItem('openPlace');
+    }
+  };
+
+  useEffect(() => {
+    const placeId = localStorage.getItem("openPlace");
+    if (placeId) {
+      loadPlaceDetails(placeId);
+    }
+  }, []);
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // предотвращает перезагрузку страницы
+      e.preventDefault();
       if (searchQuery.trim()) {
         alert(`Пошук по запиту: "${searchQuery}"`);
-        // Тут можно вызывать API или обновлять список результатов
       } else {
         alert('Введіть запит');
       }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Button } from 'react-bootstrap';
-import axios from "axios";
+import FavoriteService from '../services/FavoriteService';
 
 export default function HistoryCard({
   id,
@@ -15,135 +15,76 @@ export default function HistoryCard({
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [animating, setAnimating] = useState(false);
 
-  const getAuthToken = () => {
-  return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-};
+  const toggleFavorite = async () => {
+    const action = isFavorite ? "Remove" : "Add";
 
-const toggleFavorite = async () => {
-  const action = isFavorite ? "Remove" : "Add";
-  const token = getAuthToken();
-
-  if (!token) {
-    console.error("Токен авторизации не найден.");
-    return;
-  }
-
-  try {
-    setAnimating(true);
- 
-    const url = new URL("https://localhost:7103/api/Favorites/action");
-    url.searchParams.append("gmapsPlaceId", id);
-    url.searchParams.append("action", action);
-
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-      body: null, // пустое тело
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Ошибка ${response.status}: ${errorText}`);
+    try {
+      setAnimating(true);
+      await FavoriteService.toggleFavorite(id, action);
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error("Помилка при зміні статусу обраного:", error);
+    } finally {
+      setTimeout(() => setAnimating(false), 500);
     }
-
-    setIsFavorite(!isFavorite);
-  } catch (error) {
-    console.error("Ошибка при запросе избранного:", error);
-  } finally {
-    setTimeout(() => setAnimating(false), 500);
-  }
-};
-
+  };
 
   return (
-    <Card className="shadow-sm border-0 h-100 rounded-3">
-      <Card.Img
-        variant="top"
-        src={image}
-        className="rounded-top"
-        style={{ height: '150px', objectFit: 'cover' }}
-        alt={title}
-      />
-      <Card.Body className="d-flex flex-column justify-content-between">
-        <div className="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <Card.Title className="mb-1 fs-6">{title}</Card.Title>
-            <small className="text-muted d-flex align-items-center gap-1">
-              <span className="material-symbols-outlined fs-6">location_on</span> {locationText}
-            </small>
-            <div className="text-muted small mt-1 d-flex align-items-center gap-1">
-              <span className="material-symbols-outlined fs-6">calendar_month</span> {dateVisited}
-            </div>
-          </div>
-          <div className="d-flex align-items-center gap-2">
-            <span
-              className={`material-symbols-outlined ${isFavorite ? 'text-danger' : 'text-muted'} ${animating ? 'animate-heart' : ''}`}
-              role="button"
-              style={{ cursor: 'pointer', userSelect: 'none' }}
-              onClick={toggleFavorite}
-              title={isFavorite ? 'Видалити з обраного' : 'Додати в обране'}
-            >
-              favorite
-            </span>
-            <span
-              className="material-symbols-outlined text-muted"
-              role="button"
-              style={{ cursor: 'pointer' }}
-              onClick={onClear}
-              title="Очистити"
-            >
-              delete
-            </span>
-          </div>
-        </div>
-
-        <div className="d-flex justify-content-end mt-auto">
-          <Button
-            size="sm"
-            variant="outline-primary"
-            onClick={onGoTo}
-            className="custom-animated-button"
+    <Card className="mb-3 shadow-sm">
+      <div className="position-relative">
+        <Card.Img
+          variant="top"
+          src={image}
+          style={{ height: '150px', objectFit: 'cover' }}
+        />
+        <Button
+          variant="link"
+          className={`position-absolute top-0 end-0 p-2 ${animating ? 'animate-favorite' : ''}`}
+          onClick={toggleFavorite}
+          style={{ textDecoration: 'none' }}
+        >
+          <span
+            className="material-symbols-outlined"
+            style={{
+              color: isFavorite ? '#DC3545' : '#6C757D',
+              fontSize: '24px',
+              transition: 'color 0.3s ease'
+            }}
           >
-            Перейти
-          </Button>
+            favorite
+          </span>
+        </Button>
+      </div>
+      <Card.Body>
+        <Card.Title className="mb-1">{title}</Card.Title>
+        <Card.Text className="text-muted small mb-2">{locationText}</Card.Text>
+        <div className="d-flex justify-content-between align-items-center">
+          <small className="text-muted">{dateVisited}</small>
+          <div className="d-flex gap-2">
+            <Button
+              variant="outline-primary"
+              size="sm"
+              onClick={onGoTo}
+              className="d-flex align-items-center gap-1"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                directions
+              </span>
+              Перейти
+            </Button>
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={onClear}
+              className="d-flex align-items-center gap-1"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                delete
+              </span>
+              Видалити
+            </Button>
+          </div>
         </div>
-
-        <style>{`
-          .custom-animated-button {
-            background-color: #626FC2;
-            border-color: #626FC2;
-            color: white;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-          }
-          .custom-animated-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(98, 111, 194, 0.5);
-          }
-          .custom-animated-button:active {
-            transform: scale(0.97);
-            box-shadow: 0 2px 6px rgba(98, 111, 194, 0.5);
-          }
-
-          .animate-heart {
-            animation: pulse 0.5s ease forwards;
-          }
-          @keyframes pulse {
-            0% {
-              transform: scale(1);
-              opacity: 1;
-            }
-            50% {
-              transform: scale(1.3);
-              opacity: 0.7;
-            }
-            100% {
-              transform: scale(1);
-              opacity: 1;
-            }
-          }
-        `}</style>
       </Card.Body>
     </Card>
   );

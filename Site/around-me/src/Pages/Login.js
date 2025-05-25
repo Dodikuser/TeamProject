@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 
 
 
 const GoogleLoginForm = (isLogin) => {
+  const navigate = useNavigate();
   const googleButtonRef = useRef(null); 
 
   const GOOGLE_CLIENT_ID = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
@@ -36,12 +38,13 @@ const GoogleLoginForm = (isLogin) => {
       })
     })
     .then(res => {
-  if (!res.ok) {
-    return res.text().then(text => {
-      throw new Error(`Ошибка регистрации: ${res.status} ${res.statusText}. Ответ сервера: ${text}`);
-    });
-  }
+      if (!res.ok) {
+        return res.text().then(text => {
+          throw new Error(`Ошибка регистрации: ${res.status} ${res.statusText}. Ответ сервера: ${text}`);
+        });
+      }
   return res.text();
+
 })
 .then(async data => {
 
@@ -52,6 +55,7 @@ const GoogleLoginForm = (isLogin) => {
     localStorage.setItem('authToken', String(parsed.token));
     const token_ = localStorage.getItem('authToken');
     console.log('Token:', token_);
+    navigate("/favorites");
   } else {
     await sendToken(token, true);
   }
@@ -118,7 +122,7 @@ const GoogleLoginForm = (isLogin) => {
 
 
 export default function LoginRegister() {
-  
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -177,7 +181,7 @@ export default function LoginRegister() {
       console.log('Token:', token);
       }
       console.log('Response:', data);
-
+      navigate("/my-places");
     } catch (error) {
       console.error('Error:', error);
     }
