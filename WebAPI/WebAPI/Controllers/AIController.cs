@@ -1,6 +1,8 @@
 ﻿using Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Application.Services;
+using Application;
+using Entities.Models;
 
 namespace WebAPI.Controllers
 {
@@ -10,11 +12,13 @@ namespace WebAPI.Controllers
     {
         private readonly WtfService _wtfService;
         private readonly GmapsService _gmapsService;
+        private readonly PlaceService _placeService;
 
-        public AIController(WtfService wtfService, GmapsService gmapsService)
+        public AIController(WtfService wtfService, GmapsService gmapsService, PlaceService placeService)
         {
             _wtfService = wtfService;
             _gmapsService = gmapsService;
+            _placeService = placeService;
         }
 
         [HttpGet("search")]
@@ -42,9 +46,22 @@ namespace WebAPI.Controllers
             [FromQuery] double latitude,
             [FromQuery] double longitude)
         {
-            var dto = await _wtfService.AiPlaceRecommendation(hashTagId, radius, longitude, latitude);
-            return Ok(dto);
+            AiPlaceSearchDTO dto = await _wtfService.AiPlaceRecommendation(hashTagId, radius, longitude, latitude);
+
+            var resultList = new List<PlaceDTODefaultCard>();
+
+            foreach (var placeId in dto.GooglePlaceIds)
+            {
+                Place place = await _placeService.RegisterPlaceIfNotExist(placeId);
+
+                PlaceDTODefaultCard placeInfo = PlaceTypesConverter.ToDTODefault(place);
+
+                resultList.Add(placeInfo);
+            }
+
+            return Ok(resultList);
         }
+
 
         [HttpGet("reverseGeocoding")]
         public async Task<IActionResult> ReverseGeocodingAsync2([FromQuery] double latitude, [FromQuery] double longitude)

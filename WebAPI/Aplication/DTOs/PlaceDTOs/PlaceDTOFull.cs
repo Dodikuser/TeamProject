@@ -22,6 +22,7 @@ namespace Application.DTOs
         public int? Radius { get; set; }
         public int? TokensAvailable { get; set; }
         public DateTime? LastPromotionDateTime { get; set; }
+        public double Stars { get; set; }
 
         //тут будут доп поля которые есть на Гмапах но не было у нас
         public bool? IsOpen { get; set; }
@@ -30,5 +31,8 @@ namespace Application.DTOs
         //это не внешний ключ
         public string GmapsPlaceId { get; set; }
         public int? UserId { get; set; }
+
+
+        public virtual ICollection<PhotoDTO> Photos { get; set; } = new List<PhotoDTO>();
     }
 }

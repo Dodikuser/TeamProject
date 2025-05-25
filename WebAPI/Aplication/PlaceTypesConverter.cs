@@ -69,6 +69,54 @@ namespace Application
             };
             return result;
         }
+        public static PlaceDTOFull ToDTOFull(this Place place)
+        {
+            if (place == null) throw new ArgumentNullException(nameof(place));
+
+            return new PlaceDTOFull
+            {
+                Name = place.Name,
+                Description = place.Description,
+                Address = place.Address,
+                Site = place.Site,
+                PhoneNumber = place.PhoneNumber,
+                Email = place.Email,
+                Longitude = place.Longitude,
+                Latitude = place.Latitude,
+                Radius = place.Radius,
+                TokensAvailable = place.TokensAvailable,
+                LastPromotionDateTime = place.LastPromotionDateTime,
+                IsOpen = place.IsOpen,
+                OpeningHours = place.OpeningHours, 
+                GmapsPlaceId = place.GmapsPlaceId,
+                UserId = (int?)place.UserId, 
+                Stars = place.Stars,
+                Photos = place.Photos.Select(photo => new PhotoDTO
+                {
+                    Path = photo.Path,
+                    PlaceId = photo.PlaceId
+                }).ToList()
+            };
+        }
+        public static PlaceDTODefaultCard ToDTODefault(this Place place)
+        {
+            if (place == null) throw new ArgumentNullException(nameof(place));
+
+            return new PlaceDTODefaultCard
+            {
+                Name = place.Name,
+                Address = place.Address,
+                Longitude = place.Longitude,
+                Latitude = place.Latitude,
+                GmapsPlaceId = place.GmapsPlaceId,
+                Stars = place.Stars,
+                Photo = place.Photos.Select(photo => new PhotoDTO
+                {
+                    Path = photo.Path,
+                    PlaceId = photo.PlaceId
+                }).First(),
+            };
+        }
 
         public static Place ConvertFromGPlace(GPlaceDetailsResult gPlace, string gmapsPlaceId, string googleApiKey)
         {

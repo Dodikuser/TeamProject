@@ -1,6 +1,9 @@
 ﻿using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Entities.Models;
+using Application;
+using Application.DTOs;
 
 namespace WebAPI.Controllers
 {
@@ -24,7 +27,8 @@ namespace WebAPI.Controllers
         [HttpGet("info/")]
         public async Task<IActionResult> GetPlaceInfo(string placeId)
         {
-            var placeInfo = await _gmapsService.GetPlaceDetailsAsync(placeId);
+            Place place = await _placeService.RegisterPlaceIfNotExist(placeId);
+            PlaceDTOFull placeInfo = PlaceTypesConverter.ToDTOFull(place);
 
             return Ok(new { placeInfo });
         }

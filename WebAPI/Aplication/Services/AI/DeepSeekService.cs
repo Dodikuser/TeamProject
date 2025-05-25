@@ -120,17 +120,34 @@ namespace Application.Services.AI
         }
 
 
-        private static List<string> ParseGeneratedQueries(string json)
+        private static List<string> ParseGeneratedQueries(string raw)
         {
-            try
-            {
-                return JsonConvert.DeserializeObject<List<string>>(json) ?? new List<string>();
-            }
-            catch (JsonException)
-            {
+            if (string.IsNullOrWhiteSpace(raw))
                 return new List<string>();
-            }
+
+            raw = raw.Replace("```json", "").Replace("```", "").Trim();
+
+            raw = raw.Trim();
+
+            var lines = raw.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                           .Select(l => l.Trim())
+                           .Where(l => l != "[" && l != "]")
+                           .ToList();
+
+            var cleaned = lines.Select(line =>
+            {
+                line = line.Trim().Trim(',');
+                line = line.Trim('"');
+                return line.Trim();
+            })
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .ToList();
+
+            return cleaned;
         }
+
+
+
 
         private string BuildUserPrompt(string userRequest, string formattedAddress, string nearbyPlacesInfo)
         {
