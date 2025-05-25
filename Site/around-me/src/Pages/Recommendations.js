@@ -31,7 +31,7 @@ export default function Recommendations() {
     }
   };
 
-  // Фильтруем рекомендации по названию с учетом регистра
+ 
   const filteredRecommendations = recommendations.filter(rec =>
     rec.title.toLowerCase().includes(searchTerm.toLowerCase())
   );

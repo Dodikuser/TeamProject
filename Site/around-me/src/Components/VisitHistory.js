@@ -15,12 +15,14 @@ export default function VisitHistory({ places = [], onClear, onGoTo }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '900px', margin: '0 auto' }}>
       {places.map((place, idx) => (
-        <div key={idx} style={{ width: '100%', maxWidth: '500px', margin: '0 auto' }}>
+        <div key={place.id || idx} style={{ width: '100%', maxWidth: '500px', margin: '0 auto' }}>
           <HistoryCard
+            id={place.id}
             image={place.image}
             title={place.title}
             locationText={place.locationText}
             dateVisited={place.dateVisited}
+            initialFavorite={place.isFavorite}
             onClear={() => onClear(idx)}
             onGoTo={() => onGoTo(idx)}
           />
