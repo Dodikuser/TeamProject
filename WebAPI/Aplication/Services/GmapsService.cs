@@ -155,26 +155,21 @@ namespace Application.Services
 
 
 
-        //TODO написать сюда нормальные данные для получения
+        /// <exception cref="HttpRequestException">If status code from map API is not Success code</exception>
+        /// <exception cref="Exception">If status code != OK</exception>
         public async Task<GPlaceDetailsResult> GetPlaceDetailsAsync(string placeId)
         {
-            Console.WriteLine($"[GetPlaceDetailsAsync] Place ID: {placeId}");
-
-            var url = $"places/{placeId}";
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            AddHeaders(request, "name,formatted_address,geometry,formatted_phone_number,opening_hours,rating,editorial_summary,website,photos,price_level");
+            var fields = "name,formatted_address,geometry,formatted_phone_number,opening_hours,rating,editorial_summary,website,photos,price_level";
+            var url = $"https://maps.googleapis.com/maps/api/place/details/json?place_id={placeId}&fields={fields}&key={_apiKey}";
 
             var response = await _httpClient.GetAsync(url);
-            Console.WriteLine($"[GetPlaceDetailsAsync] HTTP статус: {response.StatusCode}");
+            response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"[GetPlaceDetailsAsync] Ответ JSON: {json}");
-
             GPlaceDetailsResponse? result = JsonConvert.DeserializeObject<GPlaceDetailsResponse>(json);
 
             if (result != null)
             {
-                Console.WriteLine($"[GetPlaceDetailsAsync] Status: {result.Status}");
                 if (result.Status != "OK")
                     throw new Exception($"Error from Google Places API: {result.Status}");
 
