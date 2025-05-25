@@ -2,6 +2,11 @@
 {
     public interface IAIService
     {
-        Task<string> GenerateTextAsync(string prompt);
+
+
+        public Task<List<string>> GenerateSearchQueriesAsync(string userRequest, string formattedAddress, string nearbyPlacesInfo, List<string> hashtags);
+        public Task<bool> IsSpecifiedQueryAsync(string query);
+        
+
     }
 }

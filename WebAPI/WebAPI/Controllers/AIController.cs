@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Application.Services.AI;
+﻿using Application.DTOs;
+using Microsoft.AspNetCore.Mvc;
+using Application.Services;
 
 namespace WebAPI.Controllers
 {
@@ -7,21 +8,49 @@ namespace WebAPI.Controllers
     [Route("api/[controller]")]
     public class AIController : ControllerBase
     {
-        private readonly IAIService _aiService;
+        private readonly WtfService _wtfService;
+        private readonly GmapsService _gmapsService;
 
-        public AIController(IAIService aiService)
+        public AIController(WtfService wtfService, GmapsService gmapsService)
         {
-            _aiService = aiService;
+            _wtfService = wtfService;
+            _gmapsService = gmapsService;
         }
 
-        [HttpGet("generate")]
-        public async Task<IActionResult> Generate([FromQuery] string prompt)
+        [HttpGet("search")]
+        public async Task<IActionResult> AiPlaceSearch(
+            [FromQuery] string text,
+            [FromQuery] List<ulong>? hashTagIds,
+            [FromQuery] int radius,
+            [FromQuery] double latitude,
+            [FromQuery] double longitude)
         {
-            if (string.IsNullOrWhiteSpace(prompt))
-                return BadRequest("Prompt is required.");
+            var dto = await _wtfService.AiPlaceSearch(text, hashTagIds, radius, longitude, latitude);
 
-            var result = await _aiService.GenerateTextAsync(prompt);
-            return Ok(result);
+            foreach (var x in dto.GooglePlaceIds)
+            {
+                Console.WriteLine("------------------------------------------------------------------" + x);
+            }
+
+            return Ok(dto);
+        }
+
+        [HttpGet("recommend")]
+        public async Task<IActionResult> AiPlaceRecommendation(
+            [FromQuery] ulong hashTagId,
+            [FromQuery] int radius,
+            [FromQuery] double latitude,
+            [FromQuery] double longitude)
+        {
+            var dto = await _wtfService.AiPlaceRecommendation(hashTagId, radius, longitude, latitude);
+            return Ok(dto);
+        }
+
+        [HttpGet("reverseGeocoding")]
+        public async Task<IActionResult> ReverseGeocodingAsync2([FromQuery] double latitude, [FromQuery] double longitude)
+        {
+            var x = await _gmapsService.ReverseGeocodingAsync(latitude, longitude);
+            return Ok(x);
         }
     }
 }

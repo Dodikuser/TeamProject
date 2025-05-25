@@ -21,6 +21,10 @@ namespace Infrastructure.Repository
 
             await _context.SaveChangesAsync();
         }
+        public async Task<bool> ExistsAsync(string gmapsPlaceId)
+        {
+            return await _context.Places.AnyAsync(p => p.GmapsPlaceId == gmapsPlaceId);
+        }
         public async Task AddTokensAsync(int placeId, int count)
         {
             if (count <= 0) throw new ArgumentException("Token count must be positive");
@@ -53,10 +57,6 @@ namespace Infrastructure.Repository
                 _context.Places.Remove(place);
                 await _context.SaveChangesAsync();
             }
-        }
-        public async Task<bool> ExistsAsync(string gmapsPlaceId)
-        {
-            return await _context.Places.AnyAsync(p => p.GmapsPlaceId == gmapsPlaceId);
         }
         public async Task<Place?> GetByIdAsync(int placeId)
         {
@@ -110,5 +110,15 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
+
+        //Добавить свзять между местом и типом мест
+        public async Task AddPlaceTypeToPlace(ulong placeId, ulong placeTypeId)
+        {
+            throw new NotImplementedException();
+        }
+
+        //добавить место с проверкой
+
+
     }
 }

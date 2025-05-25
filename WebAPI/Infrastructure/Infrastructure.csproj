@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Entities\Entities.csproj" />  
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DB_Storage\" />
+  </ItemGroup>
+
 </Project>

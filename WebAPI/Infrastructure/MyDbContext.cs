@@ -187,6 +187,7 @@ namespace Infrastructure
 
                 entity.Property(e => e.Tag);
                 entity.Property(e => e.Price);
+                entity.Property(e => e.Prompt);
             });
 
             modelBuilder.Entity<AdHashtag>(entity =>

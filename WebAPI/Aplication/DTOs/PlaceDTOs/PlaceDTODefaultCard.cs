@@ -10,5 +10,6 @@
         public PhotoDTO Photo { get; set; }
         public double Stars { get; set; }
 
+        //Я С$КА???
     }
 }

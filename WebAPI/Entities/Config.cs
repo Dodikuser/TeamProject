@@ -20,6 +20,16 @@
 
 
         //appsettings.json
+        public string MainPrompt { get; set; }
+        public string SearchTypePrompt { get; set; }
+
+        public List<string> ExcludedTypes { get; set; }
+        public List<string> IncludedTypes1 { get; set; }
+        public List<string> IncludedTypes2 { get; set; }
+        public List<string> IncludedTypes3 { get; set; }
+        public List<string> IncludedTypes4 { get; set; }
+        public List<string> IncludedTypes5 { get; set; }
+
 
     }
 }

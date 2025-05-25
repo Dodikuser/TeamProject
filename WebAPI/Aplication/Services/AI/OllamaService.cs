@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace Application.Services.AI
 {
-    public class OllamaService : IAIService
+    public class OllamaService
     {
         private readonly HttpClient _httpClient;
         private readonly Config _config;

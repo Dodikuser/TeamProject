@@ -41,9 +41,16 @@ namespace WebAPI
             builder.Services.AddScoped<AuthorizationService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<TokenService>();
-            builder.Services.AddScoped<GmapsService>();
             builder.Services.AddScoped<PlaceService>();
             builder.Services.AddScoped<HistoryService>();
+
+            builder.Services.AddScoped<WtfService>();
+
+            builder.Services.AddHttpClient<GmapsService>(client =>
+            {
+                client.BaseAddress = new Uri("https://places.googleapis.com/v1/");
+            });
+
 
             builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -62,24 +69,24 @@ namespace WebAPI
 
             //Ollama 
 
-            var useOllama = mapSettings.UseOllama;
-            var ollamaUrl = mapSettings.OllamaUrl;
-            var ollamaPort = mapSettings.OllamaPort;
-            var modelName = mapSettings.OllamaModelName;
+            //var useOllama = mapSettings.UseOllama;
+            //var ollamaUrl = mapSettings.OllamaUrl;
+            //var ollamaPort = mapSettings.OllamaPort;
+            //var modelName = mapSettings.OllamaModelName;
 
-            if (useOllama && (!string.IsNullOrEmpty(ollamaUrl) && ollamaPort.HasValue && !string.IsNullOrEmpty(modelName)))
-            {
-                var baseAddress = $"{ollamaUrl}:{ollamaPort}";
+            //if (useOllama && (!string.IsNullOrEmpty(ollamaUrl) && ollamaPort.HasValue && !string.IsNullOrEmpty(modelName)))
+            //{
+            //    var baseAddress = $"{ollamaUrl}:{ollamaPort}";
 
-                builder.Services.AddHttpClient<IAIService, OllamaService>(client =>
-                {
-                    client.BaseAddress = new Uri(baseAddress);
-                });
-            }
-            else
-            {
-                Console.WriteLine("Ollama settings are missing or invalid!");
-            }
+            //    builder.Services.AddHttpClient<IAIService, OllamaService>(client =>
+            //    {
+            //        client.BaseAddress = new Uri(baseAddress);
+            //    });
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Ollama settings are missing or invalid!");
+            //}
 
             // JWT для регестрации 
 
@@ -151,8 +158,6 @@ namespace WebAPI
             });
 
 
-
-
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -195,6 +200,7 @@ namespace WebAPI
             app.MapGet("/", () => app.Configuration.AsEnumerable());
 
             app.Run();
+
 
         }
     }

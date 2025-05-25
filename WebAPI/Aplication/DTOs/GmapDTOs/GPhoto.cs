@@ -21,11 +21,4 @@ namespace Application.DTOs.GmapDTOs
             return $"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference={PhotoReference}&key={apiKey}";
         }
     }
-
-
-
-    //TO-DO
-    //сделать запрос с фильтрами: текст, радиус, категории
-    //получить координаты по гмапс айди
-    //получить всю инфу про место по айди
 }
