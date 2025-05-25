@@ -44,10 +44,10 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
 
         holder.name.setText(item.getName());
         holder.address.setText(item.getAddress());
-        holder.description.setText(item.getDescription());
-        holder.rating.setRating(item.getRating());
+        holder.distance.setText(item.getDistance());
+        holder.ratingText.setText(String.valueOf(item.getRating()));
 
-        // Load image using Glide
+        // Load image
         if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(item.getImageUrl())
@@ -69,18 +69,18 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
         ImageView image;
         TextView name;
         TextView address;
-        TextView description;
-        RatingBar rating;
+        TextView distance;
+        TextView ratingText;
         Button btnGo;
 
         public RecommendationsViewHolder(@NonNull View itemView) {
             super(itemView);
-            image = itemView.findViewById(R.id.recommendation_image);
-            name = itemView.findViewById(R.id.recommendation_name);
-            address = itemView.findViewById(R.id.recommendation_address);
-            description = itemView.findViewById(R.id.recommendation_description);
-            rating = itemView.findViewById(R.id.recommendation_rating);
-            btnGo = itemView.findViewById(R.id.recommendation_btn_go);
+            image = itemView.findViewById(R.id.recommendations_item_image);
+            name = itemView.findViewById(R.id.recommendations_item_name);
+            address = itemView.findViewById(R.id.recommendations_item_address);
+            distance = itemView.findViewById(R.id.recommendations_item_distance);
+            ratingText = itemView.findViewById(R.id.recommendations_item_rating_text);
+            btnGo = itemView.findViewById(R.id.recommendations_item_btn_go);
         }
     }
 }

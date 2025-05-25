@@ -17,8 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maps1.PlaceDetailsActivity;
 import com.example.maps1.R;
-import com.example.maps1.history.HistoryItem;
-
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,7 +43,7 @@ public class HistoryFragment extends Fragment {
         // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.history_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setHasFixedSize(true); // Додайте цей рядок
+        recyclerView.setHasFixedSize(true);
 
         // Create adapter
         adapter = new HistoryAdapter(filteredItems, item -> {
@@ -75,12 +73,12 @@ public class HistoryFragment extends Fragment {
 
         return view;
     }
+
     private void loadHistoryItems() {
         SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
         String token = prefs.getString("auth_token", null);
 
         if (token == null) {
-            // User not logged in
             return;
         }
 
@@ -105,8 +103,8 @@ public class HistoryFragment extends Fragment {
                                 item.getString("id"),
                                 item.getString("name"),
                                 item.getString("address"),
-                                item.getString("description"),
-                                (float) item.getDouble("rating"),
+                                item.getString("date"),  // Используем новое поле даты
+                                item.getString("time"),  // Используем новое поле времени
                                 item.getString("imageUrl")
                         ));
                     }
@@ -123,20 +121,21 @@ public class HistoryFragment extends Fragment {
             }
         }).start();
     }
+
     private void testloadHistoryItems() {
         historyItems.clear();
+        // Тестовые данные с датой и временем вместо описания и рейтинга
         historyItems.add(new HistoryItem("1", "Ресторан 'Український'",
-                "вул. Хрещатик, 15", "Традиційна українська кухня", 4.5f, ""));
+                "вул. Хрещатик, 15", "15 травня 2023", "12:30", ""));
         historyItems.add(new HistoryItem("2", "Кафе 'Цукерня'",
-                "вул. Б. Хмельницького, 37", "Кава та десерти", 4.2f, ""));
+                "вул. Б. Хмельницького, 37", "16 травня 2023", "14:45", ""));
         historyItems.add(new HistoryItem("3", "Парк 'Перемоги'",
-                "просп. Перемоги, 82", "Великий парк для відпочинку", 4.7f, ""));
+                "просп. Перемоги, 82", "17 травня 2023", "10:15", ""));
 
         filteredItems.clear();
         filteredItems.addAll(historyItems);
         adapter.notifyDataSetChanged();
 
-        // Додайте логування для перевірки
         Log.d("HistoryFragment", "Loaded items: " + filteredItems.size());
     }
 
@@ -150,7 +149,8 @@ public class HistoryFragment extends Fragment {
             for (HistoryItem item : historyItems) {
                 if (item.getName().toLowerCase().contains(lowerCaseQuery) ||
                         item.getAddress().toLowerCase().contains(lowerCaseQuery) ||
-                        item.getDescription().toLowerCase().contains(lowerCaseQuery)) {
+                        item.getDate().toLowerCase().contains(lowerCaseQuery) ||  // Поиск по дате
+                        item.getTime().toLowerCase().contains(lowerCaseQuery)) {  // Поиск по времени
                     filteredItems.add(item);
                 }
             }

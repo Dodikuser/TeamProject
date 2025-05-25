@@ -5,100 +5,191 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp"
+    android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    android:backgroundTint="#FAFAFA">
+    app:cardElevation="2dp"
+    android:backgroundTint="#FFFFFF">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="0dp">
 
-        <!-- Зображення -->
+        <!-- 1. Restaurant Image -->
         <ImageView
             android:id="@+id/history_item_image"
-            android:layout_width="0dp"
-            android:layout_height="160dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_placeholder"
+            android:src="@drawable/placeholder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Назва ресторану -->
+        <!-- 2. Restaurant Name -->
         <TextView
             android:id="@+id/history_item_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="12dp"
-            android:text="Ресторан 'Український'"
-            android:textColor="#333333"
-            android:textSize="18sp"
+            android:layout_marginEnd="12dp"
+            android:text="Піцерія"
+            android:textColor="#000000"
+            android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/history_icons_container"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/history_item_image" />
 
-        <!-- Адреса -->
-        <TextView
-            android:id="@+id/history_item_address"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="вул. Хрещатик, 15"
-            android:textColor="#555555"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_name" />
-
-        <!-- Рейтинг з чорними зірками -->
-        <RatingBar
-            android:id="@+id/history_item_rating"
-            style="@style/Widget.AppCompat.RatingBar.Small"
+        <!-- Контейнер для иконок (сердечко и корзина) -->
+        <LinearLayout
+            android:id="@+id/history_icons_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:isIndicator="true"
-            android:numStars="5"
-            android:progressTint="@android:color/black"
-            android:rating="4.5"
-            android:stepSize="0.1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_address" />
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/history_item_image">
 
-        <!-- Опис -->
-        <TextView
-            android:id="@+id/history_item_description"
-            android:layout_width="0dp"
+            <!-- Иконка сердечка (избранное) -->
+            <ImageView
+                android:id="@+id/history_item_favorite"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:contentDescription="Добавить в избранное"
+                android:focusable="true"
+                android:src="@drawable/ic_favorite"
+                app:tint="#5F6368" />
+
+            <!-- Иконка удаления -->
+            <ImageView
+                android:id="@+id/history_item_delete"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:clickable="true"
+                android:contentDescription="Удалить из избранного"
+                android:focusable="true"
+                android:src="@drawable/ic_delete" />
+        </LinearLayout>
+
+        <!-- 4. Address -->
+        <LinearLayout
+            android:id="@+id/address_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:text="Традиційна українська кухня з домашньою атмосферою та смачними стравами"
-            android:textColor="#666666"
-            android:textSize="14sp"
+            android:layout_marginEnd="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_rating" />
+            app:layout_constraintTop_toBottomOf="@id/history_item_name">
 
-        <!-- Кнопка Перейти -->
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_location"
+                app:tint="#555555" />
+
+            <TextView
+                android:id="@+id/history_item_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="просп. Свободи, 15"
+                android:textColor="#555555"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- 5. Date and Time (заменяем Distance and Rating) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_layout">
+
+            <!-- Дата -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="#555555" />
+
+                <TextView
+                    android:id="@+id/history_item_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="15 травня 2025"
+                    android:textColor="#555555"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="#CCCCCC" />
+
+            <!-- Время -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_time"
+                    app:tint="#555555" />
+
+                <TextView
+                    android:id="@+id/history_item_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="14:30"
+                    android:textColor="#555555"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 6. Go Button -->
         <Button
             android:id="@+id/history_item_btn_go"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/rounded_button"
-            android:textColor="@android:color/white"
-            android:textAllCaps="false"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
             android:text="Перейти"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
             android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/history_item_description" />
+            app:layout_constraintTop_toBottomOf="@id/address_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

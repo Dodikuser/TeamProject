@@ -45,8 +45,8 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
 
         holder.name.setText(item.getName());
         holder.address.setText(item.getAddress());
-        holder.description.setText(item.getDescription());
-        holder.rating.setRating(item.getRating());
+
+
 
         // Load image using Glide
         if (!item.getImageUrl().isEmpty()) {
@@ -59,7 +59,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
         }
 
         holder.btnGo.setOnClickListener(v -> listener.onItemClick(item));
-        holder.btnRemove.setOnClickListener(v -> listener.onRemoveClick(item));
+
     }
 
     @Override
@@ -71,20 +71,18 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
         ImageView image;
         TextView name;
         TextView address;
-        TextView description;
-        RatingBar rating;
+        TextView rating;
         Button btnGo;
-        Button btnRemove;
+        ImageView btnDelete; // Changed from btnRemove to match your XML
 
         public FavoritesViewHolder(@NonNull View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.favorites_item_image);
             name = itemView.findViewById(R.id.favorites_item_name);
             address = itemView.findViewById(R.id.favorites_item_address);
-            description = itemView.findViewById(R.id.favorites_item_description);
-            rating = itemView.findViewById(R.id.favorites_item_rating);
+            rating = itemView.findViewById(R.id.favorites_item_rating_text); // Changed
             btnGo = itemView.findViewById(R.id.favorites_item_btn_go);
-            btnRemove = itemView.findViewById(R.id.favorites_item_btn_remove);
+            btnDelete = itemView.findViewById(R.id.favorites_item_delete); // Changed
         }
     }
 }

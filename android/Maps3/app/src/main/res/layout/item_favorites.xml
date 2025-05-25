@@ -5,125 +5,148 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp"
+    android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    android:backgroundTint="#FAFAFA">
+    app:cardElevation="2dp"
+    android:backgroundTint="#FFFFFF">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="0dp">
 
-        <!-- Зображення -->
+        <!-- 1. Restaurant Image (первый элемент) -->
         <ImageView
             android:id="@+id/favorites_item_image"
-            android:layout_width="0dp"
-            android:layout_height="160dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_placeholder"
+            android:src="@drawable/placeholder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Назва ресторану -->
+        <!-- 2. Restaurant Name (второй элемент, привязан к image) -->
         <TextView
             android:id="@+id/favorites_item_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="12dp"
-            android:text="Ресторан 'Український'"
-            android:textColor="#333333"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:layout_marginEnd="12dp"
+            android:text="Піцерія "
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/favorites_item_delete"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/favorites_item_image" />
+
+        <!-- 3. Delete Icon (привязан к image и name) -->
+        <ImageView
+            android:id="@+id/favorites_item_delete"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:contentDescription="Удалить из избранного"
+            android:focusable="true"
+            android:src="@drawable/ic_delete"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/favorites_item_image" />
 
-        <!-- Адреса -->
-        <TextView
-            android:id="@+id/favorites_item_address"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="вул. Хрещатик, 15"
-            android:textColor="#555555"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/favorites_item_name" />
-
-        <!-- Рейтинг -->
-        <RatingBar
-            android:id="@+id/favorites_item_rating"
-            style="@style/Widget.AppCompat.RatingBar.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:isIndicator="true"
-            android:numStars="5"
-            android:rating="4.5"
-            android:stepSize="0.1"
-            android:progressTint="@android:color/black"
-            android:secondaryProgressTint="@android:color/black"
-            android:progressBackgroundTint="@android:color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/favorites_item_address" />
-
-        <!-- Опис -->
-        <TextView
-            android:id="@+id/favorites_item_description"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:text="Традиційна українська кухня з домашньою атмосферою та смачними стравами"
-            android:textColor="#666666"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/favorites_item_rating" />
-
-        <!-- Кнопки -->
+        <!-- 4. Address (привязан к name) -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/address_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:gravity="end"
-            android:spacing="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/favorites_item_description">
+            app:layout_constraintTop_toBottomOf="@id/favorites_item_name">
 
-            <Button
-                android:id="@+id/favorites_item_btn_remove"
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_location"
+                app:tint="#555555" />
+
+            <TextView
+                android:id="@+id/favorites_item_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_button_outline"
-                android:textColor="#626FC2"
-                android:textAllCaps="false"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:text="Видалити"
-                android:textSize="14sp"
-            android:layout_marginEnd="8dp" />
+                android:layout_marginStart="4dp"
+                android:text="просп. Свободи, 15"
+                android:textColor="#555555"
+                android:textSize="14sp" />
+        </LinearLayout>
 
-            <Button
-                android:id="@+id/favorites_item_btn_go"
+        <!-- 5. Distance and Rating (привязан к address) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_layout">
+
+            <TextView
+                android:id="@+id/favorites_item_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_button"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:text="Перейти"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white"
+                android:text="3.4 км"
+                android:textColor="#555555"
                 android:textSize="14sp" />
 
+            <View
+                android:layout_width="1dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="#CCCCCC" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_star"
+                app:tint="#FFC107" />
+
+            <TextView
+                android:id="@+id/favorites_item_rating_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="4.5"
+                android:textColor="#555555"
+                android:textSize="14sp" />
         </LinearLayout>
+
+        <!-- 6. Go Button (привязан к address) -->
+        <Button
+            android:id="@+id/favorites_item_btn_go"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/rounded_button"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:text="Перейти"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/address_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

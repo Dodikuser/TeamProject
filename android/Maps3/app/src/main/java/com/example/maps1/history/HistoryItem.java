@@ -1,20 +1,22 @@
 package com.example.maps1.history;
 
+
+
 public class HistoryItem {
     private String id;
     private String name;
     private String address;
-    private String description;
-    private float rating;
+    private String date;
+    private String time;
     private String imageUrl;
 
     public HistoryItem(String id, String name, String address,
-                       String description, float rating, String imageUrl) {
+                       String date, String time, String imageUrl) {
         this.id = id;
         this.name = name;
         this.address = address;
-        this.description = description;
-        this.rating = rating;
+        this.date = date;
+        this.time = time;
         this.imageUrl = imageUrl;
     }
 
@@ -22,7 +24,15 @@ public class HistoryItem {
     public String getId() { return id; }
     public String getName() { return name; }
     public String getAddress() { return address; }
-    public String getDescription() { return description; }
-    public float getRating() { return rating; }
+    public String getDate() { return date; }
+    public String getTime() { return time; }
     public String getImageUrl() { return imageUrl; }
+
+    // Optional setters if you need them
+    public void setId(String id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setAddress(String address) { this.address = address; }
+    public void setDate(String date) { this.date = date; }
+    public void setTime(String time) { this.time = time; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

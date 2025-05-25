@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.maps1.R;
-
 
 import java.util.List;
 
@@ -48,8 +46,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
         holder.name.setText(item.getName());
         holder.address.setText(item.getAddress());
-        holder.description.setText(item.getDescription());
-        holder.rating.setRating(item.getRating());
+        holder.date.setText(item.getDate()); // Добавьте соответствующий метод в HistoryItem
+        holder.time.setText(item.getTime()); // Добавьте соответствующий метод в HistoryItem
 
         // Load image using Glide
         if (!item.getImageUrl().isEmpty()) {
@@ -73,8 +71,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         ImageView image;
         TextView name;
         TextView address;
-        TextView description;
-        RatingBar rating;
+        TextView date;
+        TextView time;
         Button btnGo;
 
         public HistoryViewHolder(@NonNull View itemView) {
@@ -82,8 +80,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             image = itemView.findViewById(R.id.history_item_image);
             name = itemView.findViewById(R.id.history_item_name);
             address = itemView.findViewById(R.id.history_item_address);
-            description = itemView.findViewById(R.id.history_item_description);
-            rating = itemView.findViewById(R.id.history_item_rating);
+            date = itemView.findViewById(R.id.history_item_date);
+            time = itemView.findViewById(R.id.history_item_time);
             btnGo = itemView.findViewById(R.id.history_item_btn_go);
         }
     }
