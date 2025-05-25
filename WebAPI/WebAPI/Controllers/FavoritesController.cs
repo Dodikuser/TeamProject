@@ -1,7 +1,6 @@
 ﻿using Application.DTOs;
 using Application.Services;
 using Entities;
-using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +17,7 @@ namespace WebAPI.Controllers
         }
 
         [Authorize]
-        [HttpPost("get")]
+        [HttpGet("get")]
         public async Task<IActionResult> GetFavorites(int skip = 0, int take = 10)
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
