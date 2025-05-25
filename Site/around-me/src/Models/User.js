@@ -1,50 +1,33 @@
-/**
- * @typedef {Object} User
- * @property {string} id
- * @property {'standard' | 'google' | 'facebook'} type
- * @property {string} name
- * @property {string} email
- * @property {string} [avatar] - URL или Base64 строка изображения аватара
- * @property {string} [avatarThumbnail] - URL или Base64 строка миниатюры аватара
- * @property {string} [password]
- * @property {string} [firstName]
- * @property {string} [lastName]
- * @property {string} [registrationDate] - Дата регистрации пользователя
- */
+class User {
+  constructor({
+    id,
+    email,
+    username,
+    firstName,
+    lastName,
+    avatar,
+    role = 'user',
+    isEmailConfirmed = false,
+    dateRegistered = new Date().toISOString(),
+    lastLoginDate,
+    settings = {
+      theme: 'light',
+      language: 'uk',
+      notifications: true
+    }
+  }) {
+    this.id = id;
+    this.email = email;
+    this.username = username;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.avatar = avatar;
+    this.role = role;
+    this.isEmailConfirmed = isEmailConfirmed;
+    this.dateRegistered = dateRegistered;
+    this.lastLoginDate = lastLoginDate;
+    this.settings = settings;
+  }
+}
 
-/**
- * @typedef {Object} UserLoginRequest
- * @property {'standard' | 'google' | 'facebook'} type
- * @property {string} email
- * @property {string} password
- */
-
-/**
- * @typedef {Object} UserRegisterRequest
- * @property {'standard' | 'google' | 'facebook'} type
- * @property {string} name
- * @property {string} email
- * @property {string} password
- */
-
-/**
- * @typedef {Object} UserResponse
- * @property {string} token
- * @property {User} user
- */
-
-/**
- * @typedef {Object} UpdateAvatarRequest
- * @property {string} avatarData - Base64 строка изображения
- * @property {string} [avatarType] - MIME тип изображения (например, 'image/jpeg')
- */
-
-/**
- * @typedef {Object} UpdateUserRequest
- * @property {string} [name]
- * @property {string} [email]
- * @property {string} [password]
- * @property {string} [firstName]
- * @property {string} [lastName]
- * @property {string} [avatar]
- */ 
+export { User }; 

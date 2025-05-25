@@ -1,46 +1,36 @@
-/**
- * @typedef {Object} Coordinates
- * @property {number} latitude
- * @property {number} longitude
- */
 
-/**
- * @typedef {Object} Place
- * @property {string} id
- * @property {string} title
- * @property {string} locationText
- * @property {string} [description]
- * @property {number} rating
- * @property {string} [distance]
- * @property {string[]} images
- * @property {string} [email]
- * @property {string} [phone]
- * @property {string} [schedule]
- * @property {Coordinates} [coordinates]
- */
+class Place {
+  constructor({
+    id,
+    title,
+    locationText,
+    description,
+    rating = 0,
+    distance,
+    images = [],
+    email,
+    phone,
+    schedule,
+    coordinates = { latitude: 0, longitude: 0 },
+    reviews = [],
+    website,
+    priceLevel
+  }) {
+    this.id = id;
+    this.title = title;
+    this.locationText = locationText;
+    this.description = description;
+    this.rating = rating;
+    this.distance = distance;
+    this.images = images;
+    this.email = email;
+    this.phone = phone;
+    this.schedule = schedule;
+    this.coordinates = coordinates;
+    this.reviews = reviews;
+    this.website = website;
+    this.priceLevel = priceLevel;
+  }
+}
 
-/**
- * @typedef {Object} ReviewStats
- * @property {number} positive
- * @property {number} negative
- */
-
-/**
- * @typedef {Object} PlaceStatistics
- * @property {number} viewCount
- * @property {number} selectCount
- * @property {number} favoriteCount
- * @property {ReviewStats} reviews
- */
-
-/**
- * @typedef {Object} NewPlaceRequest
- * @property {string} title
- * @property {string} locationText
- * @property {string} [description]
- * @property {string[]} [images]
- * @property {string} [email]
- * @property {string} [phone]
- * @property {string} [schedule]
- * @property {Coordinates} [coordinates]
- */ 
+export { Place }; 
