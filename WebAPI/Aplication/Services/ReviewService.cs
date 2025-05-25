@@ -5,7 +5,7 @@ using Infrastructure.Repository;
 
 namespace Application.Services
 {
-    public class ReviewService(ReviewRepository _reviewRepository, PhotoRepository _photoRepository)
+    public class ReviewService(ReviewRepository _reviewRepository, PhotoRepository _photoRepository, PlaceRepository _placeRepository)
     {
         public async Task AddAsync(ReviewDTO DTO)
         {
@@ -23,6 +23,8 @@ namespace Application.Services
                 UserId = DTO.UserId
             };
             await _reviewRepository.AddAsync(result);
+            await _placeRepository.SetStarsAsync(DTO.PlaceId, await _reviewRepository.GetAvgStarsAsync(DTO.PlaceId));
+
         }
 
         public async Task<ReviewOperationResult> EditAsync(ReviewDTO DTO, ulong reviewId, ulong userId)
@@ -45,6 +47,7 @@ namespace Application.Services
             };
 
             await _reviewRepository.Update(result);
+            await _placeRepository.SetStarsAsync(DTO.PlaceId, await _reviewRepository.GetAvgStarsAsync(DTO.PlaceId));
             return ReviewOperationResult.Success;
         }
 
@@ -87,6 +90,7 @@ namespace Application.Services
             if (review.UserId != userId) return ReviewOperationResult.AccessDenied;
 
             await _reviewRepository.RemoveAsync(review);
+            await _placeRepository.SetStarsAsync(review.PlaceId, await _reviewRepository.GetAvgStarsAsync(review.PlaceId));
             return ReviewOperationResult.Success;
         }
     }

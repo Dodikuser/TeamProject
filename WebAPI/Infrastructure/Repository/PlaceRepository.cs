@@ -110,6 +110,11 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
+        public async Task SetStarsAsync(ulong placeId, double stars)
+        {
+            (await _context.Places.Where(p => p.Id == placeId).FirstOrDefaultAsync())!.Stars = stars;
+            _context.SaveChanges();
+        }
 
         //Добавить свзять между местом и типом мест
         public async Task AddPlaceTypeToPlace(ulong placeId, ulong placeTypeId)
