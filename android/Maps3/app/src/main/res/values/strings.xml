@@ -16,4 +16,6 @@
     <string name="reviews">Відгуки</string>
     <string name="your_account">Твій аккаунт</string>
     <string name="welcome_to_aroundme">Ласкаво просимо до AroundMe</string>
+    <string name="place_name_example_1">Назва місця</string>
+    <string name="place_name_example_2">Кафе \'Львівські пляцки\'</string>
 </resources>
