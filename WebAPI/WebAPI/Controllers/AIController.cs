@@ -55,9 +55,12 @@ namespace WebAPI.Controllers
             [FromQuery] ulong hashTagId,
             [FromQuery] int radius,
             [FromQuery] double latitude,
-            [FromQuery] double longitude)
+            [FromQuery] double longitude,
+            [FromQuery] string tag
+            )
+
         {
-            AiPlaceSearchDTO dto = await _wtfService.AiPlaceRecommendation(hashTagId, radius, longitude, latitude);
+            AiPlaceSearchDTO dto = await _wtfService.AiPlaceRecommendation(hashTagId, radius, longitude, latitude, tag);
 
             var resultList = new List<PlaceDTODefaultCard>();
 

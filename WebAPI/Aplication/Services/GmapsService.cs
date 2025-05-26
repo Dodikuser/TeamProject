@@ -152,6 +152,61 @@ namespace Application.Services
             return places ?? new List<GSearchNearbyResult>();
         }
 
+        public async Task<List<GSearchNearbyMapsResult>> SearchNearbyByTextAsync(
+            string textQuery,
+            double latitude,
+            double longitude,
+            double radius,
+            int maxResults = 10)
+        {
+            Console.WriteLine($"[SearchNearbyByTextAsync] Query: '{textQuery}', Lat: {latitude}, Lng: {longitude}, Radius: {radius}");
+
+            var url = "https://places.googleapis.com/v1/places:searchText";
+            var requestBody = new
+            {
+                textQuery,
+                maxResultCount = maxResults,
+                rankPreference = "RELEVANCE", // FIXED
+                locationBias = new
+                {
+                    circle = new
+                    {
+                        center = new { latitude, longitude },
+                        radius
+                    }
+                }
+            };
+
+            var jsonRequest = JsonConvert.SerializeObject(requestBody);
+            Console.WriteLine($"[SearchNearbyByTextAsync] JSON запроса: {jsonRequest}");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = new StringContent(jsonRequest, Encoding.UTF8, "application/json")
+            };
+
+            AddHeaders(request, "places.displayName,places.id");
+
+            var response = await _httpClient.SendAsync(request);
+            Console.WriteLine($"[SearchNearbyByTextAsync] HTTP статус: {response.StatusCode}");
+
+            var json = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[SearchNearbyByTextAsync] Ответ JSON: {json}");
+
+            var parsed = JObject.Parse(json);
+            var places = parsed["places"]?
+                .Select(p => new GSearchNearbyMapsResult
+                {
+                    Name = p["displayName"]?["text"]?.ToString() ?? "Unknown",
+                    GmapsPlaceId = p["id"]?.ToString() ?? "unknown"
+                })
+                .Where(p => !string.IsNullOrWhiteSpace(p.Name) && !string.IsNullOrWhiteSpace(p.GmapsPlaceId))
+                .ToList();
+
+            Console.WriteLine($"[SearchNearbyByTextAsync] Найдено мест: {places?.Count ?? 0}");
+
+            return places ?? new List<GSearchNearbyMapsResult>();
+        }
 
 
 

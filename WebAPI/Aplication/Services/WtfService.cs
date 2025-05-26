@@ -46,17 +46,26 @@ namespace Application.Services
                 }
             }
 
-            return await SearchNearbyWithPromptAsync(
+            //return await SearchNearbyWithPromptAsync(
+            //    userText: text,
+            //    hashtags: hashtags,
+            //    radius: radius,
+            //    latitude: latitude,
+            //    longitude: longitude,
+            //    systemPrompt: _config.MainPrompt,
+            //    checkSpecifiedQuery: true);
+
+            return await SearchNearbyWithTextAsync(
                 userText: text,
                 hashtags: hashtags,
                 radius: radius,
                 latitude: latitude,
                 longitude: longitude,
                 systemPrompt: _config.MainPrompt,
-                checkSpecifiedQuery: true);
+                rec: false);
         }
 
-        public async Task<AiPlaceSearchDTO> AiPlaceRecommendation(ulong hashTagId, int radius, double longitude, double latitude)
+        public async Task<AiPlaceSearchDTO> AiPlaceRecommendation(ulong hashTagId, int radius, double longitude, double latitude, string Tag = "Цікаві місця")
         {
             var tagEntity = await _hashtagRepository.FindAsync(hashTagId);
             if (tagEntity == null || string.IsNullOrWhiteSpace(tagEntity.Prompt))
@@ -65,14 +74,70 @@ namespace Application.Services
             var hashtags = new List<string> { tagEntity.Tag?.Trim() ?? "" };
 
             // При рекомендации пользовательский текст пустой
-            return await SearchNearbyWithPromptAsync(
-                userText: "",
-                hashtags: hashtags,
-                radius: radius,
-                latitude: latitude,
-                longitude: longitude,
-                systemPrompt: _config.MainPrompt,
-                checkSpecifiedQuery: false);
+            //return await SearchNearbyWithPromptAsync(
+            //    userText: "",
+            //    hashtags: hashtags,
+            //    radius: radius,
+            //    latitude: latitude,
+            //    longitude: longitude,
+            //    systemPrompt: _config.MainPrompt,
+            //    checkSpecifiedQuery: false);
+
+            return await SearchNearbyWithTextAsync(
+               userText: Tag,
+               hashtags: hashtags,
+               radius: radius,
+               latitude: latitude,
+               longitude: longitude,
+               systemPrompt: _config.MainPrompt,
+               rec: true);
+        }
+
+        private async Task<AiPlaceSearchDTO> SearchNearbyWithTextAsync(
+            string userText,
+            List<string> hashtags,
+            int radius,
+            double latitude,
+            double longitude,
+            string systemPrompt,
+            bool rec)
+        {
+            var allResults = new List<GSearchNearbyMapsResult>();
+
+            if (rec)
+            {
+                allResults.AddRange(await _gmapsService.SearchNearbyByTextAsync(Tags.DicTags[userText][0], latitude, longitude, radius, 50));
+                allResults.AddRange(await _gmapsService.SearchNearbyByTextAsync(Tags.DicTags[userText][1], latitude, longitude, radius, 50));
+                allResults.AddRange(await _gmapsService.SearchNearbyByTextAsync(Tags.DicTags[userText][2], latitude, longitude, radius, 50));
+                allResults.AddRange(await _gmapsService.SearchNearbyByTextAsync(Tags.DicTags[userText][3], latitude, longitude, radius, 50));
+
+                if(allResults.Count == 0)
+                    allResults.AddRange(await _gmapsService.SearchNearbyByTextAsync(userText, latitude, longitude, radius, 50));
+            }
+            else
+            {
+                allResults.AddRange(await _gmapsService.SearchNearbyByTextAsync(userText, latitude, longitude, radius, 50));
+            }
+
+            allResults = allResults
+            .GroupBy(r => r.GmapsPlaceId) 
+            .Select(g => g.First())
+            .ToList();
+
+
+            List<string> googlePlaceIds = new List<string>();
+
+            foreach (var query in allResults)
+            {
+                googlePlaceIds.Add(query.GmapsPlaceId);
+            }
+
+            return new AiPlaceSearchDTO
+            {
+                GooglePlaceIds = googlePlaceIds,
+                IsSpecifiedQuery = false
+            };
+
         }
 
         private async Task<AiPlaceSearchDTO> SearchNearbyWithPromptAsync(
