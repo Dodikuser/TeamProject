@@ -5,7 +5,7 @@ import RecommendationService from '../services/RecommendationService';
 import FavoriteService from '../services/FavoriteService';
 
 const categories = [
-  'Туризм', 'Їжа', 'Природа', 'Шопінг', 'Історія', 'Спорт',
+  'Цікаві місця', 'Туризм', 'Їжа', 'Природа', 'Шопінг', 'Історія', 'Спорт',
   'Для дітей', 'Тихі місця', 'Романтика', 'Екзотика', 'Екстрим', 'Розваги', 'Банк', 'Місця поруч', 'Архітектура'
 ];
 
@@ -44,6 +44,7 @@ export default function Recommendations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
+  const [selectedCategory, setSelectedCategory] = useState('Туризм');
 
   // Add fetchFavorites function
   const fetchFavorites = async () => {
@@ -68,7 +69,8 @@ export default function Recommendations() {
           hashTagId: 8,
           radius: 10000,
           latitude: 47.81052,
-          longitude: 35.18286
+          longitude: 35.18286,
+          tag: selectedCategory
         });
         
         const favoritesSet = await fetchFavorites();
@@ -96,7 +98,7 @@ export default function Recommendations() {
     };
 
     fetchRecommendations();
-  }, []);
+  }, [selectedCategory]);
 
   // Add handleToggleFavorite function
   const handleToggleFavorite = async (placeId) => {
@@ -210,8 +212,15 @@ export default function Recommendations() {
             <Button
               key={idx}
               variant="light"
-              className="rounded-pill px-3 py-1 text-dark flex-shrink-0"
-              style={{ whiteSpace: 'nowrap', backgroundColor: '#D0BCFF' }}
+              className={`rounded-pill px-3 py-1 text-dark flex-shrink-0 ${
+                selectedCategory === cat ? 'active' : ''
+              }`}
+              style={{ 
+                whiteSpace: 'nowrap', 
+                backgroundColor: selectedCategory === cat ? '#9747FF' : '#D0BCFF',
+                color: selectedCategory === cat ? 'white' : 'black'
+              }}
+              onClick={() => setSelectedCategory(cat)}
             >
               {cat}
             </Button>

@@ -8,16 +8,18 @@ class RecommendationService extends BaseService {
      * @param {number} params.radius - Search radius in meters
      * @param {number} params.latitude - Latitude of the center point
      * @param {number} params.longitude - Longitude of the center point
+     * @param {string} params.tag - Category tag for filtering
      * @returns {Promise<Array<import('../Models/Place').PlaceDTODefaultCard>>}
      */
     async getRecommendations({ 
         hashTagId = 1, 
         radius = 1000, 
         latitude = 47.81052, 
-        longitude = 35.18286 
+        longitude = 35.18286,
+        tag = 'Туризм'
     } = {}) {
         // Построение URL с параметрами
-        const url = `/AI/recommend?hashTagId=${hashTagId}&radius=${radius}&latitude=${latitude}&longitude=${longitude}`;
+        const url = `/AI/recommend?hashTagId=${hashTagId}&radius=${radius}&latitude=${latitude}&longitude=${longitude}&tag=${encodeURIComponent(tag)}`;
         console.log('Making request to:', url);
         
         try {
