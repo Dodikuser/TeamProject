@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 
 
 
 const GoogleLoginForm = (isLogin) => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const googleButtonRef = useRef(null); 
 
   const GOOGLE_CLIENT_ID = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
@@ -24,44 +26,37 @@ const GoogleLoginForm = (isLogin) => {
   };
 
   const sendToken = async (token, isLogin) => {
+    const SERVER_URL = 'https://localhost:7103/api/User';
+    const url = isLogin ? `${SERVER_URL}/login` : `${SERVER_URL}/register`;
 
-        const SERVER_URL = 'https://localhost:7103/api/User';
-        const url = isLogin ? `${SERVER_URL}/login` : `${SERVER_URL}/register`;
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          googleJwtToken: token
+        })
+      });
 
-    await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        googleJwtToken: token
-      })
-    })
-    .then(res => {
       if (!res.ok) {
-        return res.text().then(text => {
-          throw new Error(`Ошибка регистрации: ${res.status} ${res.statusText}. Ответ сервера: ${text}`);
-        });
+        const text = await res.text();
+        throw new Error(`Ошибка регистрации: ${res.status} ${res.statusText}. Ответ сервера: ${text}`);
       }
-  return res.text();
 
-})
-.then(async data => {
+      const data = await res.text();
 
-  if (isLogin) {
-      const parsed = JSON.parse(data);
-      console.log('data:', parsed);
-      console.log('data.token:', parsed.token);
-    localStorage.setItem('authToken', String(parsed.token));
-    const token_ = localStorage.getItem('authToken');
-    console.log('Token:', token_);
-    navigate("/favorites");
-  } else {
-    await sendToken(token, true);
-  }
-})
-
-    .catch(err => {
+      if (isLogin) {
+        const parsed = JSON.parse(data);
+        console.log('data:', parsed);
+        console.log('data.token:', parsed.token);
+        login(parsed.token);
+        navigate("/favorites");
+      } else {
+        await sendToken(token, true);
+      }
+    } catch (err) {
       console.error('Авторизация через Google провалилась:', err);
       if (err.message.includes('UnregisteredGoogle')) {
         sendToken(token, false);
@@ -69,8 +64,7 @@ const GoogleLoginForm = (isLogin) => {
       else if (err.message.includes('EmailBusy')) {
         sendToken(token, true);
       }
-
-    });
+    }
   };
 
   useEffect(() => {
@@ -123,6 +117,7 @@ const GoogleLoginForm = (isLogin) => {
 
 export default function LoginRegister() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -150,7 +145,6 @@ export default function LoginRegister() {
     const SERVER_URL = 'https://localhost:7103/api/User';
     const url = isLogin ? `${SERVER_URL}/login` : `${SERVER_URL}/register`;
 
-
     const payload = isLogin
       ? {
           type: 'standard',
@@ -175,13 +169,10 @@ export default function LoginRegister() {
       });
 
       const data = await response.json();
-      if (isLogin){
-        localStorage.setItem('authToken', data.token);
-        const token = localStorage.getItem('authToken');
-      console.log('Token:', token);
+      if (isLogin) {
+        login(data.token);
+        navigate("/my-places");
       }
-      console.log('Response:', data);
-      navigate("/my-places");
     } catch (error) {
       console.error('Error:', error);
     }
@@ -216,11 +207,11 @@ export default function LoginRegister() {
         <Form onSubmit={handleSubmit}>
           {!isLogin && (
             <>
-              {/* Ім’я */}
+              {/* Ім'я */}
               <Form.Group controlId="firstName" className="mb-3 position-relative">
                 <Form.Control
                   type="text"
-                  placeholder="Ім’я"
+                  placeholder="Ім'я"
                   value={formData.firstName}
                   onChange={handleChange('firstName')}
                   className="bg-light-subtle p-2 pe-5"

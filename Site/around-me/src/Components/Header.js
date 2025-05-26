@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
 
 import { Container, Navbar, Dropdown } from 'react-bootstrap';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import NotificationsMenu from './NotificationsMenu';
+import { useAuth } from '../context/AuthContext';
 
 
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
 const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+const { isAuthenticated, logout } = useAuth();
+
+const handleLogout = () => {
+  logout();
+  navigate('/');
+};
 
   return (
     <Navbar expand="lg" className="shadow-sm bg-white py-2 sticky-top">
@@ -62,12 +70,18 @@ const [showLanguageMenu, setShowLanguageMenu] = useState(false);
             </Dropdown.Toggle>
 
             <Dropdown.Menu className="mt-3">
-              <Dropdown.Item as={Link} to="/login">Вхід / Реєстрація</Dropdown.Item>
+              {!isAuthenticated ? (
+                <Dropdown.Item as={Link} to="/login">Вхід / Реєстрація</Dropdown.Item>
+              ) : (
+                <>
+                  <Dropdown.Item as={Link} to="/account">Мій акаунт</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/my-places">Мої заклади</Dropdown.Item>
+                  <Dropdown.Item onClick={handleLogout}>Вийти</Dropdown.Item>
+                </>
+              )}
               <Dropdown.Item onClick={() => setShowLanguageMenu(!showLanguageMenu)}>
-               Мова інтерфейсу
-            </Dropdown.Item>
-
-              <Dropdown.Item as={Link} to="/my-places">Мої заклади</Dropdown.Item>
+                Мова інтерфейсу
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
           {showLanguageMenu && (

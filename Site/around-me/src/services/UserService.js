@@ -7,10 +7,15 @@ class UserService extends BaseService {
      */
     async login(loginData) {
         try {
-            return await this.makeRequest('/User/login', {
+            const data = await this.makeRequest('/User/login', {
                 method: 'POST',
                 body: JSON.stringify(loginData)
-            });
+            }, false);
+
+            if (data.token) {
+                localStorage.setItem('authToken', data.token);
+            }
+            return data;
         } catch (error) {
             console.error('Error during login:', error);
             throw error;
@@ -26,7 +31,7 @@ class UserService extends BaseService {
             return await this.makeRequest('/User/register', {
                 method: 'POST',
                 body: JSON.stringify(registerData)
-            });
+            }, false);
         } catch (error) {
             console.error('Error during registration:', error);
             throw error;
@@ -34,16 +39,11 @@ class UserService extends BaseService {
     }
 
     /**
-     * @param {string} token
      * @returns {Promise<import('../Models/User').UserProfile>}
      */
-    async getUserProfile(token) {
+    async getUserProfile() {
         try {
-            return await this.makeRequest('/User/profile', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            return await this.makeRequest('/User/profile');
         } catch (error) {
             console.error('Error fetching user profile:', error);
             throw error;
@@ -72,11 +72,15 @@ class UserService extends BaseService {
      * @returns {Promise<{ avatarUrl: string, thumbnailUrl: string }>}
      */
     async updateAvatar(userId, avatarData) {
-        // TODO: Реализовать реальный API запрос
-        return {
-            avatarUrl: 'https://example.com/avatars/fake-avatar.jpg',
-            thumbnailUrl: 'https://example.com/avatars/fake-avatar-thumb.jpg'
-        };
+        try {
+            return await this.makeRequest(`/User/${userId}/avatar`, {
+                method: 'PUT',
+                body: JSON.stringify(avatarData)
+            });
+        } catch (error) {
+            console.error('Error updating avatar:', error);
+            throw error;
+        }
     }
 
     /**
@@ -84,17 +88,43 @@ class UserService extends BaseService {
      * @returns {Promise<void>}
      */
     async deleteAvatar(userId) {
-        // TODO: Реализовать реальный API запрос
-        return Promise.resolve();
+        try {
+            await this.makeRequest(`/User/${userId}/avatar`, {
+                method: 'DELETE'
+            });
+        } catch (error) {
+            console.error('Error deleting avatar:', error);
+            throw error;
+        }
     }
 
     /**
      * @returns {Promise<void>}
      */
     async logout() {
-        // TODO: Реализовать реальный API запрос
-        localStorage.removeItem('authToken');
-        return Promise.resolve();
+        try {
+            await this.makeRequest('/User/logout', {
+                method: 'POST'
+            });
+            localStorage.removeItem('authToken');
+        } catch (error) {
+            console.error('Error during logout:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * @returns {Promise<import('../Models/User').UserProfile>}
+     */
+    async getUserData() {
+        try {
+            return await this.makeRequest('/User/get', {
+                method: 'POST'
+            });
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            throw error;
+        }
     }
 }
 

@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import UserService from '../services/UserService';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const reviews = [
   {
@@ -12,15 +15,42 @@ const reviews = [
 
 const AccountPage = () => {
   const [showModal, setShowModal] = useState(false);
-  const [name, setName] = useState('Ім’я Прізвище');
-  const [email, setEmail] = useState('example@gmail.com');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatar, setAvatar] = useState(null);
   const [errors, setErrors] = useState({});
+  const [createdAt, setCreatedAt] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await UserService.getUserData();
+        if (userData) {
+          setName(userData.name);
+          setEmail(userData.email);
+          // Convert the date to a more readable format
+          const date = new Date(userData.createdAt);
+          setCreatedAt(date.toLocaleDateString());
+        }
+      } catch (err) {
+        setError('Failed to load user data');
+        console.error('Error fetching user data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const validate = () => {
     const newErrors = {};
-    if (!name.trim()) newErrors.name = 'Ім’я обов’язкове';
+    if (!name.trim()) newErrors.name = 'Імя обовязкове';
     if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
       newErrors.email = 'Некоректна електронна адреса';
     if (password && password.length < 6)
@@ -52,6 +82,11 @@ const AccountPage = () => {
 
   const handleRemoveAvatar = () => {
     setAvatar(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -100,7 +135,7 @@ const AccountPage = () => {
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="Ім’я"
+              placeholder="Ім'я"
             />
             {errors.name && <div className="error-text">{errors.name}</div>}
 
@@ -116,7 +151,7 @@ const AccountPage = () => {
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Новий пароль (необов’язково)"
+              placeholder="Новий пароль (необов'язково)"
             />
             {errors.password && <div className="error-text">{errors.password}</div>}
 
@@ -139,77 +174,89 @@ const AccountPage = () => {
       <div className="container py-5" style={{ fontFamily: 'Arial, sans-serif' }}>
         <div className="card mb-4 p-4">
           <h2 className="h5 mb-3">Обліковий запис</h2>
-          <div className="row align-items-center gx-4">
-            <div className="col-auto ms-4">
-              <input
-                type="file"
-                accept="image/*"
-                id="avatarInput"
-                style={{ display: 'none' }}
-                onChange={handleAvatarChange}
-              />
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center position-relative"
-                style={{
-                  width: '130px',
-                  height: '130px',
-                  backgroundColor: '#ddd',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                }}
-                onClick={() => document.getElementById('avatarInput').click()}
-              >
-                {avatar ? (
-                  <img
-                    src={avatar}
-                    alt="avatar"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                ) : (
-                  <span className="material-symbols-outlined" style={{ fontSize: '3rem', color: '#666' }}>
-                    person
-                  </span>
-                )}
+          {loading ? (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          ) : (
+            <div className="row align-items-center gx-4">
+              <div className="col-auto ms-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="avatarInput"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarChange}
+                />
                 <div
-                  className="position-absolute bottom-0 start-0 end-0 text-center py-1"
+                  className="rounded-circle d-flex align-items-center justify-content-center position-relative"
                   style={{
-                    backgroundColor: 'rgba(0,0,0,0.4)',
-                    color: 'white',
-                    fontSize: '0.75rem',
+                    width: '130px',
+                    height: '130px',
+                    backgroundColor: '#ddd',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
                   }}
+                  onClick={() => document.getElementById('avatarInput').click()}
+                >
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt="avatar"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <span className="material-symbols-outlined" style={{ fontSize: '3rem', color: '#666' }}>
+                      person
+                    </span>
+                  )}
+                  <div
+                    className="position-absolute bottom-0 start-0 end-0 text-center py-1"
+                    style={{
+                      backgroundColor: 'rgba(0,0,0,0.4)',
+                      color: 'white',
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    Змінити
+                  </div>
+                </div>
+                {avatar && (
+                  <button
+                    className="btn btn-outline-danger btn-sm mt-2 btn-hover"
+                    onClick={handleRemoveAvatar}
+                  >
+                    Видалити аватарку
+                  </button>
+                )}
+              </div>
+
+              <div className="col ps-3">
+                <h5>{name}</h5>
+                <a
+                  href={`mailto:${email}`}
+                  className="d-block mb-1 text-primary text-decoration-none"
+                >
+                  {email}
+                </a>
+                <p className="mb-2 text-muted">Дата реєстрації: {createdAt}</p>
+                <button
+                  className="btn btn-sm me-2 btn-hover"
+                  style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}
+                  onClick={() => setShowModal(true)}
                 >
                   Змінити
-                </div>
-              </div>
-              {avatar && (
-                <button
-                  className="btn btn-outline-danger btn-sm mt-2 btn-hover"
-                  onClick={handleRemoveAvatar}
-                >
-                  Видалити аватарку
                 </button>
-              )}
+                <button className="btn btn-secondary btn-sm btn-hover" onClick={handleLogout}>Вийти</button>
+              </div>
             </div>
-
-            <div className="col ps-3">
-              <h5>{name}</h5>
-              <a
-                href={`mailto:${email}`}
-                className="d-block mb-1 text-primary text-decoration-none"
-              >
-                {email}
-              </a>
-              <p className="mb-2 text-muted">Дата реєстрації: 25.04.2025</p>
-              <button
-                className="btn btn-sm me-2 btn-hover"
-                style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}
-                onClick={() => setShowModal(true)}
-              >
-                Змінити
-              </button>
-              <button className="btn btn-secondary btn-sm btn-hover">Вийти</button>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="card p-4" style={{ minHeight: '250px', display: 'flex', flexDirection: 'column' }}>
