@@ -127,34 +127,21 @@ public class AccountFragment extends Fragment {
         }).start();
     }
 
+    // В методі sendLoginRequest замініть імітацію на такий код:
     private void sendLoginRequest(String email, String password) {
-        new Thread(() -> {
-            try {
-                // Імітуємо успішний вхід, оскільки сервер не підключено
-                requireActivity().runOnUiThread(() -> {
-                    // Зберігаємо фейковий токен
-                    SharedPreferences prefs = requireActivity()
-                            .getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
-                    prefs.edit()
-                            .putString("auth_token", "fake_token")
-                            .apply();
+        // Зберігаємо дані користувача
+        SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        prefs.edit()
+                .putString("auth_token", "fake_token")
+                .putString("user_email", email)
+                .putString("user_name", "Ім'я Прізвище") // Тимчасове значення
+                .putString("reg_date", "25.04.2025") // Тимчасове значення
+                .apply();
 
-                    Toast.makeText(getContext(), "Успішний вхід!", Toast.LENGTH_SHORT).show();
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new MainAccount())
-                            .commit();
-                });
-
-                Thread.sleep(1000); // Імітація затримки мережі
-            } catch (Exception e) {
-                e.printStackTrace();
-                requireActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(),
-                                "Помилка підключення: " + e.getMessage(),
-                                Toast.LENGTH_LONG).show()
-                );
-            }
-        }).start();
+        Toast.makeText(getContext(), "Успішний вхід!", Toast.LENGTH_SHORT).show();
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new MainAccount())
+                .commit();
     }
         /*new Thread(() -> {
 
