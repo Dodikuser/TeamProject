@@ -18,12 +18,44 @@ class PlaceService extends BaseService {
     }
 
     /**
+     * Преобразует данные места в формат для LocationCard и LocationModal
+     * @param {Object} placeData - Данные места с API
+     * @returns {Object} Трансформированные данные
+     */
+    transformPlaceData(placeData) {
+        return {
+            id: placeData.gmapsPlaceId,
+            image: placeData.photos?.[0]?.path || 'https://via.placeholder.com/300x180?text=No+Image',
+            images: placeData.photos?.map(photo => photo.path) || [placeData.photos?.[0]?.path || 'https://via.placeholder.com/300x180?text=No+Image'],
+            title: placeData.name,
+            location: placeData.address,
+            locationText: placeData.address,
+            rating: placeData.stars || 0,
+            description: placeData.description || '',
+            phone: placeData.phoneNumber,
+            email: placeData.email,
+            website: placeData.site,
+            coordinates: {
+                lat: placeData.latitude,
+                lng: placeData.longitude
+            },
+            isOpen: placeData.isOpen,
+            hours: placeData.isOpen ? 'Відчинено' : 'Зачинено',
+            schedule: placeData.openingHours?.map(hours => ({
+                day: hours.dayOfWeek,
+                hours: hours.isOpen ? `${hours.openTime} - ${hours.closeTime}` : 'Зачинено'
+            })) || []
+        };
+    }
+
+    /**
      * @param {string} placeId
-     * @returns {Promise<import('../Models/Place').Place>}
+     * @returns {Promise<Object>}
      */
     async getPlaceById(placeId) {
         try {
-            return await this.makeRequest(`/Places/get/${placeId}`);
+            const data = await this.makeRequest(`/Place/get/${placeId}`);
+            return this.transformPlaceData(data);
         } catch (error) {
             console.error('Error fetching place details:', error);
             throw error;

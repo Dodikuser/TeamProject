@@ -5,6 +5,7 @@ import FilterOffcanvas from '../Components/FilterOffcanvas';
 import SortOffcanvas from '../Components/SortOffcanvas';
 import FavoritesCard from '../Components/Cards/FavoritesCard';
 import {useNavigate} from "react-router-dom";
+import FavoriteService from '../services/FavoriteService';
 
 const API_BASE_URL = 'https://localhost:7103/api';
 
@@ -25,31 +26,6 @@ export default function Favorites() {
   const [take] = useState(10);
   const [hasMore, setHasMore] = useState(true);
 
-  // Function to get auth token (adjust based on your auth implementation)
-  const getAuthToken = () => {
-    return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-  };
-
-  // Function to calculate distance (placeholder - replace with actual calculation)
-  const calculateDistance = (lat, lng) => {
-    // This is a placeholder. You should implement actual distance calculation
-    // based on user's current location
-    return `${(Math.random() * 10).toFixed(1)} км`;
-  };
-
-  // Function to transform API response to component format
-  const transformFavoriteData = (apiData) => {
-    return apiData.favorites.$values.map(favorite => ({
-      id: favorite.placeDTO.gmapsPlaceId,
-      image: favorite.placeDTO.photo?.path || 'https://via.placeholder.com/300x180?text=No+Image',
-      title: favorite.placeDTO.name,
-      locationText: favorite.placeDTO.address || 'Адреса не вказана',
-      rating: favorite.placeDTO.stars || 0,
-      distance: calculateDistance(favorite.placeDTO.latitude, favorite.placeDTO.longitude),
-      favoritedAt: favorite.favoritedAt,
-      placeDTO: favorite.placeDTO
-    }));
-  };
 
   // Function to load favorites from API
   const loadFavorites = async (skipCount = 0, isLoadMore = false) => {
@@ -57,28 +33,10 @@ export default function Favorites() {
       setLoading(true);
       setError(null);
 
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('Токен авторизації не знайдено');
-      }
-
-      const response = await fetch(`${API_BASE_URL}/Favorites/get?skip=${skipCount}&take=${take}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      const transformedData = await FavoriteService.getFavorites({ 
+        skip: skipCount, 
+        take: take 
       });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Необхідна авторизація');
-        }
-        throw new Error(`Помилка сервера: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const transformedData = transformFavoriteData(data);
 
       if (isLoadMore) {
         setFavoritePlaces(prev => [...prev, ...transformedData]);
@@ -124,26 +82,7 @@ export default function Favorites() {
     try {
       const placeToDelete = filteredPlaces[deleteIndex];
       
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('Токен авторизації не знайдено');
-      }
-
-      // API call to remove favorite
-      const response = await fetch(`${API_BASE_URL}/Favorites/action?gmapsPlaceId=${placeToDelete.id}&action=1`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      }
-    });
-
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Необхідна авторизація');
-        }
-        throw new Error(`Помилка сервера: ${response.status}`);
-      }
+      await FavoriteService.toggleFavorite(placeToDelete.id, '1');
 
       // Remove from local state only after successful API call
       setFavoritePlaces(prev => prev.filter((_, i) => i !== deleteIndex));

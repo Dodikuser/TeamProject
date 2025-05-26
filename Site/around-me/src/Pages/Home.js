@@ -127,8 +127,22 @@ function Home() {
   };
 
   const handleCardClick = (place) => {
-    setSelectedPlace(place.originalItem);
-    setShowModal(true);
+    openPlaceModal(place.id);
+  };
+
+  const openPlaceModal = async (placeId) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const placeData = await PlaceService.getPlaceById(placeId);
+      setSelectedPlace(placeData);
+      setShowModal(true);
+    } catch (err) {
+      console.error('Error loading place details:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -235,7 +249,10 @@ function Home() {
       {selectedPlace && (
         <LocationModal
           show={showModal}
-          onHide={() => setShowModal(false)}
+          onHide={() => {
+            setShowModal(false);
+            setSelectedPlace(null);
+          }}
           place={selectedPlace}
         />
       )}

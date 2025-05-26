@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import LocationCard from './LocationCard';
-import LocationModal from './LocationModal'; // импортируй модалку
+import LocationModal from './LocationModal';
 import { Container } from 'react-bootstrap';
+import PlaceService from '../services/PlaceService';
 
 const sampleData = [
 
@@ -11,6 +12,8 @@ function LocationList() {
   const [favorites, setFavorites] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) =>
@@ -18,9 +21,19 @@ function LocationList() {
     );
   };
 
-  const openModal = (place) => {
-    setSelectedPlace(place);
-    setShowModal(true);
+  const openModal = async (place) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const placeData = await PlaceService.getPlaceById(place.id);
+      setSelectedPlace(placeData);
+      setShowModal(true);
+    } catch (err) {
+      console.error('Error loading place details:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,7 +56,7 @@ function LocationList() {
               distance={place.distance}
               isFavorite={favorites.includes(place.id)}
               onToggleFavorite={() => toggleFavorite(place.id)}
-              onClick={() => openModal(place)} // открытие модалки
+              onClick={() => openModal(place)}
             />
           </div>
         ))}
@@ -51,7 +64,10 @@ function LocationList() {
 
       <LocationModal
         show={showModal}
-        onHide={() => setShowModal(false)}
+        onHide={() => {
+          setShowModal(false);
+          setSelectedPlace(null);
+        }}
         place={selectedPlace}
       />
     </Container>

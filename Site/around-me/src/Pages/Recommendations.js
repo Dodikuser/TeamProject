@@ -3,6 +3,7 @@ import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import RecommendationsCard from '../Components/RecommendationsCard';
 import RecommendationService from '../services/RecommendationService';
 import FavoriteService from '../services/FavoriteService';
+import { useNavigate } from 'react-router-dom';
 
 const categories = [
   'Цікаві місця', 'Туризм', 'Їжа', 'Природа', 'Шопінг', 'Історія', 'Спорт',
@@ -45,6 +46,7 @@ export default function Recommendations() {
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
   const [selectedCategory, setSelectedCategory] = useState('Туризм');
+  const navigate = useNavigate();
 
   // Add fetchFavorites function
   const fetchFavorites = async () => {
@@ -166,6 +168,11 @@ export default function Recommendations() {
   console.log('Filtered recommendations:', filteredRecommendations.length);
   console.log('Search term:', searchTerm);
 
+  const handleGoTo = (placeId) => {
+    navigate("/");
+    localStorage.setItem("openPlace", `${placeId}`);
+  };
+
   const content = (
     <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', minHeight: '100vh' }}>
       {/* Пошук */}
@@ -268,6 +275,7 @@ export default function Recommendations() {
                 {...rec}
                 isFavorite={favorites.has(rec.id)}
                 onToggleFavorite={() => handleToggleFavorite(rec.id)}
+                onGoTo={() => handleGoTo(rec.id)}
               />
             </Col>
           ))

@@ -10,7 +10,8 @@ export default function RecommendationsCard({
   rating = 4,
   distance = '100 км',
   isFavorite = false,
-  onToggleFavorite
+  onToggleFavorite,
+  onGoTo
 }) {
   const [animating, setAnimating] = useState(false);
 
@@ -91,6 +92,7 @@ export default function RecommendationsCard({
             size="sm"
             variant="outline-primary"
             className="custom-animated-button"
+            onClick={onGoTo}
           >
             Перейти
           </Button>
