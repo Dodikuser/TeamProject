@@ -39,12 +39,24 @@ namespace Application.Services
                 };
             return null;
         }
-        public async Task EditUser(ulong userId, UserDTO userDTO)
+        public async Task<UserEditStatus> EditUser(ulong userId, UserEditDTO userDTO)
         {
             User user = (await _userRepository.GetByIdMainAsync(userId))!;
-            user.Name = userDTO.Name;
-            //...
+
+            if (userDTO.Name != null)
+                user.Name = userDTO.Name;
+
+            if (userDTO.PasswordOld != null)
+            {
+                string passwordHash = _authorizationService.HashFunction(userDTO.PasswordOld);
+                bool isPasswordValid = await _userRepository.IsPasswordValidByEmailAsync(user.Email, passwordHash);
+                if (isPasswordValid)
+                    user.PasswordHash = _authorizationService.HashFunction(userDTO.PasswordNew);
+                else return UserEditStatus.OldPasswordIsIncorrect;
+            }
+
             await _userRepository.Update(user);
+            return UserEditStatus.Success;
         }
         public async Task<UserDeleteStatus> DeleteUser(ulong userId, ulong userToDeleteId)
         {
