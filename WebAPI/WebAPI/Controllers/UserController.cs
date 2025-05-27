@@ -75,14 +75,15 @@ namespace WebAPI.Controllers
 
         [HttpPatch("edit")]
         [Authorize]
-        public async Task<IActionResult> EditUser(UserDTO userDTO)
+        public async Task<IActionResult> EditUser(UserEditDTO userDTO)
         {
-            if (/*userDTO.Name == null ||*/ userDTO.Name == "")
+            if (userDTO.Name == "")
                 return BadRequest();
 
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
-            await _userService.EditUser(userId, userDTO);
-            return Ok();
+            var result = await _userService.EditUser(userId, userDTO);
+
+            return result == UserEditStatus.Success ? Ok() : BadRequest(result);
         }
 
         [HttpPatch("delete")]
