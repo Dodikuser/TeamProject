@@ -27,7 +27,9 @@ namespace Entities.Models
         public double Stars { get; set; }
 
         //тут будут доп поля которые есть на Гмапах но не было у нас
-        public bool? IsOpen { get; set; }
+
+        //DOTO
+        //public bool? IsOpen { get; set; }
         public ICollection<OpeningHours> OpeningHours { get; set; }
 
         //это не внешний ключ

@@ -1,4 +1,6 @@
-﻿namespace Application.DTOs
+﻿using Entities.Models;
+
+namespace Application.DTOs
 {
     public class PlaceDTODefaultCard
     {
@@ -9,7 +11,6 @@
         public string GmapsPlaceId { get; set; }
         public PhotoDTO Photo { get; set; }
         public double Stars { get; set; }
-
-        //Я С$КА???
+        public ICollection<OpeningHours> OpeningHours { get; set; }
     }
 }

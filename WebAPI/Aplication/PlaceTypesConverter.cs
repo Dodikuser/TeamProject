@@ -6,7 +6,7 @@ namespace Application
 {
     public static class PlaceTypesConverter
     {
-
+        //этот метод юзлес
         public static GPlaceDetailsResult ToPlaceDetailsResult(this PlaceDTOFull argument)
         {
 
@@ -28,7 +28,7 @@ namespace Application
 
                 OpeningHours = new GOpeningHours()
                 {
-                    OpenNow = argument.IsOpen,
+                    //OpenNow = argument.IsOpen,
                     WeekdayText = argument.OpeningHours.Select(x => x.ToString()).ToList()!
                 },
 
@@ -47,6 +47,7 @@ namespace Application
             };
             return result;
         }
+        //этот тоже
         public static PlaceDTOFull ToPlace(this GPlaceDetailsResult argument)
         {
             PlaceDTOFull result = new PlaceDTOFull()
@@ -63,7 +64,8 @@ namespace Application
                 Radius = null,
                 TokensAvailable = null,
                 LastPromotionDateTime = null,
-                IsOpen = argument.OpeningHours.OpenNow,
+                //IsOpen = argument.OpeningHours.OpenNow,
+
                 //todo convert List<string> to List<OpeningHours>
                 //OpeningHours = argument.OpeningHours.WeekdayText,
             };
@@ -86,7 +88,7 @@ namespace Application
                 Radius = place.Radius,
                 TokensAvailable = place.TokensAvailable,
                 LastPromotionDateTime = place.LastPromotionDateTime,
-                IsOpen = place.IsOpen,
+                //IsOpen = place.IsOpen,
                 OpeningHours = place.OpeningHours, 
                 GmapsPlaceId = place.GmapsPlaceId,
                 UserId = (int?)place.UserId, 
@@ -110,6 +112,7 @@ namespace Application
                 Latitude = place.Latitude,
                 GmapsPlaceId = place.GmapsPlaceId,
                 Stars = place.Stars,
+                OpeningHours = place.OpeningHours,
                 Photo = place.Photos.Any()
                 ? place.Photos.Select(photo => new PhotoDTO
                 {
@@ -132,7 +135,7 @@ namespace Application
                 PhoneNumber = gPlace.PhoneNumber,
                 Site = gPlace.Website,
                 Description = gPlace.EditorialSummary?.Overview,
-                IsOpen = gPlace.OpeningHours?.OpenNow,
+                //IsOpen = gPlace.OpeningHours?.OpenNow,
                 GmapsPlaceId = gmapsPlaceId,
                 Stars = gPlace.Rating ?? 0,
 
