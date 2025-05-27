@@ -5,7 +5,7 @@ namespace Infrastructure.Repository
 {
     public class PlaceRepository(MyDbContext _context) : GenericRepository<Place>(_context)
     {
-        public async Task UpdateAllowedFieldsAsync(int placeId, string? name, string? description, string? site, string? phoneNumber, string? email, int? radius)
+        public async Task UpdateAllowedFieldsAsync(ulong placeId, string? name, string? description, string? site, string? phoneNumber, string? email, int? radius)
         {
             var existing = await _context.Places.FindAsync(placeId);
             if (existing == null)
@@ -25,7 +25,7 @@ namespace Infrastructure.Repository
         {
             return await _context.Places.AnyAsync(p => p.GmapsPlaceId == gmapsPlaceId);
         }
-        public async Task AddTokensAsync(int placeId, int count)
+        public async Task AddTokensAsync(ulong placeId, int count)
         {
             if (count <= 0) throw new ArgumentException("Token count must be positive");
 
@@ -35,7 +35,7 @@ namespace Infrastructure.Repository
             place.TokensAvailable = (place.TokensAvailable ?? 0) + count;
             await _context.SaveChangesAsync();
         }
-        public async Task RemoveTokensAsync(int placeId, int count)
+        public async Task RemoveTokensAsync(ulong placeId, int count)
         {
             if (count <= 0) throw new ArgumentException("Token count must be positive");
 
@@ -49,7 +49,7 @@ namespace Infrastructure.Repository
             place.TokensAvailable = current - count;
             await _context.SaveChangesAsync();
         }
-        public async Task DeleteAsync(int placeId)
+        public async Task DeleteAsync(ulong placeId)
         {
             var place = await _context.Places.FindAsync(placeId);
             if (place != null)
@@ -58,7 +58,7 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<Place?> GetByIdAsync(int placeId)
+        public async Task<Place?> GetByIdAsync(ulong placeId)
         {
             return await _context.Places.FindAsync(placeId);
         }
@@ -123,14 +123,19 @@ namespace Infrastructure.Repository
             _context.SaveChanges();
         }
 
-        //Добавить свзять между местом и типом мест
-        public async Task AddPlaceTypeToPlace(ulong placeId, ulong placeTypeId)
+        public async Task AssignUserToPlaceAsync(ulong placeId, ulong userId)
         {
-            throw new NotImplementedException();
+            var place = await _context.Places.FindAsync(placeId);
+            if (place == null)
+                throw new KeyNotFoundException("Place not found");
+
+            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+            if (!userExists)
+                throw new KeyNotFoundException("User not found");
+
+            place.UserId = userId;
+            await _context.SaveChangesAsync();
         }
-
-        //добавить место с проверкой
-
 
     }
 }

@@ -19,6 +19,7 @@ namespace Infrastructure
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Search> Searches { get; set; }
         public virtual DbSet<Photo> Photos { get; set; }
+        public virtual DbSet<ConfirmationCode> ConfirmationCodes { get; set; }
 
         //todo
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -10,4 +10,10 @@
     <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="HTML_templates\ConfirmationTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

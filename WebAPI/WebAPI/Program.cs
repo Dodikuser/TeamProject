@@ -1,8 +1,10 @@
 ﻿using Application.Services;
 using Application.Services.AI;
+using Application.Services.Email;
 using Entities;
 using Infrastructure;
 using Infrastructure.Repository;
+using MailKit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -45,6 +47,9 @@ namespace WebAPI
             builder.Services.AddScoped<HistoryService>();
 
             builder.Services.AddScoped<WtfService>();
+
+            builder.Services.AddScoped<EmailTemplateService>();
+            builder.Services.AddScoped<IMail, MailService>();
 
             builder.Services.AddHttpClient<GmapsService>(client =>
             {

@@ -1,6 +1,7 @@
 ﻿using Application;
 using Application.DTOs;
 using Application.Services;
+using Application.Services.Email;
 using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PlaceController(PlaceService _placeService, GmapsService _gmapsService) : ControllerBase
+    public class PlaceController(PlaceService _placeService, GmapsService _gmapsService, EmailConfirmationService emailConfirmationService) : ControllerBase
     {
         /// <summary> Получить список своих мест. </summary>
         [HttpGet("get/{gMapId}")]
@@ -56,8 +57,42 @@ namespace WebAPI.Controllers
         public IActionResult SearchPlaces([FromBody] object filters) => Ok();
 
         /// <summary> Привязать пользователя к месту. </summary>
-        [HttpPost("{placeId}/bind-user")]
-        public IActionResult BindUserToPlace(int placeId, [FromBody] object bindRequest) => Ok();
+        [HttpGet("{placeId}/sendConfirmationCode")]
+        [Authorize]
+        public async Task<IActionResult> SendConfirmationCode([FromRoute] ulong placeId)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+
+            try
+            {
+                await emailConfirmationService.SendCodeAsync(placeId, userId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest();
+            }
+
+        }
+
+        /// <summary> Привязать пользователя к месту. </summary>
+        [HttpGet("{placeId}/{input}/useConfirmationCode")]
+        [Authorize]
+        public async Task<IActionResult> TryConfirm([FromRoute] ulong placeId, [FromRoute] string input)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+
+            bool result =  await emailConfirmationService.VerifyCodeAsync(placeId, userId, input);
+
+            if (result)
+                return Ok("success");
+
+            return BadRequest("Incorrect code");
+            
+
+        }
+
     }
 
 }

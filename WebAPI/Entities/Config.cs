@@ -30,6 +30,6 @@
         public List<string> IncludedTypes4 { get; set; }
         public List<string> IncludedTypes5 { get; set; }
 
-
+        public SmtpSettings SmtpSettings { get; set; }
     }
 }
