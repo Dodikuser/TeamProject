@@ -17,7 +17,9 @@ const AccountPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [avatar, setAvatar] = useState(null);
   const [errors, setErrors] = useState({});
   const [createdAt, setCreatedAt] = useState('');
@@ -51,22 +53,43 @@ const AccountPage = () => {
   const validate = () => {
     const newErrors = {};
     if (!name.trim()) newErrors.name = 'Імя обовязкове';
-    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
-      newErrors.email = 'Некоректна електронна адреса';
+    if (password && !oldPassword) 
+      newErrors.oldPassword = 'Введіть поточний пароль';
     if (password && password.length < 6)
       newErrors.password = 'Пароль повинен містити щонайменше 6 символів';
+    if (password && password !== confirmPassword)
+      newErrors.confirmPassword = 'Паролі не співпадають';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validate()) return;
-    if (password) {
-      console.log('Новий пароль збережено:', password);
+
+    try {
+      const userData = {
+        name: name.trim(),
+      };
+
+      if (password) {
+        userData.passwordOld = oldPassword;
+        userData.passwordNew = password;
+      }
+
+      await UserService.editUser(userData);
+      setShowModal(false);
+      setOldPassword('');
+      setPassword('');
+      setConfirmPassword('');
+      setErrors({});
+    } catch (err) {
+      // if (err.message === 'OldPasswordIsIncorrect') {
+        setErrors({ oldPassword: 'Невірний поточний пароль' });
+      // } else {
+      //   setError('Failed to update user data');
+      //   console.error('Error updating user:', err);
+      // }
     }
-    setShowModal(false);
-    setPassword('');
-    setErrors({});
   };
 
   const handleAvatarChange = (e) => {
@@ -140,12 +163,12 @@ const AccountPage = () => {
             {errors.name && <div className="error-text">{errors.name}</div>}
 
             <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="Email"
+              type="password"
+              value={oldPassword}
+              onChange={e => setOldPassword(e.target.value)}
+              placeholder="Поточний пароль"
             />
-            {errors.email && <div className="error-text">{errors.email}</div>}
+            {errors.oldPassword && <div className="error-text">{errors.oldPassword}</div>}
 
             <input
               type="password"
@@ -154,6 +177,14 @@ const AccountPage = () => {
               placeholder="Новий пароль (необов'язково)"
             />
             {errors.password && <div className="error-text">{errors.password}</div>}
+
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              placeholder="Підтвердження нового пароля"
+            />
+            {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
 
             <div className="d-flex justify-content-end">
               <button className="btn btn-secondary me-2 btn-hover" onClick={() => setShowModal(false)}>

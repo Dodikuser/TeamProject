@@ -126,6 +126,26 @@ class UserService extends BaseService {
             throw error;
         }
     }
+
+    /**
+     * @param {Object} userData
+     * @param {string} userData.name
+     * @param {string} [userData.passwordOld]
+     * @param {string} [userData.passwordNew]
+     * @returns {Promise<void>}
+     * @throws {Error} When the old password is incorrect or other errors occur
+     */
+    async editUser(userData) {
+        try {
+            await this.makeRequest('/User/edit', {
+                method: 'PATCH',
+                body: JSON.stringify(userData)
+            });
+        } catch (error) {
+            console.error('Error editing user:', error);
+            throw error;
+        }
+    }
 }
 
 export default new UserService(); 
