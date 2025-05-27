@@ -1,9 +1,9 @@
-﻿using Application.Services;
+﻿using Application;
+using Application.DTOs;
+using Application.Services;
+using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Entities.Models;
-using Application;
-using Application.DTOs;
 
 namespace WebAPI.Controllers
 {
@@ -11,7 +11,13 @@ namespace WebAPI.Controllers
     [Route("api/[controller]")]
     public class PlaceController(PlaceService _placeService, GmapsService _gmapsService) : ControllerBase
     {
-
+        /// <summary> Получить список своих мест. </summary>
+        [HttpGet("get/{gMapId}")]
+        public async Task<IActionResult> GetPlaceAsync([FromRoute] string gMapId)
+        {
+            PlaceDTOFull? place = await _placeService.GetByGmapId(gMapId);
+            return Ok(place);
+        }
         /// <summary> Получить список своих мест. </summary>
         [HttpGet("my")]
         [Authorize]

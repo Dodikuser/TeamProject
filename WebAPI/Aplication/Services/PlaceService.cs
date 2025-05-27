@@ -15,8 +15,8 @@ namespace Application.Services
         public async Task<Place> RegisterPlaceIfNotExist(string gmapsPlaceId)
         {
             bool exists = await _placeRepository.ExistsAsync(gmapsPlaceId);
-            if (exists) 
-                return  await _placeRepository.GetByIdGmapsPlaceIdWhisPhotos(gmapsPlaceId);
+            if (exists)
+                return await _placeRepository.GetByIdGmapsPlaceIdWhisPhotos(gmapsPlaceId);
 
             GPlaceDetailsResult gPlaceDetailsResult = await _gmapsService.GetPlaceDetailsAsync(gmapsPlaceId);
             Place place = PlaceTypesConverter.ConvertFromGPlace(gPlaceDetailsResult, gmapsPlaceId, _googleMapsKey);
@@ -27,7 +27,7 @@ namespace Application.Services
 
         public async Task FavoriteAction(ulong UserId, string gmapsPlaceId, FavoriteActionEnum action)
         {
-            await RegisterPlaceIfNotExist(gmapsPlaceId);    
+            await RegisterPlaceIfNotExist(gmapsPlaceId);
 
             ulong placeId = (await _placeRepository.GetIdByGmapsPlaceIdAsync(gmapsPlaceId)).Value;
 
@@ -118,6 +118,31 @@ namespace Application.Services
             }
             return result;
         }
+        public async Task<PlaceDTOFull?> GetByGmapId(string gMapId)
+        {
+            Place? place = await _placeRepository.GetByIdGmapsPlaceId(gMapId);
+            if (place == null) return null;
 
+            PlaceDTOFull dto = new PlaceDTOFull()
+            {
+                Name = place.Name,
+                Description = place.Description,
+                Address = place.Address,
+                Site = place.Site,
+                PhoneNumber = place.PhoneNumber,
+                Email = place.Email,
+                Longitude = place.Longitude,
+                Latitude = place.Latitude,
+                Radius = place.Radius,
+                TokensAvailable = place.TokensAvailable,
+                LastPromotionDateTime = place.LastPromotionDateTime,
+                Stars = place.Stars,
+                OpeningHours = place.OpeningHours,
+                GmapsPlaceId = place.GmapsPlaceId,
+                Photos = null,
+            };
+
+            return dto;
+        }
     }
 }
