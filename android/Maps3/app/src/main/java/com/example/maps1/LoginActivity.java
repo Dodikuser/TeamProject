@@ -83,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         // Вход успешный
-                        Toast.makeText(this, "Успішний вхід!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "вчыапывпа вхід!", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
                     } else {

@@ -24,6 +24,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
 
 public class AccountFragment extends Fragment {
 
@@ -90,30 +95,48 @@ public class AccountFragment extends Fragment {
                                          String email, String password) {
         new Thread(() -> {
             try {
-                URL url = new URL("http://10.0.2.2:7103/api/User/register");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                // Отключаем проверку SSL сертификатов для localhost (только для разработки!)
+                // disableSSLVerification();
+                trustAllCertificates();
+                URL url = new URL("https://10.0.2.2:7103/api/User/register");
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 conn.setDoOutput(true);
 
+                // Формат данных под UserRegisterDTO
                 JSONObject json = new JSONObject();
-                json.put("type", "standard");
                 json.put("name", firstName + " " + lastName);
                 json.put("email", email);
                 json.put("password", password);
+                // googleJwtToken и FacebookId не отправляем (null по умолчанию)
 
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(json.toString().getBytes("UTF-8"));
                 }
 
                 int code = conn.getResponseCode();
-                requireActivity().runOnUiThread(() ->
-                        Toast.makeText(getContext(),
-                                code == HttpURLConnection.HTTP_OK
-                                        ? "Успішна реєстрація!"
-                                        : "Помилка при реєстрації: " + code,
-                                Toast.LENGTH_SHORT).show()
-                );
+
+                // Читаем ответ
+                String response = "";
+                if (code == HttpURLConnection.HTTP_OK) {
+                    try (Scanner scanner = new Scanner(conn.getInputStream())) {
+                        response = scanner.useDelimiter("\\A").next();
+                    }
+                } else {
+                    try (Scanner scanner = new Scanner(conn.getErrorStream())) {
+                        response = scanner.useDelimiter("\\A").next();
+                    }
+                }
+
+                final String finalResponse = response;
+                requireActivity().runOnUiThread(() -> {
+                    if (code == HttpURLConnection.HTTP_OK) {
+                        Toast.makeText(getContext(), "Успішна реєстрація: " + finalResponse, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Помилка реєстрації: " + finalResponse, Toast.LENGTH_LONG).show();
+                    }
+                });
 
                 conn.disconnect();
             } catch (Exception e) {
@@ -127,78 +150,90 @@ public class AccountFragment extends Fragment {
         }).start();
     }
 
-    // В методі sendLoginRequest замініть імітацію на такий код:
-    private void sendLoginRequest(String email, String password) {
-        // Зберігаємо дані користувача
-        SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
-        prefs.edit()
-                .putString("auth_token", "fake_token")
-                .putString("user_email", email)
-                .putString("user_name", "Ім'я Прізвище") // Тимчасове значення
-                .putString("reg_date", "25.04.2025") // Тимчасове значення
-                .apply();
+    private static void trustAllCertificates() {
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
+                    }
+            };
 
-        Toast.makeText(getContext(), "Успішний вхід!", Toast.LENGTH_SHORT).show();
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new MainAccount())
-                .commit();
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-        /*new Thread(() -> {
 
+    private void sendLoginRequest(String email, String password) {
+        new Thread(() -> {
             try {
-                URL url = new URL("http://10.0.2.2:7103/api/User/login");
+                trustAllCertificates();
+                URL url = new URL("https://10.0.2.2:7103/api/User/login");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 conn.setDoOutput(true);
 
-                JSONObject jsonReq = new JSONObject();
-                jsonReq.put("type", "standard");
-                jsonReq.put("name", "");
-                jsonReq.put("email", email);
-                jsonReq.put("password", password);
+                // Формат данных под UserLoginDTO
+                JSONObject json = new JSONObject();
+                json.put("email", email);
+                json.put("password", password);
+                // googleJwtToken и FacebookId не отправляем (null по умолчанию)
 
                 try (OutputStream os = conn.getOutputStream()) {
-                    os.write(jsonReq.toString().getBytes("UTF-8"));
+                    os.write(json.toString().getBytes("UTF-8"));
                 }
 
                 int code = conn.getResponseCode();
-                InputStream is = (code == HttpURLConnection.HTTP_OK)
-                        ? conn.getInputStream()
-                        : conn.getErrorStream();
-                String response = new Scanner(is).useDelimiter("\\A").next();
-                conn.disconnect();
 
                 if (code == HttpURLConnection.HTTP_OK) {
-                    JSONObject jsonResp = new JSONObject(response);
-                    String token = jsonResp.getString("token");
+                    // Читаем ответ с токеном
+                    String response = "";
+                    try (Scanner scanner = new Scanner(conn.getInputStream())) {
+                        response = scanner.useDelimiter("\\A").next();
+                    }
 
-                    // Сохраняем токен
-                    SharedPreferences prefs = requireActivity()
-                            .getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+                    // Парсим JSON ответ для получения токена
+                    JSONObject responseJson = new JSONObject(response);
+                    String token = responseJson.getString("token");
+
+                    // Сохраняем токен и данные пользователя
+                    SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
                     prefs.edit()
                             .putString("auth_token", token)
+                            .putString("user_email", email)
+                            .putString("user_name", "Ім'я Прізвище") // Временное значение
+                            .putString("reg_date", "25.04.2025") // Временное значение
                             .apply();
-                    String token1 = prefs.getString("auth_token", null);
 
                     requireActivity().runOnUiThread(() -> {
                         Toast.makeText(getContext(), "Успішний вхід!", Toast.LENGTH_SHORT).show();
-                        // Замінюємо поточний фрагмент на MainAccountFragment
                         getParentFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container, new MainAccount())
                                 .commit();
                     });
                 } else {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, new MainAccount())
-                            .commit();
-                    /*
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(getContext(), "Помилка входу: " + response,
-                                    Toast.LENGTH_LONG).show()
+                    // Обрабатываем ошибку
+                    String errorResponse = "";
+                    try (Scanner scanner = new Scanner(conn.getErrorStream())) {
+                        errorResponse = scanner.useDelimiter("\\A").next();
+                    }
 
+                    final String finalErrorResponse = errorResponse;
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(getContext(),
+                                    "Помилка входу: " + finalErrorResponse,
+                                    Toast.LENGTH_LONG).show()
                     );
                 }
+
+                conn.disconnect();
             } catch (Exception e) {
                 e.printStackTrace();
                 requireActivity().runOnUiThread(() ->
@@ -207,6 +242,6 @@ public class AccountFragment extends Fragment {
                                 Toast.LENGTH_LONG).show()
                 );
             }
-        }).start();*/
+        }).start();
     }
-
+}
