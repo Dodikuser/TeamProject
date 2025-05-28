@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="1dp"
+    android:backgroundTint="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="15dp"
+        android:gravity="center_vertical">
+
+        <!-- Иконка поиска -->
+        <ImageView
+            android:id="@+id/search_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_search"
+            android:layout_marginEnd="12dp"
+            app:tint="#626FC2" />
+
+        <!-- Контейнер для текста -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <!-- Поисковый запрос -->
+            <TextView
+                android:id="@+id/search_query"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Піцерія біля метро"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- Дата и время поиска -->
+            <TextView
+                android:id="@+id/search_date_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="25 травня 2025 • 17:51"
+                android:textColor="#666666"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- Кнопка "Перейти" -->
+        <TextView
+            android:id="@+id/go_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Перейти"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:padding="4dp"
+            android:layout_marginEnd="12dp"
+            android:background="#626FC2"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Кнопка удаления -->
+        <ImageView
+            android:id="@+id/delete_search"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_delete"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Видалити з історії"
+            android:padding="2dp"
+            app:tint="#000000"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
