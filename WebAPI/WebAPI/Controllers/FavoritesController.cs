@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
 
         [Authorize]
         [HttpPost("search")]
-        public async Task<IActionResult> SearchFavorites(string keyWord, int skip = 0, int take = 10)
+        public async Task<IActionResult> SearchFavorites([FromForm] string keyWord, [FromForm] int skip = 0, [FromForm] int take = 10)
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
             List<FavoriteDTO> results = await _placeService.SearchFavorites(userId, keyWord, skip, take);
@@ -36,7 +36,7 @@ namespace WebAPI.Controllers
 
         [Authorize]
         [HttpPost("action")]
-        public async Task<IActionResult> FavoriteAction(string gmapsPlaceId, FavoriteActionEnum action)
+        public async Task<IActionResult> FavoriteAction([FromForm] string gmapsPlaceId, [FromForm] FavoriteActionEnum action)
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
             await _placeService.FavoriteAction(userId, gmapsPlaceId, action);
