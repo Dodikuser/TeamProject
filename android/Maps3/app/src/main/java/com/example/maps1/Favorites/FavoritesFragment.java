@@ -195,18 +195,15 @@ public class FavoritesFragment extends Fragment {
 
         new Thread(() -> {
             try {
-                URL url = new URL("https://10.0.2.2:7103/api/Favorites/search");
+                URL url = new URL("https://10.0.2.2:7103/api/Favorites/search?" +
+                        "keyWord=" + java.net.URLEncoder.encode(query, "UTF-8") +
+                        "&skip=0&take=50");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setDoOutput(true);
                 conn.setDoInput(true);
-
-                // Send form data
-                String postData = "keyWord=" + java.net.URLEncoder.encode(query, "UTF-8") +
-                        "&skip=0&take=50";
-                conn.getOutputStream().write(postData.getBytes("UTF-8"));
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -278,18 +275,17 @@ public class FavoritesFragment extends Fragment {
 
         new Thread(() -> {
             try {
-                URL url = new URL("https://10.0.2.2:7103/api/Favorites/action");
+
+                URL url = new URL("https://10.0.2.2:7103/api/Favorites/action?gmapsPlaceId="
+                        + java.net.URLEncoder.encode(item.getGmapsPlaceId(), "UTF-8") +
+                        "&action=Remove");
+
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setDoOutput(true);
                 conn.setDoInput(true);
-
-                // Send form data
-                String postData = "gmapsPlaceId=" + java.net.URLEncoder.encode(item.getGmapsPlaceId(), "UTF-8") +
-                        "&action=Remove";
-                conn.getOutputStream().write(postData.getBytes("UTF-8"));
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK) {
