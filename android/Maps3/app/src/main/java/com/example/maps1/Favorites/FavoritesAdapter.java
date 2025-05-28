@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.maps1.R;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavoritesViewHolder> {
@@ -25,6 +25,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
 
     private List<FavoritesItem> items;
     private OnItemClickListener listener;
+    private DecimalFormat ratingFormat = new DecimalFormat("0.0");
 
     public FavoritesAdapter(List<FavoritesItem> items, OnItemClickListener listener) {
         this.items = items;
@@ -45,21 +46,25 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
 
         holder.name.setText(item.getName());
         holder.address.setText(item.getAddress());
-
-
+        holder.rating.setText(ratingFormat.format(item.getRating()));
+        holder.distance.setText(item.getDistance());
 
         // Load image using Glide
-        if (!item.getImageUrl().isEmpty()) {
+        if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(item.getImageUrl())
-                    .placeholder(R.drawable.ic_placeholder)
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
                     .into(holder.image);
         } else {
-            holder.image.setImageResource(R.drawable.ic_placeholder);
+            holder.image.setImageResource(R.drawable.placeholder);
         }
 
         holder.btnGo.setOnClickListener(v -> listener.onItemClick(item));
+        holder.btnDelete.setOnClickListener(v -> listener.onRemoveClick(item));
 
+        // Set click listener for entire item
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(item));
     }
 
     @Override
@@ -72,17 +77,19 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
         TextView name;
         TextView address;
         TextView rating;
+        TextView distance;
         Button btnGo;
-        ImageView btnDelete; // Changed from btnRemove to match your XML
+        ImageView btnDelete;
 
         public FavoritesViewHolder(@NonNull View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.favorites_item_image);
             name = itemView.findViewById(R.id.favorites_item_name);
             address = itemView.findViewById(R.id.favorites_item_address);
-            rating = itemView.findViewById(R.id.favorites_item_rating_text); // Changed
+            rating = itemView.findViewById(R.id.favorites_item_rating_text);
+            distance = itemView.findViewById(R.id.favorites_item_distance);
             btnGo = itemView.findViewById(R.id.favorites_item_btn_go);
-            btnDelete = itemView.findViewById(R.id.favorites_item_delete); // Changed
+            btnDelete = itemView.findViewById(R.id.favorites_item_delete);
         }
     }
 }

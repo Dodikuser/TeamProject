@@ -150,7 +150,7 @@ public class AccountFragment extends Fragment {
         }).start();
     }
 
-    private static void trustAllCertificates() {
+    public static void trustAllCertificates() {
         try {
             TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
