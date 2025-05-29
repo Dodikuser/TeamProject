@@ -1,0 +1,42 @@
+﻿@page
+@model AdminPanel.Pages.CRUD.OpeningHoursPages.IndexModel
+
+@{
+    ViewData["Title"] = "OpeningHours";
+}
+
+<h1>OpeningHours</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OpeningHours[0].Open)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OpeningHours[0].Close)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.OpeningHours) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Open)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Close)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

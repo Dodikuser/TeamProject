@@ -1,0 +1,60 @@
+﻿@page
+@model AdminPanel.Pages.CRUD.ConfirmationCodePages.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>ConfirmationCode</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ConfirmationCode.Id" />
+            <div class="form-group">
+                <label asp-for="ConfirmationCode.Code" class="control-label"></label>
+                <input asp-for="ConfirmationCode.Code" class="form-control" />
+                <span asp-validation-for="ConfirmationCode.Code" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmationCode.CreatedAt" class="control-label"></label>
+                <input asp-for="ConfirmationCode.CreatedAt" class="form-control" />
+                <span asp-validation-for="ConfirmationCode.CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmationCode.ExpiresAt" class="control-label"></label>
+                <input asp-for="ConfirmationCode.ExpiresAt" class="form-control" />
+                <span asp-validation-for="ConfirmationCode.ExpiresAt" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="ConfirmationCode.IsUsed" /> @Html.DisplayNameFor(model => model.ConfirmationCode.IsUsed)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmationCode.PlaceId" class="control-label"></label>
+                <select asp-for="ConfirmationCode.PlaceId" class="form-control" asp-items="ViewBag.PlaceId"></select>
+                <span asp-validation-for="ConfirmationCode.PlaceId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmationCode.UserId" class="control-label"></label>
+                <select asp-for="ConfirmationCode.UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                <span asp-validation-for="ConfirmationCode.UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

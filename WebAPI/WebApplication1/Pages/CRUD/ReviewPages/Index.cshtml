@@ -1,0 +1,90 @@
+﻿@page
+@model AdminPanel.Pages.CRUD.ReviewPages.IndexModel
+
+@{
+    ViewData["Title"] = "Review";
+}
+
+<h1>Review</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].Quality)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].Congestion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].Location)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].Infrastructure)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].Stars)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].ReviewDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].Place)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Review[0].User)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Review) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Text)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quality)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Congestion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Location)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Infrastructure)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Stars)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReviewDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Place.Address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Name)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
