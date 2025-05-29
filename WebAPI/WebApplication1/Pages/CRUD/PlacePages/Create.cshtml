@@ -1,0 +1,98 @@
+﻿@page
+@model AdminPanel.Pages.CRUD.PlacePages.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Place</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Place.Name" class="control-label"></label>
+                <input asp-for="Place.Name" class="form-control" />
+                <span asp-validation-for="Place.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.Address" class="control-label"></label>
+                <input asp-for="Place.Address" class="form-control" />
+                <span asp-validation-for="Place.Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.Description" class="control-label"></label>
+                <input asp-for="Place.Description" class="form-control" />
+                <span asp-validation-for="Place.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.Site" class="control-label"></label>
+                <input asp-for="Place.Site" class="form-control" />
+                <span asp-validation-for="Place.Site" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.PhoneNumber" class="control-label"></label>
+                <input asp-for="Place.PhoneNumber" class="form-control" />
+                <span asp-validation-for="Place.PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.Email" class="control-label"></label>
+                <input asp-for="Place.Email" class="form-control" />
+                <span asp-validation-for="Place.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.Longitude" class="control-label"></label>
+                <input asp-for="Place.Longitude" class="form-control" />
+                <span asp-validation-for="Place.Longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.Latitude" class="control-label"></label>
+                <input asp-for="Place.Latitude" class="form-control" />
+                <span asp-validation-for="Place.Latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.Radius" class="control-label"></label>
+                <input asp-for="Place.Radius" class="form-control" />
+                <span asp-validation-for="Place.Radius" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.TokensAvailable" class="control-label"></label>
+                <input asp-for="Place.TokensAvailable" class="form-control" />
+                <span asp-validation-for="Place.TokensAvailable" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.LastPromotionDateTime" class="control-label"></label>
+                <input asp-for="Place.LastPromotionDateTime" class="form-control" />
+                <span asp-validation-for="Place.LastPromotionDateTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.Stars" class="control-label"></label>
+                <input asp-for="Place.Stars" class="form-control" />
+                <span asp-validation-for="Place.Stars" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.GmapsPlaceId" class="control-label"></label>
+                <input asp-for="Place.GmapsPlaceId" class="form-control" />
+                <span asp-validation-for="Place.GmapsPlaceId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Place.UserId" class="control-label"></label>
+                <select asp-for="Place.UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

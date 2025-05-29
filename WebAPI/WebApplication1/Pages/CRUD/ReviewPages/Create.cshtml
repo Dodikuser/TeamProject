@@ -1,0 +1,72 @@
+﻿@page
+@model AdminPanel.Pages.CRUD.ReviewPages.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Review</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Review.Text" class="control-label"></label>
+                <input asp-for="Review.Text" class="form-control" />
+                <span asp-validation-for="Review.Text" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review.Price" class="control-label"></label>
+                <input asp-for="Review.Price" class="form-control" />
+                <span asp-validation-for="Review.Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review.Quality" class="control-label"></label>
+                <input asp-for="Review.Quality" class="form-control" />
+                <span asp-validation-for="Review.Quality" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review.Congestion" class="control-label"></label>
+                <input asp-for="Review.Congestion" class="form-control" />
+                <span asp-validation-for="Review.Congestion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review.Location" class="control-label"></label>
+                <input asp-for="Review.Location" class="form-control" />
+                <span asp-validation-for="Review.Location" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review.Infrastructure" class="control-label"></label>
+                <input asp-for="Review.Infrastructure" class="form-control" />
+                <span asp-validation-for="Review.Infrastructure" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review.Stars" class="control-label"></label>
+                <input asp-for="Review.Stars" class="form-control" />
+                <span asp-validation-for="Review.Stars" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review.PlaceId" class="control-label"></label>
+                <select asp-for="Review.PlaceId" class ="form-control" asp-items="ViewBag.PlaceId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review.UserId" class="control-label"></label>
+                <select asp-for="Review.UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

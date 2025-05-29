@@ -1,0 +1,54 @@
+﻿@page
+@model AdminPanel.Pages.CRUD.HistoryPages.IndexModel
+
+@{
+    ViewData["Title"] = "History";
+}
+
+<h1>History</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.History[0].VisitDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.History[0].IsFromRecs)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.History[0].Place)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.History[0].User)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.History) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.VisitDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsFromRecs)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Place.Address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Name)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

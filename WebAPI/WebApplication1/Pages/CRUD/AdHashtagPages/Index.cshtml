@@ -1,0 +1,54 @@
+﻿@page
+@model AdminPanel.Pages.CRUD.AdHashtagPages.IndexModel
+
+@{
+    ViewData["Title"] = "AdHashtag";
+}
+
+<h1>AdHashtag</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AdHashtag[0].Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AdHashtag[0].PromotionCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AdHashtag[0].Place)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AdHashtag[0].Hashtag)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.AdHashtag) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PromotionCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Place.Address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hashtag.Tag)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,42 @@
+﻿@page
+@model AdminPanel.Pages.CRUD.PhotoPages.IndexModel
+
+@{
+    ViewData["Title"] = "Photo";
+}
+
+<h1>Photo</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Photo[0].Path)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Photo[0].Place)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Photo) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Path)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Place.Address)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

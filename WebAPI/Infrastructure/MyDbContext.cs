@@ -21,6 +21,9 @@ namespace Infrastructure
         public virtual DbSet<Photo> Photos { get; set; }
         public virtual DbSet<ConfirmationCode> ConfirmationCodes { get; set; }
 
+        //Нужно для CRUD
+        public virtual DbSet<OpeningHours> OpeningHours { get; set; }
+
         //todo
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
