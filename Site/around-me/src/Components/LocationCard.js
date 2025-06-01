@@ -11,20 +11,22 @@ const LocationCard = ({
   onClick,
   onToggleFavorite,
 }) => {
-  const [currentRating, setCurrentRating] = useState(rating);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
+      const isFilled = i <= rating;
       stars.push(
         <span
           key={i}
           className="material-symbols-outlined"
-          style={{ cursor: 'pointer' }}
-          onClick={() => setCurrentRating(i)}
+          style={{
+            cursor: 'pointer',
+            color: isFilled ? '#F5B50A' : '#CCCCCC'
+          }}
         >
-          {i <= currentRating ? 'star' : 'star_border'}
+          {isFilled ? 'star' : 'star_border'}
         </span>
       );
     }
@@ -49,7 +51,7 @@ const LocationCard = ({
               <span className="material-symbols-outlined me-1">pin_drop</span>
               {distance}
             </div>
-            <div className="text-warning d-flex">{renderStars(currentRating)}</div>
+            <div className="text-warning d-flex">{renderStars(rating)}</div>
           </div>
         </div>
       </div>

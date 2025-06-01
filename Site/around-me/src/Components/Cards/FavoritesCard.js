@@ -5,7 +5,7 @@ export default function FavoritesCard({
   id,
   image,
   title = 'Назва місця',
-  locationText = 'Адреса закладу',
+  location = 'Адреса закладу',
   rating = 4,
   distance = '100 км',
   onDelete,
@@ -45,7 +45,7 @@ export default function FavoritesCard({
           <div>
             <Card.Title className="mb-1 fs-6">{title}</Card.Title>
             <small className="text-muted d-flex align-items-center gap-1">
-              <span className="material-symbols-outlined fs-6">location_on</span> {locationText}
+              <span className="material-symbols-outlined fs-6">location_on</span> {location}
             </small>
           </div>
           <span

@@ -1,21 +1,7 @@
 import BaseService from './BaseService';
 
 class PlaceService extends BaseService {
-    /**
-     * @param {Object} params
-     * @param {string} [params.search]
-     * @param {number} [params.skip]
-     * @param {number} [params.take]
-     * @returns {Promise<{ items: import('../Models/Place').Place[], total: number }>}
-     */
-    async getPlaces({ search = '', skip = 0, take = 10 } = {}) {
-        try {
-            return await this.makeRequest(`/Places/search?search=${encodeURIComponent(search)}&skip=${skip}&take=${take}`);
-        } catch (error) {
-            console.error('Error fetching places:', error);
-            throw error;
-        }
-    }
+   
 
     /**
      * Преобразует данные места в формат для LocationCard и LocationModal

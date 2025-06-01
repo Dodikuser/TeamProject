@@ -36,8 +36,6 @@ export default function Favorites() {
   // Filter and sort places
   const sortedAndFilteredPlaces = React.useMemo(() => {
     let result = [...favoritePlaces];
-    console.log('Sorting with type:', sortType, 'order:', sortOrder);
-    console.log('Initial places:', result);
 
     // Фильтрация по поисковому запросу
     if (searchTerm) {
@@ -76,7 +74,6 @@ export default function Favorites() {
       });
     }
 
-    console.log('Sorted result:', result);
     return result;
   }, [favoritePlaces, searchTerm, sortType, sortOrder]);
 
@@ -91,18 +88,11 @@ export default function Favorites() {
         take: take 
       });
 
-      // Преобразуем данные в нужный формат
-      const transformedData = response.favorites.$values.map(fav => ({
-        id: fav.placeDTO.gmapsPlaceId,
-        title: fav.placeDTO.name,
-        location: fav.placeDTO.address,
-        rating: fav.placeDTO.rating,
-        distance: fav.placeDTO.distance,
-        image: fav.placeDTO.photos?.[0]?.path || 'https://via.placeholder.com/150',
-        price: fav.placeDTO.priceLevel
-      }));
-
-      console.log('Transformed favorites data:', transformedData);
+      // Проверяем и трансформируем данные
+      let transformedData = [];
+      if (response && response.favorites && response.favorites.$values) {
+        transformedData = FavoriteService.transformFavoriteData(response);
+      }
 
       if (isLoadMore) {
         setFavoritePlaces(prev => [...prev, ...transformedData]);
@@ -114,8 +104,7 @@ export default function Favorites() {
       setHasMore(transformedData.length === take);
       
     } catch (err) {
-      console.error('Error loading favorites:', err);
-      setError(err.message);
+      setError('Помилка при завантаженні улюблених місць');
     } finally {
       setLoading(false);
     }
@@ -164,10 +153,8 @@ export default function Favorites() {
 
   const handleGoTo = (idx) => {
     const place = sortedAndFilteredPlaces[idx];
-    navigate("/");
     localStorage.setItem("openPlace", `${place.id}`);
-    // Here you would typically navigate to the place details or map
-    alert(`Перейти до місця: ${place.title}`);
+    navigate("/");
   };
 
   if (loading && favoritePlaces.length === 0) {
@@ -249,6 +236,7 @@ export default function Favorites() {
       </Row>
 
       <Row>
+
         {sortedAndFilteredPlaces.length === 0 && !loading ? (
           <Col xs={12} className="text-center py-5 text-muted fs-6">
             {searchTerm ? 'Нічого не знайдено за вашим запитом' : 'Улюблених поки немає'}
@@ -259,7 +247,7 @@ export default function Favorites() {
               <FavoritesCard
                 image={place.image}
                 title={place.title}
-                location={place.location}
+                location={place.locationText}
                 rating={place.rating}
                 distance={place.distance}
                 onDelete={() => handleDelete(idx)}

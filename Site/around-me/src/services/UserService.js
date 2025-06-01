@@ -43,7 +43,7 @@ class UserService extends BaseService {
      */
     async getUserProfile() {
         try {
-            return await this.makeRequest('/User/profile');
+            return await this.makeRequest('/User/get');
         } catch (error) {
             console.error('Error fetching user profile:', error);
             throw error;

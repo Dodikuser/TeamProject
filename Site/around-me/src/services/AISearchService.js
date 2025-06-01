@@ -14,7 +14,7 @@ class AISearchService extends BaseService {
     async searchPlaces({ 
         text,
         hashTagIds = [],
-        radius = 10000,
+        radius = 20,
         latitude = 47.81052,
         longitude = 35.18286
     } = {}) {

@@ -7,6 +7,9 @@ import PlaceService from '../services/PlaceService';
 import AISearchService from '../services/AISearchService';
 import FavoriteService from '../services/FavoriteService';
 import LocationCard from '../Components/LocationCard';
+import GeoService from '../services/GeoService';
+import MapStateService from '../services/MapStateService';
+
 
 function Home() {
   const [showFilters, setShowFilters] = useState(false);
@@ -26,8 +29,13 @@ function Home() {
       setError(null);
 
       const data = await PlaceService.getPlaceById(placeId);
+      if (data?.coordinates?.lat && data?.coordinates?.lng) {
+        MapStateService.setCenter({ lat: data.coordinates.lat, lng: data.coordinates.lng });
+      }
       setSelectedPlace(data);
       setShowModal(true);
+
+      
     } catch (err) {
       console.error('Error loading place details:', err);
       setError(err.message);
@@ -57,6 +65,23 @@ function Home() {
     fetchFavorites();
   }, []);
 
+  useEffect(() => {
+    // Когда searchResults обновляются, обновляем маркеры на карте
+    if (searchResults && searchResults.length > 0) {
+      const markers = searchResults
+        .map(place =>
+          place.originalItem && place.originalItem.latitude && place.originalItem.longitude
+            ? { lat: place.originalItem.latitude, lng: place.originalItem.longitude }
+            : null
+        )
+        .filter(Boolean);
+      MapStateService.setMarkers(markers);
+      MapStateService.setCenter({ lat: markers[0].lat, lng: markers[0].lng });
+    } else {
+      MapStateService.setMarkers([]);
+    }
+  }, [searchResults]);
+
   const handleSearch = async (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -65,24 +90,55 @@ function Home() {
           setLoading(true);
           setError(null);
           
+          let latitude = 47.81052;
+          let longitude = 35.18286;
+          try {
+            const pos = await GeoService.getCurrentPosition();
+            latitude = pos.lat;
+            longitude = pos.lng;
+          } catch (geoErr) {
+            // Если не удалось получить геолокацию — используем дефолт
+          }
+          
           const data = await AISearchService.searchPlaces({
             text: searchQuery,
-            radius: 10000,
-            latitude: 47.81052,
-            longitude: 35.18286
+            radius: 20,
+            latitude,
+            longitude
           });
 
-          // Transform API data for LocationCard format
-          const transformedPlaces = Array.isArray(data) ? data.map(item => ({
-            id: item.gmapsPlaceId || item.id,
-            image: item.photo?.path || item.photos?.[0]?.path || 'https://cdn-icons-png.flaticon.com/512/2966/2966959.png',
-            title: item.title || item.name || 'Без назви',
-            locationText: item.location || item.address || 'Місцезнаходження невідоме',
-            rating: parseFloat(item.rating || item.stars || 4),
-            distance: item.distance || item.distanceText || '100 км',
-            isFavorite: favorites.has(item.gmapsPlaceId || item.id),
-            originalItem: item
-          })) : [];
+          // Функция для расчёта расстояния
+          const getDistance = (lat1, lng1, lat2, lng2) => {
+            const toRad = (value) => value * Math.PI / 180;
+            const R = 6371;
+            const dLat = toRad(lat2 - lat1);
+            const dLng = toRad(lng2 - lng1);
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+          };
+
+          // Преобразуем результаты с реальным расстоянием
+          const transformedPlaces = Array.isArray(data) ? data.map(item => {
+            const placeLat = item.latitude || item.lat || (item.location && item.location.lat);
+            const placeLng = item.longitude || item.lng || (item.location && item.location.lng);
+            let distance = 'N/A';
+            if (placeLat && placeLng) {
+              distance = `${getDistance(latitude, longitude, placeLat, placeLng).toFixed(1)} км`;
+            }
+            return {
+              id: item.gmapsPlaceId || item.id,
+              image: item.photo?.path || item.photos?.[0]?.path || 'https://cdn-icons-png.flaticon.com/512/2966/2966959.png',
+              title: item.title || item.name || 'Без назви',
+              locationText: item.location || item.address || 'Місцезнаходження невідоме',
+              rating: item.rating || item.stars || 0,
+              distance,
+              isFavorite: favorites.has(item.gmapsPlaceId || item.id),
+              originalItem: item
+            };
+          }) : [];
 
           setSearchResults(transformedPlaces);
         } catch (err) {

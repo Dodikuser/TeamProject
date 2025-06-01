@@ -49,10 +49,8 @@ const AccountPage = () => {
         setReviewsLoading(true);
         setReviewsError(null);
         
-        const response = await ReviewService.getReviews(null, { skip: 0, take: 100 });
-        if (response && response.reviews) {
-          setReviews(response.reviews);
-        }
+        const reviews = await ReviewService.getUserReviews({ skip: 0, take: 100 });
+        setReviews(reviews);
       } catch (err) {
         console.error('Error fetching user reviews:', err);
         setReviewsError('Помилка завантаження відгуків');
@@ -318,23 +316,59 @@ const AccountPage = () => {
               </div>
             ) : (
               reviews.map((review, index) => (
-                <div key={index} className="d-flex justify-content-between align-items-center border-bottom py-3">
-                  <div className="flex-grow-1 pe-3">
-                    <h6 className="mb-1">{review.placeName || 'Без назви'}</h6>
-                    <p className="mb-1 text-muted" style={{ fontSize: '0.9rem' }}>
-                      Адреса: {review.placeAddress || 'Адреса не вказана'}
-                    </p>
-                    <div style={{ color: '#FFD700', fontSize: '1.2rem' }}>
-                      {'★'.repeat(review.stars)}
-                      {'☆'.repeat(5 - review.stars)}
-                    </div>
-                    {review.text && (
-                      <p className="mb-0 mt-1" style={{ fontSize: '0.9rem' }}>
-                        Коментар: {review.text}
-                      </p>
+                <div key={index} className="d-flex justify-content-between align-items-start border-bottom py-3">
+                  <div className="d-flex gap-3">
+                    {review.placePhoto ? (
+                      <img
+                        src={review.placePhoto}
+                        alt={review.placeName}
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          objectFit: 'cover',
+                          borderRadius: '8px'
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          backgroundColor: '#f0f0f0',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '2rem', color: '#666' }}>
+                          photo
+                        </span>
+                      </div>
                     )}
+                    <div className="flex-grow-1 pe-3">
+                      <div className="d-flex justify-content-between align-items-start mb-1">
+                        <h6 className="mb-0">{review.placeName || 'Без назви'}</h6>
+                        <small className="text-muted">
+                          {new Date(review.reviewDateTime).toLocaleDateString()}
+                        </small>
+                      </div>
+                      <p className="mb-1 text-muted" style={{ fontSize: '0.9rem' }}>
+                        {review.placeAddress || 'Адреса не вказана'}
+                      </p>
+                      <div className="d-flex gap-3 mb-2">
+                        <div style={{ color: '#FFD700', fontSize: '1.2rem' }}>
+                          {'★'.repeat(review.stars)}{'☆'.repeat(5 - review.stars)}
+                        </div>
+                      </div>
+                      {review.text && (
+                        <p className="mb-0" style={{ fontSize: '0.9rem' }}>
+                          {review.text}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-end">
+                  <div className="text-end ms-3">
                     <button
                       className="btn btn-sm btn-hover"
                       style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}
