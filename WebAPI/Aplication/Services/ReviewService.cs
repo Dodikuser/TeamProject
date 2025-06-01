@@ -9,6 +9,7 @@ namespace Application.Services
     {
         public async Task AddAsync(ReviewDTO DTO)
         {
+            ulong Id = (await _placeRepository.GetByIdGmapsPlaceId(DTO.GmapId))!.Id;
             Review result = new Review()
             {
                 Text = DTO.Text,
@@ -19,11 +20,11 @@ namespace Application.Services
                 Infrastructure = DTO.Infrastructure,
                 Stars = DTO.Stars,
                 ReviewDateTime = DateTime.Now,
-                PlaceId = DTO.PlaceId,
+                PlaceId = Id,
                 UserId = DTO.UserId
             };
             await _reviewRepository.AddAsync(result);
-            await _placeRepository.SetStarsAsync(DTO.PlaceId, await _reviewRepository.GetAvgStarsAsync(DTO.PlaceId));
+            await _placeRepository.SetStarsAsync(Id, await _reviewRepository.GetAvgStarsAsync(Id));
 
         }
 
@@ -33,7 +34,7 @@ namespace Application.Services
             if (original == null) return ReviewOperationResult.NotFound;
 
             if (original.UserId != userId) return ReviewOperationResult.AccessDenied;
-
+            ulong Id = (await _placeRepository.GetByIdGmapsPlaceId(DTO.GmapId))!.Id;
             Review result = new Review()
             {
                 Id = original.Id,
@@ -47,18 +48,19 @@ namespace Application.Services
             };
 
             await _reviewRepository.Update(result);
-            await _placeRepository.SetStarsAsync(DTO.PlaceId, await _reviewRepository.GetAvgStarsAsync(DTO.PlaceId));
+            await _placeRepository.SetStarsAsync(Id, await _reviewRepository.GetAvgStarsAsync(Id));
             return ReviewOperationResult.Success;
         }
 
-        public async Task<List<ReviewDTO>> GetAsync(ulong placeId, int skip, int take)
+        public async Task<List<ReviewDTO>> GetAsync(string placeId, int skip, int take)
         {
-            List<Review> rawReviews = await _reviewRepository.GetReviewsPagedAsync(placeId, skip, take);
+            ulong Id = (await _placeRepository.GetIdByGmapsPlaceIdAsync(placeId)).Value;
+            List<Review> rawReviews = await _reviewRepository.GetReviewsPagedAsync(Id, skip, take);
             List<Photo> photos = await _photoRepository.GetFirstAsync(rawReviews.Select(r => r.Id).ToList());
             List<ReviewDTO> reviewDTOs = new List<ReviewDTO>();
             foreach (var review in rawReviews)
             {
-                Photo photo = photos.First(p => p.PlaceId == review.PlaceId);
+                Photo photo = photos.FirstOrDefault(p => p.PlaceId == review.PlaceId);
                 reviewDTOs.Add(new ReviewDTO()
                 {
                     Text = review.Text,
@@ -75,7 +77,38 @@ namespace Application.Services
                     Photo = new PhotoDTO()
                     {
                         PlaceId = review.PlaceId,
-                        Path = photo.Path,
+                        Path = photo == null ? "" : photo.Path,
+                    }
+                });
+            }
+            return reviewDTOs;
+        }
+        public async Task<List<ReviewDTO>> GetByUserAsync(ulong userId, int skip, int take)
+        {
+            List<Review> rawReviews = await _reviewRepository.GetByUserAsync(userId, skip, take);
+            List<Photo> photos = await _photoRepository.GetFirstAsync(rawReviews.Select(r => r.Id).ToList());
+            List<ReviewDTO> reviewDTOs = new List<ReviewDTO>();
+            foreach (var review in rawReviews)
+            {
+                Photo photo = photos.FirstOrDefault(p => p.PlaceId == review.PlaceId);
+                reviewDTOs.Add(new ReviewDTO()
+                {
+                    Text = review.Text,
+                    Price = review.Price,
+                    Quality = review.Quality,
+                    Congestion = review.Congestion,
+                    Location = review.Location,
+                    Infrastructure = review.Infrastructure,
+                    Stars = review.Stars,
+                    ReviewDateTime = DateTime.Now,
+                    PlaceId = review.PlaceId,
+                    GmapId = (await _placeRepository.GetByIdAsync(review.PlaceId)).GmapsPlaceId,
+                    UserId = review.UserId,
+                    UserName = review.User.Name,
+                    Photo = new PhotoDTO()
+                    {
+                        PlaceId = review.PlaceId,
+                        Path = photo == null ? "" : photo.Path,
                     }
                 });
             }

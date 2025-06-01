@@ -26,9 +26,16 @@ namespace WebAPI.Controllers
 
         [HttpGet("get")]
         [Authorize]
-        public async Task<IActionResult> GetReviews(ulong placeId, int skip = 0, int take = 10)
+        public async Task<IActionResult> GetReviews([FromQuery] string placeId, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             return Ok(await _reviewService.GetAsync(placeId, skip, take));
+        }
+        [HttpGet("get-by-user")]
+        [Authorize]
+        public async Task<IActionResult> GetUserReviews([FromQuery] int skip = 0, [FromQuery] int take = 10)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            return Ok(await _reviewService.GetByUserAsync(userId, skip, take));
         }
 
         [HttpPut("edit")]

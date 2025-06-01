@@ -6,7 +6,7 @@ using Infrastructure.Repository;
 
 namespace Application.Services
 {
-    public class PlaceService(FavoritesRepository _favoritesRepository, PlaceRepository _placeRepository, GmapsService _gmapsService, Config _config, ReviewRepository _reviewRepository)
+    public class PlaceService(FavoritesRepository _favoritesRepository, PlaceRepository _placeRepository, GmapsService _gmapsService, Config _config, ReviewRepository _reviewRepository, PhotoRepository _photoRepository)
     {
 
         private string _googleMapsKey { get { return _config.GoogleMapsKey; } }
@@ -121,8 +121,10 @@ namespace Application.Services
         public async Task<PlaceDTOFull?> GetByGmapId(string gMapId)
         {
             Place? place = await _placeRepository.GetByIdGmapsPlaceId(gMapId);
-            if (place == null) return null;
 
+            if (place == null) return null;
+            List<Photo> photos = await _photoRepository.GetAllByPlaceAsync(place.Id);
+            List<PhotoDTO> photoDTOs = photos.Select(p => new PhotoDTO { Path = p.Path, PlaceId = p.PlaceId }).ToList();
             PlaceDTOFull dto = new PlaceDTOFull()
             {
                 Name = place.Name,
@@ -139,7 +141,7 @@ namespace Application.Services
                 Stars = place.Stars,
                 OpeningHours = place.OpeningHours,
                 GmapsPlaceId = place.GmapsPlaceId,
-                Photos = null,
+                Photos = photoDTOs,
             };
 
             return dto;

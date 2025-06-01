@@ -36,7 +36,7 @@ namespace WebAPI.Controllers
 
         [Authorize]
         [HttpPost("action")]
-        public async Task<IActionResult> FavoriteAction([FromForm] string gmapsPlaceId, [FromForm] FavoriteActionEnum action)
+        public async Task<IActionResult> FavoriteAction([FromQuery] string gmapsPlaceId, [FromQuery] FavoriteActionEnum action)
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
             await _placeService.FavoriteAction(userId, gmapsPlaceId, action);
