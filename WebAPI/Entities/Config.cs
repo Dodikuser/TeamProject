@@ -31,5 +31,8 @@
         public List<string> IncludedTypes5 { get; set; }
 
         public SmtpSettings SmtpSettings { get; set; }
+
+        public PayPalOptions PayPalOptions { get; set; }
+        public Dictionary<string, decimal> TokensPerCurrency { get; set; } = new();
     }
 }

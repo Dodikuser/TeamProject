@@ -5,21 +5,50 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
-            padding: 20px;
+            background-color: #f5f1fa;
+            color: #333;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #e2d9f3;
+            padding: 30px;
+            border-radius: 8px;
+        }
+
+        .header {
+            text-align: center;
+            color: #8e7cc3;
         }
 
         .code {
-            font-size: 24px;
-            color: #2a9df4;
+            font-size: 28px;
+            color: #8e7cc3;
             font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .footer {
+            color: #888;
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
-    <h2>Вітаємо!</h2>
-    <p>Ваш код підтвердження:</p>
-    <p class="code">{{CODE}}</p>
-    <p>Введіть цей код у додатку, щоб підтвердити свою електронну пошту.</p>
+    <div class="container">
+        <h2 class="header">Ласкаво просимо до AroundMe!</h2>
+        <p>Ваш код підтвердження:</p>
+        <div class="code">{{CODE}}</div>
+        <p>Введіть цей код у додатку, щоб підтвердити свою електронну пошту.</p>
+        <div class="footer">
+            Це автоматичне повідомлення від <strong>AroundMe</strong>. Якщо у вас виникли питання — зверніться в підтримку.
+        </div>
+    </div>
 </body>
 </html>

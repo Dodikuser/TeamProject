@@ -1,6 +1,7 @@
 ﻿using Application.Services;
 using Application.Services.AI;
 using Application.Services.Email;
+using Application.Services.Payment;
 using Entities;
 using Infrastructure;
 using Infrastructure.Repository;
@@ -56,6 +57,11 @@ namespace WebAPI
                 client.BaseAddress = new Uri("https://places.googleapis.com/v1/");
             });
 
+
+            builder.Services.AddHttpClient<PayPalService>();
+
+            builder.Services.AddHostedService<OrderService>();
+            builder.Services.AddScoped<OrderService>();
 
             builder.Services.AddControllers()
             .AddJsonOptions(options =>
