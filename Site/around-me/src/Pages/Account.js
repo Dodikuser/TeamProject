@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import UserService from '../services/UserService';
+import ReviewService from '../services/ReviewService';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
-const reviews = [
-  {
-    placeName: 'Назва місця',
-    address: 'вулиця Академіка Павлова, 446, Харків, Харківська область',
-    rating: 4,
-    comment: 'Відгук про місце...',
-    image: 'https://via.placeholder.com/120x80',
-  },
-];
 
 const AccountPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -25,6 +16,9 @@ const AccountPage = () => {
   const [createdAt, setCreatedAt] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState(null);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -35,12 +29,11 @@ const AccountPage = () => {
         if (userData) {
           setName(userData.name);
           setEmail(userData.email);
-          // Convert the date to a more readable format
           const date = new Date(userData.createdAt);
           setCreatedAt(date.toLocaleDateString());
         }
       } catch (err) {
-        setError('Failed to load user data');
+        setError('Помилка завантаження даних користувача');
         console.error('Error fetching user data:', err);
       } finally {
         setLoading(false);
@@ -48,6 +41,27 @@ const AccountPage = () => {
     };
 
     fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserReviews = async () => {
+      try {
+        setReviewsLoading(true);
+        setReviewsError(null);
+        
+        const response = await ReviewService.getReviews(null, { skip: 0, take: 100 });
+        if (response && response.reviews) {
+          setReviews(response.reviews);
+        }
+      } catch (err) {
+        console.error('Error fetching user reviews:', err);
+        setReviewsError('Помилка завантаження відгуків');
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
+    fetchUserReviews();
   }, []);
 
   const validate = () => {
@@ -83,12 +97,7 @@ const AccountPage = () => {
       setConfirmPassword('');
       setErrors({});
     } catch (err) {
-      // if (err.message === 'OldPasswordIsIncorrect') {
-        setErrors({ oldPassword: 'Невірний поточний пароль' });
-      // } else {
-      //   setError('Failed to update user data');
-      //   console.error('Error updating user:', err);
-      // }
+      setErrors({ oldPassword: 'Невірний поточний пароль' });
     }
   };
 
@@ -293,33 +302,53 @@ const AccountPage = () => {
         <div className="card p-4" style={{ minHeight: '250px', display: 'flex', flexDirection: 'column' }}>
           <h3 className="h6 mb-3">Мої відгуки</h3>
           <div style={{ overflowY: 'auto', flexGrow: 1 }}>
-            {reviews.map((r, i) => (
-              <div key={i} className="d-flex justify-content-between align-items-center border-bottom py-3">
-                <div className="flex-grow-1 pe-3">
-                  <h6 className="mb-1">{r.placeName}</h6>
-                  <p className="mb-1 text-muted" style={{ fontSize: '0.9rem' }}>
-                    Адреса: {r.address}
-                  </p>
-                  <div style={{ color: '#FFD700', fontSize: '1.2rem' }}>
-                    {'★'.repeat(r.rating)}
-                    {'☆'.repeat(5 - r.rating)}
-                  </div>
-                  {r.comment && (
-                    <p className="mb-0 mt-1" style={{ fontSize: '0.9rem' }}>
-                      Коментар: {r.comment}
-                    </p>
-                  )}
-                </div>
-                <div className="text-end">
-                  <button
-                    className="btn btn-sm btn-hover"
-                    style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}
-                  >
-                    Перейти
-                  </button>
+            {reviewsLoading ? (
+              <div className="text-center py-4">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Завантаження...</span>
                 </div>
               </div>
-            ))}
+            ) : reviewsError ? (
+              <div className="alert alert-danger" role="alert">
+                {reviewsError}
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center text-muted py-4">
+                У вас поки немає відгуків
+              </div>
+            ) : (
+              reviews.map((review, index) => (
+                <div key={index} className="d-flex justify-content-between align-items-center border-bottom py-3">
+                  <div className="flex-grow-1 pe-3">
+                    <h6 className="mb-1">{review.placeName || 'Без назви'}</h6>
+                    <p className="mb-1 text-muted" style={{ fontSize: '0.9rem' }}>
+                      Адреса: {review.placeAddress || 'Адреса не вказана'}
+                    </p>
+                    <div style={{ color: '#FFD700', fontSize: '1.2rem' }}>
+                      {'★'.repeat(review.stars)}
+                      {'☆'.repeat(5 - review.stars)}
+                    </div>
+                    {review.text && (
+                      <p className="mb-0 mt-1" style={{ fontSize: '0.9rem' }}>
+                        Коментар: {review.text}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-end">
+                    <button
+                      className="btn btn-sm btn-hover"
+                      style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}
+                      onClick={() => {
+                        navigate("/");
+                        localStorage.setItem("openPlace", review.gmapId);
+                      }}
+                    >
+                      Перейти
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

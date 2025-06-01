@@ -2,80 +2,116 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 import ReviewsModal from './ReviewsModal';
 import RatingModal from './RatingModal';
-
-
+import ReviewService from '../services/ReviewService';
 
 const LocationModal = ({ show, onHide, place }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(false);
-
   const [showReviews, setShowReviews] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsError, setReviewsError] = useState(null);
+  const [averageRating, setAverageRating] = useState(0);
 
-const dummyReviews = [
-  { name: 'Ім’я Прізвище', date: '5 днів тому', stars: 4, text: 'Гарний заклад!' },
-  { name: 'Марія Іваненко', date: '2 роки тому', stars: 5, text: 'Все сподобалося!' },
-  { name: 'Олег Сидоренко', date: 'рік тому', stars: 3, text: 'Могло бути краще.' },
-];
+  const loadReviews = async () => {
+    if (!place?.id) return;
+    
+    try {
+      setReviewsLoading(true);
+      setReviewsError(null);
+      const response = await ReviewService.getReviews(place.id);
+      
+      // Предполагаем, что API возвращает { reviews: [], averageRating: number }
+      if (response && response.reviews) {
+        setReviews(response.reviews);
+        setAverageRating(response.averageRating || 0);
+      }
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+      setReviewsError('Помилка при завантаженні відгуків');
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  // Загружаем отзывы при открытии модального окна отзывов
+  useEffect(() => {
+    if (showReviews) {
+      loadReviews();
+    }
+  }, [showReviews, place?.id]);
+
+  const handleReviewSubmit = async (reviewData) => {
+    try {
+      await ReviewService.createReview(place.id, reviewData);
+      // После успешного создания отзыва, перезагружаем список отзывов
+      await loadReviews();
+      setShowRatingModal(false);
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      // Здесь можно добавить обработку ошибки, например показать уведомление
+    }
+  };
 
   const ScheduleInfo = ({ hours, schedule }) => {
-  const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
-  // Пример расписания, если не передано
-  const workSchedule = schedule || [
-    { day: 'Понеділок', hours: '09:00 - 21:00' },
-    { day: 'Вівторок', hours: '09:00 - 21:00' },
-    { day: 'Середа', hours: '09:00 - 21:00' },
-    { day: 'Четвер', hours: '09:00 - 21:00' },
-    { day: 'П’ятниця', hours: '09:00 - 21:00' },
-    { day: 'Субота', hours: '10:00 - 20:00' },
-    { day: 'Неділя', hours: 'Вихідний' },
-  ];
+    // Пример расписания, если не передано
+    const workSchedule = schedule || [
+      { day: 'Понеділок', hours: '09:00 - 21:00' },
+      { day: 'Вівторок', hours: '09:00 - 21:00' },
+      { day: 'Середа', hours: '09:00 - 21:00' },
+      { day: 'Четвер', hours: '09:00 - 21:00' },
+      { day: 'П’ятниця', hours: '09:00 - 21:00' },
+      { day: 'Субота', hours: '10:00 - 20:00' },
+      { day: 'Неділя', hours: 'Вихідний' },
+    ];
 
-  return (
-    <div className="info-item" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <span className="material-symbols-outlined">schedule</span>
-        <button
-          onClick={() => setOpen(!open)}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            color: '#5b6dc0',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            fontSize: '1rem',
-          }}
-          aria-expanded={open}
-          aria-controls="work-schedule"
-        >
-          {hours || 'Відчинено'}
-        </button>
-      </div>
-      {open && (
-        <div
-          id="work-schedule"
-          style={{
-            marginTop: '0.5rem',
-            background: '#f9f9f9',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-            padding: '8px 12px',
-            maxWidth: '250px',
-            fontSize: '0.9rem',
-            color: '#333',
-          }}
-        >
-          {workSchedule.map(({ day, hours }) => (
-            <div key={day}>
-              <strong>{day}:</strong> {hours}
-            </div>
-          ))}
+    return (
+      <div className="info-item" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span className="material-symbols-outlined">schedule</span>
+          <button
+            onClick={() => setOpen(!open)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              color: '#5b6dc0',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              fontSize: '1rem',
+            }}
+            aria-expanded={open}
+            aria-controls="work-schedule"
+          >
+            {hours || 'Відчинено'}
+          </button>
         </div>
-      )}
-    </div>
-  );
-};
+        {open && (
+          <div
+            id="work-schedule"
+            style={{
+              marginTop: '0.5rem',
+              background: '#f9f9f9',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              padding: '8px 12px',
+              maxWidth: '250px',
+              fontSize: '0.9rem',
+              color: '#333',
+            }}
+          >
+            {workSchedule.map(({ day, hours }) => (
+              <div key={day}>
+                <strong>{day}:</strong> {hours}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   useEffect(() => {
     setCurrentImageIndex(0);
@@ -271,30 +307,42 @@ const dummyReviews = [
                 </Col>
               </Row>
 
-              <Row className="modal-content-top">
+              <Row>
                 <Col xs={12} md={5} className="modal-info">
-                  <div className="info-item">
-                    <span className="material-symbols-outlined">location_on</span>
-                    <span>{place.location || 'Адреса не вказана'}</span>
-                  </div>
-                 <ScheduleInfo hours={place.hours} schedule={place.schedule} />
+                  {place.location && (
+                    <div className="info-item">
+                      <span className="material-symbols-outlined">location_on</span>
+                      <span>{place.location}</span>
+                    </div>
+                  )}
+                  
+                  {(place.hours || (place.schedule && place.schedule.length > 0)) && (
+                    <ScheduleInfo hours={place.hours} schedule={place.schedule} />
+                  )}
 
-                  <div className="info-item">
-                    <span className="material-symbols-outlined">call</span>
-                    <span>{place.phone || '+1234567890'}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="material-symbols-outlined">mail</span>
-                    <span>{place.email || 'example@gmail.com'}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="material-symbols-outlined">info</span>
-                    <span>{place.description || 'Ресторан французької кухні...'}</span>
-                  </div>
+                  {place.phone && (
+                    <div className="info-item">
+                      <span className="material-symbols-outlined">call</span>
+                      <span>{place.phone}</span>
+                    </div>
+                  )}
+
+                  {place.email && (
+                    <div className="info-item">
+                      <span className="material-symbols-outlined">mail</span>
+                      <span>{place.email}</span>
+                    </div>
+                  )}
+
+                  {place.description && (
+                    <div className="info-item">
+                      <span className="material-symbols-outlined">info</span>
+                      <span>{place.description}</span>
+                    </div>
+                  )}
                 </Col>
 
                 <Col xs={12} md={7} className="d-flex flex-column justify-content-between">
-                
                   <div className="d-flex justify-content-center gap-4 mb-3">
                     <div className="action-button">
                       <span className="material-symbols-outlined">turn_right</span>
@@ -312,20 +360,18 @@ const dummyReviews = [
 
                   <div className="d-flex justify-content-center gap-3 flex-wrap">
                     <button className="review-button" onClick={() => setShowRatingModal(true)}>
-                    <span className="material-symbols-outlined">add</span>
-                    Залишити відгук
-                  </button>
+                      <span className="material-symbols-outlined">add</span>
+                      Залишити відгук
+                    </button>
 
-                                      <button className="review-button" onClick={() => setShowReviews(true)}>
-                    <span className="material-symbols-outlined">reviews</span>
-                    Переглянути відгуки
-                  </button>
-
+                    <button className="review-button" onClick={() => setShowReviews(true)}>
+                      <span className="material-symbols-outlined">reviews</span>
+                      Переглянути відгуки
+                    </button>
                   </div>
                 </Col>
               </Row>
             </Container>
-            
           </Modal.Body>
 
           <Modal.Footer className="modal-footer-fixed">
@@ -335,21 +381,19 @@ const dummyReviews = [
           </Modal.Footer>
         </div>
         <ReviewsModal
-        show={showReviews}
-        onHide={() => setShowReviews(false)}
-        reviews={dummyReviews}
-        rating={4.0}
-      />
-      <RatingModal
-        show={showRatingModal}
-        onHide={() => setShowRatingModal(false)}
-        placeName={place.title}
-        onSubmit={(rating) => {
-          console.log('Оцінка:', rating);
-          // Тут можно добавить API-запрос или обновление состояния
-        }}
-/>
-
+          show={showReviews}
+          onHide={() => setShowReviews(false)}
+          reviews={reviews}
+          rating={averageRating}
+          isLoading={reviewsLoading}
+          error={reviewsError}
+        />
+        <RatingModal
+          show={showRatingModal}
+          onHide={() => setShowRatingModal(false)}
+          placeName={place?.title}
+          onSubmit={handleReviewSubmit}
+        />
       </Modal>
     </>
   );

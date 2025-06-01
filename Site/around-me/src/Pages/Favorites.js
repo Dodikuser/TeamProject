@@ -18,6 +18,8 @@ export default function Favorites() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [sortType, setSortType] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
   
   // API related states
   const [loading, setLoading] = useState(true);
@@ -26,6 +28,57 @@ export default function Favorites() {
   const [take] = useState(10);
   const [hasMore, setHasMore] = useState(true);
 
+  const handleSort = (type, order) => {
+    setSortType(type);
+    setSortOrder(order);
+  };
+
+  // Filter and sort places
+  const sortedAndFilteredPlaces = React.useMemo(() => {
+    let result = [...favoritePlaces];
+    console.log('Sorting with type:', sortType, 'order:', sortOrder);
+    console.log('Initial places:', result);
+
+    // Фильтрация по поисковому запросу
+    if (searchTerm) {
+      result = result.filter(place =>
+        place.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Сортировка
+    if (sortType) {
+      result.sort((a, b) => {
+        let comparison = 0;
+        
+        switch (sortType) {
+          case 'distance':
+            // Преобразуем строку дистанции в число (удаляем 'км' и пробелы)
+            const distA = parseFloat(String(a.distance).replace(/[^\d.]/g, '')) || 0;
+            const distB = parseFloat(String(b.distance).replace(/[^\d.]/g, '')) || 0;
+            comparison = distA - distB;
+            break;
+          case 'rating':
+            const ratingA = parseFloat(a.rating) || 0;
+            const ratingB = parseFloat(b.rating) || 0;
+            comparison = ratingA - ratingB;
+            break;
+          case 'price':
+            const priceA = parseFloat(a.price) || 0;
+            const priceB = parseFloat(b.price) || 0;
+            comparison = priceA - priceB;
+            break;
+          default:
+            return 0;
+        }
+
+        return sortOrder === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    console.log('Sorted result:', result);
+    return result;
+  }, [favoritePlaces, searchTerm, sortType, sortOrder]);
 
   // Function to load favorites from API
   const loadFavorites = async (skipCount = 0, isLoadMore = false) => {
@@ -33,10 +86,23 @@ export default function Favorites() {
       setLoading(true);
       setError(null);
 
-      const transformedData = await FavoriteService.getFavorites({ 
+      const response = await FavoriteService.getFavorites({ 
         skip: skipCount, 
         take: take 
       });
+
+      // Преобразуем данные в нужный формат
+      const transformedData = response.favorites.$values.map(fav => ({
+        id: fav.placeDTO.gmapsPlaceId,
+        title: fav.placeDTO.name,
+        location: fav.placeDTO.address,
+        rating: fav.placeDTO.rating,
+        distance: fav.placeDTO.distance,
+        image: fav.placeDTO.photos?.[0]?.path || 'https://via.placeholder.com/150',
+        price: fav.placeDTO.priceLevel
+      }));
+
+      console.log('Transformed favorites data:', transformedData);
 
       if (isLoadMore) {
         setFavoritePlaces(prev => [...prev, ...transformedData]);
@@ -80,7 +146,7 @@ export default function Favorites() {
 
   const confirmDelete = async () => {
     try {
-      const placeToDelete = filteredPlaces[deleteIndex];
+      const placeToDelete = sortedAndFilteredPlaces[deleteIndex];
       
       await FavoriteService.toggleFavorite(placeToDelete.id, '1');
 
@@ -97,17 +163,12 @@ export default function Favorites() {
   };
 
   const handleGoTo = (idx) => {
-    const place = filteredPlaces[idx];
+    const place = sortedAndFilteredPlaces[idx];
     navigate("/");
     localStorage.setItem("openPlace", `${place.id}`);
     // Here you would typically navigate to the place details or map
     alert(`Перейти до місця: ${place.title}`);
   };
-
-  // Filter places based on search term
-  const filteredPlaces = favoritePlaces.filter(place =>
-    place.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   if (loading && favoritePlaces.length === 0) {
     return (
@@ -188,17 +249,17 @@ export default function Favorites() {
       </Row>
 
       <Row>
-        {filteredPlaces.length === 0 && !loading ? (
+        {sortedAndFilteredPlaces.length === 0 && !loading ? (
           <Col xs={12} className="text-center py-5 text-muted fs-6">
             {searchTerm ? 'Нічого не знайдено за вашим запитом' : 'Улюблених поки немає'}
           </Col>
         ) : (
-          filteredPlaces.map((place, idx) => (
+          sortedAndFilteredPlaces.map((place, idx) => (
             <Col key={place.id || idx} xs={12} md={6} lg={4} xl={3} className="mb-4">
               <FavoritesCard
                 image={place.image}
                 title={place.title}
-                locationText={place.locationText}
+                location={place.location}
                 rating={place.rating}
                 distance={place.distance}
                 onDelete={() => handleDelete(idx)}
@@ -209,7 +270,7 @@ export default function Favorites() {
         )}
 
         {/* Load More Button */}
-        {hasMore && !loading && filteredPlaces.length > 0 && (
+        {hasMore && !loading && sortedAndFilteredPlaces.length > 0 && (
           <Col xs={12} className="text-center mt-4">
             <Button 
               variant="outline-primary" 
@@ -230,7 +291,13 @@ export default function Favorites() {
       </Row>
 
       <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} />
-      <SortOffcanvas show={showSort} onClose={() => setShowSort(false)} />
+      <SortOffcanvas 
+        show={showSort} 
+        onClose={() => setShowSort(false)} 
+        onSort={handleSort}
+        currentSortType={sortType}
+        currentSortOrder={sortOrder}
+      />
 
       <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
         <Modal.Body className="text-center py-4">

@@ -10,7 +10,16 @@ class ReviewService extends BaseService {
      */
     async getReviews(placeId, { skip = 0, take = 10 } = {}) {
         try {
-            return await this.makeRequest(`/Reviews/${placeId}?skip=${skip}&take=${take}`);
+            const response = await this.makeRequest(`/Review/get?placeId=${placeId}&skip=${skip}&take=${take}`);
+            const reviews = response.$values || [];
+            const averageRating = reviews.length > 0 
+                ? reviews.reduce((acc, r) => acc + r.stars, 0) / reviews.length 
+                : 0;
+            
+            return {
+                reviews,
+                averageRating
+            };
         } catch (error) {
             console.error('Error fetching reviews:', error);
             throw error;
@@ -19,14 +28,30 @@ class ReviewService extends BaseService {
 
     /**
      * @param {string} placeId
-     * @param {import('../Models/Review').NewReviewRequest} reviewData
+     * @param {Object} reviewData
+     * @param {string} [reviewData.text] - Текст отзыва (максимум 250 символов)
+     * @param {number} [reviewData.stars] - Общая оценка (1-5)
      * @returns {Promise<import('../Models/Review').Review>}
      */
     async createReview(placeId, reviewData) {
         try {
-            return await this.makeRequest(`/Reviews/${placeId}/create`, {
+            const currentUserId = 1; // TODO: Получать реальный ID пользователя
+            const formattedReview = {
+                text: reviewData.text || '',
+                price: reviewData.stars || 5,         // Используем общую оценку как значение по умолчанию
+                quality: reviewData.stars || 5,       // для всех отдельных критериев
+                congestion: reviewData.stars || 5,
+                location: reviewData.stars || 5,
+                infrastructure: reviewData.stars || 5,
+                stars: reviewData.stars || 5,
+                reviewDateTime: new Date().toISOString(),
+                gmapId: placeId,
+                userId: currentUserId
+            };
+
+            return await this.makeRequest(`/Review/add`, {
                 method: 'POST',
-                body: JSON.stringify(reviewData)
+                body: JSON.stringify(formattedReview)
             });
         } catch (error) {
             console.error('Error creating review:', error);
@@ -41,7 +66,7 @@ class ReviewService extends BaseService {
      */
     async updateReview(reviewId, updateData) {
         try {
-            return await this.makeRequest(`/Reviews/${reviewId}/update`, {
+            return await this.makeRequest(`/Review/${reviewId}/update`, {
                 method: 'PUT',
                 body: JSON.stringify(updateData)
             });
@@ -57,7 +82,7 @@ class ReviewService extends BaseService {
      */
     async deleteReview(reviewId) {
         try {
-            await this.makeRequest(`/Reviews/${reviewId}/delete`, {
+            await this.makeRequest(`/Review/${reviewId}/delete`, {
                 method: 'DELETE'
             });
         } catch (error) {

@@ -23,10 +23,11 @@ class PlaceService extends BaseService {
      * @returns {Object} Трансформированные данные
      */
     transformPlaceData(placeData) {
+        const photoValues = placeData.photos?.$values || [];
         return {
             id: placeData.gmapsPlaceId,
-            image: placeData.photos?.[0]?.path || 'https://via.placeholder.com/300x180?text=No+Image',
-            images: placeData.photos?.map(photo => photo.path) || [placeData.photos?.[0]?.path || 'https://via.placeholder.com/300x180?text=No+Image'],
+            image: photoValues[0]?.path || 'https://via.placeholder.com/300x180?text=No+Image',
+            images: photoValues.map(photo => photo.path) || ['https://via.placeholder.com/300x180?text=No+Image'],
             title: placeData.name,
             location: placeData.address,
             locationText: placeData.address,
