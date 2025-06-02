@@ -29,7 +29,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <!-- Поисковый запрос -->
@@ -60,27 +60,32 @@
             android:id="@+id/go_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/rounded_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:gravity="center"
             android:text="Перейти"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:padding="4dp"
-            android:layout_marginEnd="12dp"
-            android:background="#626FC2"
-            android:clickable="true"
-            android:focusable="true" />
+            android:textSize="12sp" />
+
 
         <!-- Кнопка удаления -->
         <ImageView
             android:id="@+id/delete_search"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:clickable="true"
-            android:focusable="true"
             android:contentDescription="Видалити з історії"
+            android:focusable="true"
             android:padding="2dp"
-            app:tint="#000000"
-            android:background="?android:attr/selectableItemBackgroundBorderless" />
+            android:src="@drawable/ic_delete"
+            app:tint="#666666" />
 
     </LinearLayout>
 

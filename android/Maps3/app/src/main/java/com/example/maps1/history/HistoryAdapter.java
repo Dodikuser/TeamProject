@@ -18,14 +18,16 @@ import java.util.List;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 
-    public interface OnItemClickListener {
+    public interface OnHistoryItemClickListener {
         void onItemClick(HistoryItem item);
+        void onFavoriteClick(HistoryItem item, boolean addToFavorites);
+        void onDeleteClick(HistoryItem item);
     }
 
     private List<HistoryItem> items;
-    private OnItemClickListener listener;
+    private OnHistoryItemClickListener listener;
 
-    public HistoryAdapter(List<HistoryItem> items, OnItemClickListener listener) {
+    public HistoryAdapter(List<HistoryItem> items, OnHistoryItemClickListener listener) {
         this.items = items;
         this.listener = listener;
     }
@@ -46,8 +48,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
         holder.name.setText(item.getName());
         holder.address.setText(item.getAddress());
-        holder.date.setText(item.getDate()); // Добавьте соответствующий метод в HistoryItem
-        holder.time.setText(item.getTime()); // Добавьте соответствующий метод в HistoryItem
+        holder.date.setText(item.getDate());
+        holder.time.setText(item.getTime());
 
         // Load image using Glide
         if (!item.getImageUrl().isEmpty()) {
@@ -59,7 +61,43 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             holder.image.setImageResource(R.drawable.ic_placeholder);
         }
 
-        holder.btnGo.setOnClickListener(v -> listener.onItemClick(item));
+        // Устанавливаем цвет иконки избранного в зависимости от статуса
+        updateFavoriteIcon(holder.favoriteIcon, item.isFavorite());
+
+        // Обработчик для кнопки "Перейти"
+        holder.btnGo.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(item);
+            }
+        });
+
+        // Обработчик для иконки избранного
+        holder.favoriteIcon.setOnClickListener(v -> {
+            if (listener != null) {
+                // Переключаем состояние
+                boolean newFavoriteState = !item.isFavorite();
+                listener.onFavoriteClick(item, newFavoriteState);
+
+                // Обновляем состояние элемента и UI
+                item.setFavorite(newFavoriteState);
+                updateFavoriteIcon(holder.favoriteIcon, newFavoriteState);
+            }
+        });
+
+        // Обработчик для иконки удаления
+        holder.deleteIcon.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteClick(item);
+            }
+        });
+    }
+
+    private void updateFavoriteIcon(ImageView favoriteIcon, boolean isFavorite) {
+        if (isFavorite) {
+            favoriteIcon.setColorFilter(favoriteIcon.getContext().getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            favoriteIcon.setColorFilter(favoriteIcon.getContext().getResources().getColor(R.color.gray_icon)); // или используйте #5F6368
+        }
     }
 
     @Override
@@ -74,6 +112,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         TextView date;
         TextView time;
         Button btnGo;
+        ImageView favoriteIcon;
+        ImageView deleteIcon;
 
         public HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -83,6 +123,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             date = itemView.findViewById(R.id.history_item_date);
             time = itemView.findViewById(R.id.history_item_time);
             btnGo = itemView.findViewById(R.id.history_item_btn_go);
+            favoriteIcon = itemView.findViewById(R.id.history_item_favorite);
+            deleteIcon = itemView.findViewById(R.id.history_item_delete);
         }
     }
 }

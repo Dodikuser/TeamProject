@@ -24,4 +24,5 @@
     <color name="chip_text_selected">#FFFFFF</color>
     <color name="liked_color">#FF0000</color>
     <color name="unliked_color">#5F6368</color>
+    <color name="gray_icon">#5F6368</color>
 </resources>

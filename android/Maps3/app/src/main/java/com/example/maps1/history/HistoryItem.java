@@ -9,19 +9,34 @@ public class HistoryItem {
     private String date;
     private String time;
     private String imageUrl;
+    private long historyId;
+    private boolean isFavorite; // Новое поле
 
-    public HistoryItem(String id, String name, String address,
-                       String date, String time, String imageUrl) {
+    public HistoryItem(String id, String name, String address, String date, String time, String imageUrl, long historyId, boolean isFavorite) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.date = date;
         this.time = time;
         this.imageUrl = imageUrl;
+        this.historyId = historyId;
+        this.isFavorite = isFavorite;
+    }
+    public HistoryItem(String id, String name, String address, String date, String time, String imageUrl, long historyId) {
+        this(id, name, address, date, time, imageUrl, historyId, false);
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 
     // Getters and setters
     public String getId() { return id; }
+    public long getHistoryId() { return historyId; }
     public String getName() { return name; }
     public String getAddress() { return address; }
     public String getDate() { return date; }

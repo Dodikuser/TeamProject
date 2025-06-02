@@ -134,6 +134,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         searchResultsContainer = findViewById(R.id.searchResultsContainer);
         searchResultsLayout = findViewById(R.id.searchResultsLayout);
         setupKeyboardListeners();
+
+        AccountFragment.trustAllCertificates();
     }
 
     public void showSearchField(boolean show) {
