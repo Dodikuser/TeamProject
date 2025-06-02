@@ -21,6 +21,16 @@ namespace WebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            if (builder.Environment.EnvironmentName == "vm")
+            {
+                builder.Configuration.AddJsonFile("/home/test-demo/AroundMe/configs/mysettings.vm.webapi.json", optional: false, reloadOnChange: true);
+
+                builder.WebHost.ConfigureKestrel((context, options) =>
+                {
+                    options.Configure(context.Configuration.GetSection("Kestrel"));
+                });
+            }
+
             //подключаем сервис конфига
             builder.Services.Configure<Config>(builder.Configuration.GetSection("MapSettings"));
 
