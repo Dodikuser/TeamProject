@@ -11,6 +11,7 @@ namespace Application.DTOs
         public string GmapsPlaceId { get; set; }
         public PhotoDTO Photo { get; set; }
         public double Stars { get; set; }
+        public bool IsFavorite { get; set; } = false;
         public ICollection<OpeningHours> OpeningHours { get; set; }
     }
 }
