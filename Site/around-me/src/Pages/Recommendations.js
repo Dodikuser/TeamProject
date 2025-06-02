@@ -4,6 +4,7 @@ import RecommendationsCard from '../Components/RecommendationsCard';
 import RecommendationService from '../services/RecommendationService';
 import FavoriteService from '../services/FavoriteService';
 import { useNavigate } from 'react-router-dom';
+import GeoService from '../services/GeoService';
 
 const categories = [
   'Цікаві місця', 'Туризм', 'Їжа', 'Природа', 'Шопінг', 'Історія', 'Спорт',
@@ -66,12 +67,23 @@ export default function Recommendations() {
       try {
         setLoading(true);
         setError(null);
+
+        let latitude = 47.81052;
+        let longitude = 35.18286;
+
+        try {
+          const pos = await GeoService.getCurrentPosition();
+          latitude = pos.lat;
+          longitude = pos.lng;
+        } catch (geoErr) {
+          // Если не удалось получить геолокацию — используем дефолт
+        }
         
         const data = await RecommendationService.getRecommendations({
           hashTagId: 8,
-          radius: 10000,
-          latitude: 47.81052,
-          longitude: 35.18286,
+          radius: 1,
+          latitude: latitude,
+          longitude: longitude,
           tag: selectedCategory
         });
         
