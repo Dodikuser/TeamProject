@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maps1.PlaceDetailsActivity;
 import com.example.maps1.R;
+import com.example.maps1.utils.PlaceUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,12 +121,16 @@ public class RecommendationsFragment extends Fragment {
     }
 
     private void onRecommendationItemClick(RecommendationsItem item) {
-        Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
-        intent.putExtra("place_name", item.getName());
-        intent.putExtra("place_address", item.getAddress());
-        intent.putExtra("place_rating", item.getRating());
-        intent.putExtra("place_image_url", item.getImageUrl());
-        startActivity(intent);
+        android.content.SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
+        String token = prefs.getString("auth_token", null);
+        if (token != null) {
+            PlaceUtils.addPlaceToHistory(requireContext(), token, item.getPlaceId());
+        }
+        PlaceUtils.fetchPlaceDetails(requireContext(), item.getPlaceId(), place -> {
+            Intent intent = new Intent(getActivity(), com.example.maps1.PlaceDetailsActivity.class);
+            intent.putExtra("place", place);
+            startActivity(intent);
+        });
     }
 
     private void handleLikeClick(RecommendationsItem item) {

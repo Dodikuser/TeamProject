@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class HistoryApiHelper {
@@ -200,4 +201,47 @@ public class HistoryApiHelper {
             }
         }).start();
     }
+
+    public static void addSearchHistoryItem(String token, String searchText, ApiCallback callback) {
+        new Thread(() -> {
+            try {
+                URL url = new URL(BASE_URL + "/history/requests/action");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                // Create JSON body - теперь все поля на верхнем уровне
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("historyAction", "Add");
+                jsonBody.put("historyId", JSONObject.NULL); // ulong? -> null
+                jsonBody.put("text", searchText != null ? searchText : JSONObject.NULL);
+                jsonBody.put("searchDateTime", JSONObject.NULL); // DateTime? -> null
+                jsonBody.put("userId", JSONObject.NULL); // ulong? -> null
+
+                // Send request body
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+                writer.write(jsonBody.toString());
+                writer.flush();
+                writer.close();
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream is = conn.getInputStream();
+                    String response = new Scanner(is).useDelimiter("\\A").next();
+                    callback.onSuccess(response);
+                } else {
+                    callback.onError("HTTP Error: " + responseCode);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("HistoryApiHelper", "Error adding search history item", e);
+                callback.onError(e.getMessage());
+            }
+        }).start();
+    }
+
 }

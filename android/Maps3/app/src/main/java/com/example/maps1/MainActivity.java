@@ -161,6 +161,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void performSearch() {
         String query = searchEditText.getText().toString().trim();
         if (!query.isEmpty()) {
+            // Добавляем запрос в историю
+            String token = prefs.getString("auth_token", null);
+            if (token != null) {
+                com.example.maps1.history.HistoryApiHelper.addSearchHistoryItem(token, query, new com.example.maps1.history.HistoryApiHelper.ApiCallback() {
+                    @Override
+                    public void onSuccess(String response) {
+                        // Можно добавить логирование или обработку успеха
+                    }
+                    @Override
+                    public void onError(String error) {
+                        // Можно добавить логирование ошибки
+                    }
+                });
+            }
             searchWithCurrentLocation(query);
             showSearchResults(true);
         } else {

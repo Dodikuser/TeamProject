@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.maps1.PlaceDetailsActivity;
 import com.example.maps1.R;
 import com.example.maps1.account.AccountFragment;
+import com.example.maps1.utils.PlaceUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,10 +52,17 @@ public class FavoritesFragment extends Fragment {
         adapter = new FavoritesAdapter(filteredItems, new FavoritesAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(FavoritesItem item) {
-                // Open place details
-                Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
-                intent.putExtra("place_id", item.getGmapsPlaceId());
-                startActivity(intent);
+                // Open place details через PlaceUtils
+                android.content.SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
+                String token = prefs.getString("auth_token", null);
+                if (token != null) {
+                    PlaceUtils.addPlaceToHistory(requireContext(), token, item.getGmapsPlaceId());
+                }
+                PlaceUtils.fetchPlaceDetails(requireContext(), item.getGmapsPlaceId(), place -> {
+                    Intent intent = new Intent(getActivity(), com.example.maps1.PlaceDetailsActivity.class);
+                    intent.putExtra("place", place);
+                    startActivity(intent);
+                });
             }
 
             @Override

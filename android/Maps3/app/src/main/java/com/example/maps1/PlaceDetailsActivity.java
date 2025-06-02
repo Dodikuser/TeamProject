@@ -55,6 +55,39 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         placeHours.setText(place.getHours());
         placeWebsite.setText(place.getEmail() != null ? "Сайт: " + place.getEmail() : "Сайт: не вказано");
 
+        // Фото
+        java.util.List<String> photoUrls = place.getPhotoUrls();
+        if (photoUrls != null && !photoUrls.isEmpty()) {
+            // Главное фото
+            Glide.with(this)
+                    .load(photoUrls.get(0))
+                    .placeholder(R.drawable.ic_placeholder)
+                    .into(mainPhoto);
+        } else {
+            mainPhoto.setImageResource(R.drawable.ic_placeholder);
+        }
+
+        // Галерея
+        android.widget.LinearLayout photosContainer = findViewById(R.id.photos_container);
+        photosContainer.removeAllViews();
+        if (photoUrls != null && photoUrls.size() > 1) {
+            for (int i = 1; i < photoUrls.size(); i++) {
+                ImageView imageView = new ImageView(this);
+                android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
+                        getResources().getDimensionPixelSize(R.dimen.search_card_width) / 2,
+                        getResources().getDimensionPixelSize(R.dimen.search_card_height)
+                );
+                params.setMargins(8, 0, 8, 0);
+                imageView.setLayoutParams(params);
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                Glide.with(this)
+                        .load(photoUrls.get(i))
+                        .placeholder(R.drawable.ic_placeholder)
+                        .into(imageView);
+                photosContainer.addView(imageView);
+            }
+        }
+
         // Кнопка маршруту
         Button btnRoute = findViewById(R.id.btn_route);
         btnRoute.setOnClickListener(v -> {
@@ -97,54 +130,3 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         return false;
     }
 }
-/*
-    private void loadPlacePhoto(ImageView imageView, String photoReference) {
-        int width = 500; // Ширина фото
-        int height = 300; // Висота фото
-
-        PhotoMetadata photoMetadata = photoReference;
-        FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                .setMaxWidth(width)
-                .setMaxHeight(height)
-                .build();
-
-        placesClient.fetchPhoto(photoRequest).addOnSuccessListener(fetchPhotoResponse -> {
-            Bitmap bitmap = fetchPhotoResponse.getBitmap();
-            imageView.setImageBitmap(bitmap);
-        }).addOnFailureListener(e -> {
-            imageView.setImageResource(R.drawable.ic_placeholder);
-        });
-    }
-    private void openPlaceDetails(Place place) {
-        Intent intent = new Intent(this, PlaceDetailsActivity.class);
-        intent.putExtra("place", place); // Передаємо об'єкт Place
-        startActivity(intent);
-    }
-
-    private void addPlaceholderPhotos(LinearLayout container) {
-        // Add 3 placeholder photos
-        for (int i = 0; i < 3; i++) {
-            ImageView imageView = new ImageView(this);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    300, // width
-                    LinearLayout.LayoutParams.MATCH_PARENT // height
-            );
-            if (i > 0) {
-                params.leftMargin = 16;
-            }
-            imageView.setLayoutParams(params);
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-            // Load placeholder image (replace with actual image loading from server)
-            Glide.with(this)
-                    .load(ContextCompat.getDrawable(this, R.drawable.ic_placeholder))
-                    .into(imageView);
-
-            // Add click listener to view full image
-            imageView.setOnClickListener(v -> {
-                // TODO: Implement full image view
-                Toast.makeText(this, "Перегляд фото в повному розмірі", Toast.LENGTH_SHORT).show();
-            });
-
-            container.addView(imageView);
-        }}}*/

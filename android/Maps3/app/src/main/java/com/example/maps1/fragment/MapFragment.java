@@ -32,6 +32,7 @@ import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.example.maps1.utils.PlaceUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,7 +77,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         enableMyLocation();
 
         mMap.setOnPoiClickListener(poi -> {
-            fetchPlaceDetails(poi.placeId, this::openPlaceDetails);
+            PlaceUtils.fetchPlaceDetails(requireContext(), poi.placeId, this::openPlaceDetails);
         });
 
         mMap.setOnMapClickListener(latLng ->
@@ -121,49 +122,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    private void fetchPlaceDetails(String placeId, java.util.function.Consumer<MyPlace> callback) {
-        List<Place.Field> fields = Arrays.asList(
-                Place.Field.NAME,
-                Place.Field.ADDRESS,
-                Place.Field.PHOTO_METADATAS,
-                Place.Field.RATING,
-                Place.Field.PHONE_NUMBER,
-                Place.Field.OPENING_HOURS,
-                Place.Field.WEBSITE_URI,
-                Place.Field.LAT_LNG
-        );
-
-        FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, fields);
-
-        placesClient.fetchPlace(request).addOnSuccessListener(response -> {
-            Place place = response.getPlace();
-            List<String> photoUrls = new ArrayList<>();
-            if (place.getPhotoMetadatas() != null) {
-                for (PhotoMetadata metadata : place.getPhotoMetadatas()) {
-                    photoUrls.add(metadata.toString());
-                }
-            }
-
-            MyPlace myPlace = new MyPlace(
-                    placeId,
-                    place.getName(),
-                    place.getAddress(),
-                    "Опис відсутній",
-                    place.getRating(),
-                    place.getPhoneNumber(),
-                    place.getOpeningHours() != null ?
-                            String.join("\n", place.getOpeningHours().getWeekdayText()) : "Не вказано",
-                    place.getWebsiteUri() != null ? place.getWebsiteUri().toString() : "Не вказано",
-                    photoUrls,
-                    place.getLatLng()
-            );
-
-            callback.accept(myPlace);
-        }).addOnFailureListener(e ->
-                Toast.makeText(requireContext(), "Помилка завантаження місця", Toast.LENGTH_SHORT).show());
-    }
-
     private void openPlaceDetails(MyPlace place) {
+        // Добавляем в историю посещений
+        android.content.SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
+        String token = prefs.getString("auth_token", null);
+        if (token != null) {
+            PlaceUtils.addPlaceToHistory(requireContext(), token, place.getId());
+        }
         Intent intent = new Intent(requireContext(), PlaceDetailsActivity.class);
         intent.putExtra("place", place);
         startActivity(intent);

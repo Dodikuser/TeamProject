@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maps1.PlaceDetailsActivity;
 import com.example.maps1.R;
+import com.example.maps1.utils.PlaceUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -77,9 +78,16 @@ public class HistoryFragment extends Fragment {
         historyAdapter = new HistoryAdapter(filteredHistoryItems, new HistoryAdapter.OnHistoryItemClickListener() {
             @Override
             public void onItemClick(HistoryItem item) {
-                Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
-                intent.putExtra("place_id", item.getId());
-                startActivity(intent);
+                android.content.SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
+                String token = prefs.getString("auth_token", null);
+                if (token != null) {
+                    PlaceUtils.addPlaceToHistory(requireContext(), token, item.getId());
+                }
+                PlaceUtils.fetchPlaceDetails(requireContext(), item.getId(), place -> {
+                    Intent intent = new Intent(getActivity(), com.example.maps1.PlaceDetailsActivity.class);
+                    intent.putExtra("place", place);
+                    startActivity(intent);
+                });
             }
 
             @Override
