@@ -5,13 +5,11 @@ using Application.Services.Payment;
 using Entities;
 using Infrastructure;
 using Infrastructure.Repository;
-using MailKit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
-
 
 namespace WebAPI
 {
@@ -50,16 +48,19 @@ namespace WebAPI
             builder.Services.AddScoped<HistoryRepository>();
             builder.Services.AddScoped<SearchesRepository>();
             builder.Services.AddScoped<ReviewRepository>();
+            builder.Services.AddScoped<ConfirmationCodeRepository>();
 
             builder.Services.AddScoped<AuthorizationService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<TokenService>();
             builder.Services.AddScoped<PlaceService>();
             builder.Services.AddScoped<HistoryService>();
+            builder.Services.AddScoped<ReviewService>();
 
             builder.Services.AddScoped<WtfService>();
 
             builder.Services.AddScoped<EmailTemplateService>();
+            builder.Services.AddScoped<EmailConfirmationService>();
             builder.Services.AddScoped<IMail, MailService>();
 
             builder.Services.AddHttpClient<GmapsService>(client =>

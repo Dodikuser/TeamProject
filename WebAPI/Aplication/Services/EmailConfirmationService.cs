@@ -1,11 +1,5 @@
-﻿using Application.DTOs.UserDTOs;
-using Application.Services.Email;
+﻿using Application.Services.Email;
 using Infrastructure.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Services
 {
@@ -13,14 +7,14 @@ namespace Application.Services
     {
         private IMail _mailService;
         private EmailTemplateService _emailTemplateService;
-        private ConfirmationCodeRespository _confirmationCodeRespository;
+        private ConfirmationCodeRepository _confirmationCodeRepository;
         private PlaceRepository _placeRepository;
 
-        public EmailConfirmationService(IMail mailService, EmailTemplateService emailTemplateService, ConfirmationCodeRespository confirmationCodeRespository, PlaceRepository placeRepository)
+        public EmailConfirmationService(IMail mailService, EmailTemplateService emailTemplateService, ConfirmationCodeRepository confirmationCodeRespository, PlaceRepository placeRepository)
         {
             this._mailService = mailService;
             this._emailTemplateService = emailTemplateService;
-            this._confirmationCodeRespository = confirmationCodeRespository;
+            this._confirmationCodeRepository = confirmationCodeRespository;
             this._placeRepository = placeRepository;
         }
 
@@ -31,7 +25,7 @@ namespace Application.Services
             if (place == null) throw new ArgumentException("Место еще не добавлено");
             if (string.IsNullOrWhiteSpace(place.Email)) throw new ArgumentException("это место без имейла");
 
-            var code = await _confirmationCodeRespository.CreateCodeAsync(placeId, userId);
+            var code = await _confirmationCodeRepository.CreateCodeAsync(placeId, userId);
             var htmlBody = await _emailTemplateService.GetConfirmationEmailBodyAsync(code.Code);
             _mailService.SendEmailAsync(place.Email, "Код підтвердження для AroundMe", htmlBody);
 
@@ -39,8 +33,8 @@ namespace Application.Services
 
         public async Task<bool> VerifyCodeAsync(ulong placeId, ulong userId, string input)
         {
-            //надо бы сделать _confirmationCodeRespository.VerifyCodeAsync разбить на подметоды, но работает и так 
-            var ans = await _confirmationCodeRespository.VerifyCodeAsync(placeId, userId, input);
+            //надо бы сделать _confirmationCodeRepository.VerifyCodeAsync разбить на подметоды, но работает и так 
+            var ans = await _confirmationCodeRepository.VerifyCodeAsync(placeId, userId, input);
             return ans;
         }
     }

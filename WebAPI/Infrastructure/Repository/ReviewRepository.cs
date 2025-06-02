@@ -26,6 +26,17 @@ namespace Infrastructure.Repository
                 .Take(take)
                 .ToListAsync();
         }
+        public async Task<List<Review>> GetByUserAsync(ulong userId, int skip = 0, int take = 50)
+        {
+
+            return await _context.Reviews
+                .Where(r => r.UserId == userId)
+                .Include(r => r.User)
+                .OrderByDescending(h => h.ReviewDateTime)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
         public async Task<double> GetAvgStarsAsync(ulong placeId)
         {
             return await _context.Reviews

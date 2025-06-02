@@ -1,9 +1,8 @@
 ﻿using Entities.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
-    public class ConfirmationCodeRespository(MyDbContext _context) : GenericRepository<ConfirmationCode>(_context)
+    public class ConfirmationCodeRepository(MyDbContext _context) : GenericRepository<ConfirmationCode>(_context)
     {
         public async Task<ConfirmationCode> CreateCodeAsync(ulong placeId, ulong userId)
         {
@@ -25,10 +24,10 @@ namespace Infrastructure.Repository
 
         public async Task<bool> VerifyCodeAsync(ulong placeId, ulong userId, string inputCode)
         {
-            var code = await _context.ConfirmationCodes
+            var code = _context.ConfirmationCodes
                 .Where(c => c.PlaceId == placeId && c.UserId == userId && !c.IsUsed)
                 .OrderByDescending(c => c.CreatedAt)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (code == null || code.ExpiresAt < DateTime.UtcNow || code.Code != inputCode)
                 return false;

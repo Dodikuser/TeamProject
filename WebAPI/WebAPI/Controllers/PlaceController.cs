@@ -1,7 +1,6 @@
 ﻿using Application;
 using Application.DTOs;
 using Application.Services;
-using Application.Services.Email;
 using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +13,7 @@ namespace WebAPI.Controllers
     {
         /// <summary> Получить список своих мест. </summary>
         [HttpGet("get/{gMapId}")]
-        public async Task<IActionResult> GetPlaceAsync([FromRoute] string gMapId)
+        public async Task<IActionResult> Get([FromRoute] string gMapId)
         {
             PlaceDTOFull? place = await _placeService.GetByGmapId(gMapId);
             return Ok(place);
@@ -83,13 +82,13 @@ namespace WebAPI.Controllers
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
 
-            bool result =  await emailConfirmationService.VerifyCodeAsync(placeId, userId, input);
+            bool result = await emailConfirmationService.VerifyCodeAsync(placeId, userId, input);
 
             if (result)
                 return Ok("success");
 
             return BadRequest("Incorrect code");
-            
+
 
         }
 

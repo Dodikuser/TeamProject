@@ -21,7 +21,8 @@ namespace Application.DTOs
         public int Stars { get; set; } // пускай будет общая оценка тоже - OK
         public DateTime ReviewDateTime { get; set; }
 
-        public ulong PlaceId { get; set; }
+        public string GmapId { get; set; }
+        public ulong? PlaceId { get; set; }
         public ulong UserId { get; set; }
         // поля которые заполняются только если дто полетит ОТ апи
         public string? UserName { get; set; }

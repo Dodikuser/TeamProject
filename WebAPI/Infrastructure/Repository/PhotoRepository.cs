@@ -7,7 +7,6 @@ namespace Infrastructure.Repository
     public class PhotoRepository(MyDbContext _context) : GenericRepository<Photo>(_context)
     {
         //todo
-        private readonly MyDbContext _context;
         private readonly string WebRootPath;
 
         public async Task AddAsync(ulong placeId, IFormFile file)
@@ -71,7 +70,7 @@ namespace Infrastructure.Repository
             return await _context.Photos
                .Where(p => placesId.Contains(p.PlaceId))
                .GroupBy(p => p.PlaceId)
-               .Select(g => g.OrderByDescending(p => p.Id).First())
+               .Select(g => g.OrderByDescending(p => (long)p.Id).First())
                .ToListAsync();
         }
         public async Task<List<Photo>> GetAllByPlaceAsync(ulong placeId)
