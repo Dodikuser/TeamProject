@@ -65,6 +65,7 @@ export default function History() {
       // Transform API data to match component structure
       const transformedPlaces = data.histoires.$values.map(item => ({
         id: item.placeDTO.gmapsPlaceId,
+        historyId: item.placeDTO.historyId,
         originalItem: item,
         image: item.placeDTO.photo?.path || 'https://via.placeholder.com/300x150',
         title: item.placeDTO.name,
@@ -143,8 +144,9 @@ export default function History() {
     
     try {
       const placeHistoryDTO = {
-        gmapsPlaceId: place.originalItem.placeDTO.gmapsPlaceId,
-        visitDateTime: place.originalItem.visitDateTime
+        // gmapsPlaceId: place.originalItem.placeDTO.gmapsPlaceId,
+        // visitDateTime: place.originalItem.visitDateTime
+        historyId: place.originalItem.historyId
       };
 
       await HistoryService.deleteVisitHistoryItem(placeHistoryDTO);
@@ -170,8 +172,9 @@ export default function History() {
     
     try {
       const searchDTO = {
-        text: searchItem.originalItem.text,
-        searchDateTime: searchItem.originalItem.searchDateTime
+        // text: searchItem.originalItem.text,
+        // searchDateTime: searchItem.originalItem.searchDateTime,
+        historyId: searchItem.originalItem.historyId
       };
 
       await HistoryService.deleteSearchHistoryItem(searchDTO);

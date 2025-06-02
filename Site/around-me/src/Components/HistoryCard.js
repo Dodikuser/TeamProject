@@ -4,6 +4,7 @@ import FavoriteService from '../services/FavoriteService';
 
 export default function HistoryCard({
   id,
+  historyId,
   image,
   title = 'Назва місця',
   locationText = 'Адреса закладу',

@@ -4,6 +4,7 @@ import HistoryService from '../services/HistoryService';
 
 export default function SearchHistoryCard({
   id,
+  historyId,
   searchTerm,
   searchDate,
   results = [],
