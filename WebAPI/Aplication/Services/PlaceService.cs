@@ -66,7 +66,10 @@ namespace Application.Services
                 .ToList();
         }
 
-
+        public async Task<bool> IsFavorite(ulong UserId, ulong placeId)
+        {
+            return await _favoritesRepository.ExistsAsync(UserId, placeId);
+        }
         public static FavoriteDTO FavoriteToDTO(Favorite favorite)
         {
             if (favorite == null)

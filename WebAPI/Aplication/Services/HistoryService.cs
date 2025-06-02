@@ -3,6 +3,7 @@ using Entities;
 using Entities.Enums;
 using Entities.Models;
 using Infrastructure.Repository;
+using System.Threading.Tasks;
 
 namespace Application.Services
 {
@@ -11,12 +12,14 @@ namespace Application.Services
         private readonly HistoryRepository _historyRepository;
         private readonly SearchesRepository _searchesRepository;
         private readonly PlaceRepository _placeRepository;
+        private readonly FavoritesRepository _favoritesRepository;
 
-        public HistoryService(HistoryRepository historyRepository, SearchesRepository searchesRepository, PlaceRepository placeRepository)
+        public HistoryService(HistoryRepository historyRepository, SearchesRepository searchesRepository, PlaceRepository placeRepository, FavoritesRepository favoritesRepository)
         {
             _historyRepository = historyRepository;
             _searchesRepository = searchesRepository;
             _placeRepository = placeRepository;
+            _favoritesRepository = favoritesRepository;
         }
 
         public async Task<List<SearchDTO>> GetSearchHistory(ulong userId, int skip = 0, int take = 10)
@@ -41,15 +44,12 @@ namespace Application.Services
                     await _searchesRepository.AddAsync(UserId, searchDTO.Text);
                     return HistoryOperationResult.Success;
                 case HistoryActionEnum.Remove:
-                    if (searchDTO.SearchDateTime == null)
-                        return HistoryOperationResult.NullSearchDateTime;
+                    if (searchDTO.HistoryId == null)
+                        return HistoryOperationResult.IdNull;
 
-                    ulong? searchId = await _searchesRepository.GetSearchIdByTextAndDateAsync(searchDTO.Text, (DateTime)searchDTO.SearchDateTime);
-                    if (searchId == null)
-                        return HistoryOperationResult.NotFound;
-
-                    await _searchesRepository.RemoveAsync((ulong)searchId);
+                    await _searchesRepository.RemoveAsync((ulong)searchDTO.HistoryId);
                     return HistoryOperationResult.Success;
+
                 case HistoryActionEnum.Clear:
                     await _searchesRepository.RemoveAllAsync(UserId);
                     return HistoryOperationResult.Success;
@@ -62,14 +62,20 @@ namespace Application.Services
         {
             List<History> histories = await _historyRepository.GetHistoryPagedAsync(userId, skip, take);
 
-            return histories.Select(h => ToHistoryPlaceResponseDTO(h)).ToList();
+            var dtoTasks = histories.Select(h => ToHistoryPlaceResponseDTO(h, userId));
+            var dtoResults = await Task.WhenAll(dtoTasks);
+            return dtoResults.ToList();
+
         }
 
         public async Task<List<HistoryPlaceResponseDTO>> SearchPlaceHistory(ulong userId, string keyword, int skip = 0, int take = 10)
         {
             List<History> histories = await _historyRepository.SearchUserHistoryByKeywordAsync(userId, keyword, skip, take);
 
-            return histories.Select(h => ToHistoryPlaceResponseDTO(h)).ToList();
+            var dtoTasks = histories.Select(h => ToHistoryPlaceResponseDTO(h, userId));
+            var dtoResults = await Task.WhenAll(dtoTasks);
+            return dtoResults.ToList();
+
         }
 
         public async Task<HistoryOperationResult> HistoryAction(ulong UserId, HistoryPlaceRequestDTO historyDTO, HistoryActionEnum action)
@@ -85,17 +91,10 @@ namespace Application.Services
                     return HistoryOperationResult.Success;
 
                 case HistoryActionEnum.Remove:
-                    if (historyDTO.VisitDateTime == null)
-                        return HistoryOperationResult.NullSearchDateTime;
+                    if (historyDTO.HistoryId == null)
+                        return HistoryOperationResult.IdNull;
 
-                    if (!await _placeRepository.ExistsAsync(historyDTO.GmapsPlaceId))
-                        return HistoryOperationResult.NotFound;
-
-                    ulong? historyId = await _historyRepository.GetHistoryIdByVisitDateAndGmapsPlaceIdAsync((DateTime)historyDTO.VisitDateTime, historyDTO.GmapsPlaceId);
-                    if (historyId == null)
-                        return HistoryOperationResult.NotFound;
-
-                    await _historyRepository.RemoveAsync((ulong)historyId);
+                    await _historyRepository.RemoveAsync((ulong)historyDTO.HistoryId);
                     return HistoryOperationResult.Success;
 
                 case HistoryActionEnum.Clear:
@@ -112,10 +111,13 @@ namespace Application.Services
             {
                 Text = search.Text,
                 SearchDateTime = search.SearchDateTime,
-                UserId = search.UserId
+                UserId = search.UserId,
+                HistoryId = search.Id
             };
         }
-        public static HistoryPlaceResponseDTO ToHistoryPlaceResponseDTO(History history)
+
+
+        public async Task<HistoryPlaceResponseDTO> ToHistoryPlaceResponseDTO(History history, ulong userId)
         {
             if (history == null)
                 throw new ArgumentNullException(nameof(history));
@@ -126,6 +128,7 @@ namespace Application.Services
 
             return new HistoryPlaceResponseDTO
             {
+                HistoryId = history.Id,
                 VisitDateTime = history.VisitDateTime,
                 GmapsPlaceId = history.Place.GmapsPlaceId,
                 placeDTO = new PlaceDTODefaultCard
@@ -136,6 +139,7 @@ namespace Application.Services
                     GmapsPlaceId = history.Place.GmapsPlaceId,
                     Stars = history.Place.Stars,
                     Address = history.Place.Address,
+                    IsFavorite = await _favoritesRepository.ExistsAsync(userId, history.Place.Id),
                     //Stars = history.Place.Reviews?.Any() == true
                     //            ? (int)Math.Round(history.Place.Reviews.Average(r => r.Stars))
                     //            : 0,
