@@ -113,8 +113,27 @@ const AccountPage = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#f0f0f0', minHeight: '100vh' }}>
+    <div className="account-background">
       <style>{`
+        .account-background {
+          position: relative;
+          min-height: 100vh;
+          background-image: url("/images/background(login).png");
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          overflow: hidden;
+        }
+
+        @keyframes mapMove {
+          0% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          100% {
+            transform: translate(-50%, -50%) rotate(360deg);
+          }
+        }
+
         .modal-overlay {
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
@@ -131,6 +150,7 @@ const AccountPage = () => {
           width: 100%;
           max-width: 400px;
           box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+          backdrop-filter: blur(10px);
         }
         .modal-content input {
           width: 100%;
@@ -146,6 +166,18 @@ const AccountPage = () => {
         }
         .btn-hover:hover {
           opacity: 0.85;
+        }
+
+        .container {
+          position: relative;
+          z-index: 2;
+        }
+
+        .card {
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(10px);
+          border: 2px solid #626FC2;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
       `}</style>
 
