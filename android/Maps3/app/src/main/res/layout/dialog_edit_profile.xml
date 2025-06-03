@@ -49,61 +49,33 @@
             android:hint="Введіть ім'я"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Фамилия -->
+    <!-- Старый пароль -->
     <TextView
-        android:id="@+id/labelSurname"
+        android:id="@+id/labelOldPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Прізвище"
+        android:text="Старий пароль"
         android:textColor="#000000"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nameInputLayout"
         android:layout_marginTop="16dp" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/surnameInputLayout"
+        android:id="@+id/oldPasswordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/labelSurname"
+        app:layout_constraintTop_toBottomOf="@id/labelOldPassword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/surnameEditText"
+            android:id="@+id/oldPasswordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Прізвище"
-            android:hint="Введіть прізвище"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Email -->
-    <TextView
-        android:id="@+id/labelEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Email"
-        android:textColor="#000000"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/surnameInputLayout"
-        android:layout_marginTop="16dp" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/emailInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/labelEmail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/emailEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="example@gmail.com"
-            android:inputType="textEmailAddress"
-            android:hint="Введіть email"/>
+            android:inputType="textPassword"
+            android:hint="Введіть старий пароль"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Пароль -->
@@ -114,7 +86,7 @@
         android:text="Пароль"
         android:textColor="#000000"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/emailInputLayout"
+        app:layout_constraintTop_toBottomOf="@id/oldPasswordInputLayout"
         android:layout_marginTop="16dp" />
 
     <com.google.android.material.textfield.TextInputLayout
