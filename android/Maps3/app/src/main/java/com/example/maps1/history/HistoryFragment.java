@@ -9,19 +9,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.maps1.PlaceDetailsActivity;
+import com.example.maps1.places.PlaceDetailsActivity;
 import com.example.maps1.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,16 +41,27 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
-        // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.history_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
-        // Create adapter
-        adapter = new HistoryAdapter(filteredItems, item -> {
-            Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
-            intent.putExtra("place_id", item.getId());
-            startActivity(intent);
+        adapter = new HistoryAdapter(filteredItems, new HistoryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(HistoryItem item) {
+                Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
+                intent.putExtra("place_id", item.getId());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onDeleteClick(HistoryItem item) {
+                removeFromHistory(item);
+            }
+
+            @Override
+            public void onFavoriteClick(HistoryItem item) {
+                addToFavorites(item);
+            }
         });
         recyclerView.setAdapter(adapter);
 
@@ -73,7 +85,76 @@ public class HistoryFragment extends Fragment {
 
         return view;
     }
+    private void removeFromHistory(HistoryItem item) {
+        SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        String token = prefs.getString("auth_token", null);
 
+        if (token == null) {
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:7103/api/History/" + item.getId());
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("DELETE");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+                conn.setDoInput(true);
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    requireActivity().runOnUiThread(() -> {
+                        historyItems.remove(item);
+                        filterHistoryItems("");
+                        Toast.makeText(getContext(), "Місце видалено з історії", Toast.LENGTH_SHORT).show();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void addToFavorites(HistoryItem item) {
+        SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        String token = prefs.getString("auth_token", null);
+
+        if (token == null) {
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:7103/api/Favorites");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("id", item.getId());
+                jsonParam.put("name", item.getName());
+                jsonParam.put("address", item.getAddress());
+                // Додайте інші необхідні поля
+
+                OutputStream os = conn.getOutputStream();
+                os.write(jsonParam.toString().getBytes("UTF-8"));
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    requireActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Місце додано до улюблених", Toast.LENGTH_SHORT).show();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
     private void loadHistoryItems() {
         SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
         String token = prefs.getString("auth_token", null);

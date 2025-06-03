@@ -33,7 +33,7 @@
 
         <!-- AccountActivity -->
         <activity
-            android:name=".PlaceDetailsActivity"
+            android:name=".places.PlaceDetailsActivity"
             android:exported="true" />
         <activity
             android:name=".AccountActivity"

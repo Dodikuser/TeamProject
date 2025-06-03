@@ -49,6 +49,8 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.android.libraries.places:places:3.4.0")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

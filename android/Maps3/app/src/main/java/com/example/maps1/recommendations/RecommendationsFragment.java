@@ -1,19 +1,27 @@
 package com.example.maps1.recommendations;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.maps1.PlaceDetailsActivity;
+import com.example.maps1.places.PlaceDetailsActivity;
 import com.example.maps1.R;
 
+import org.json.JSONObject;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,14 +40,21 @@ public class RecommendationsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
-        adapter = new RecommendationsAdapter(filteredItems, item -> {
-            // Open place details
-            Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
-            intent.putExtra("place_name", item.getName());
-            intent.putExtra("place_address", item.getAddress());
-            intent.putExtra("place_rating", item.getRating());
-            intent.putExtra("place_image_url", item.getImageUrl());
-            startActivity(intent);
+        adapter = new RecommendationsAdapter(filteredItems, new RecommendationsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(RecommendationsItem item) {
+                Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
+                intent.putExtra("place_name", item.getName());
+                intent.putExtra("place_address", item.getAddress());
+                intent.putExtra("place_rating", item.getRating());
+                intent.putExtra("place_image_url", item.getImageUrl());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFavoriteClick(RecommendationsItem item) {
+                addToFavorites(item);
+            }
         });
         recyclerView.setAdapter(adapter);
 
@@ -63,6 +78,51 @@ public class RecommendationsFragment extends Fragment {
         return view;
     }
 
+    private void addToFavorites(RecommendationsItem item) {
+        SharedPreferences prefs = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        String token = prefs.getString("auth_token", null);
+
+        if (token == null) {
+            Toast.makeText(getContext(), "Будь ласка, увійдіть в систему", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://10.0.2.2:7103/api/Favorites");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("name", item.getName());
+                jsonParam.put("address", item.getAddress());
+                jsonParam.put("description", item.getDescription());
+                jsonParam.put("rating", item.getRating());
+                jsonParam.put("imageUrl", item.getImageUrl());
+                // Додайте інші необхідні поля
+
+                OutputStream os = conn.getOutputStream();
+                os.write(jsonParam.toString().getBytes("UTF-8"));
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    requireActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Місце додано до улюблених", Toast.LENGTH_SHORT).show();
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getContext(), "Помилка при додаванні до улюблених", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+    }
     private void loadRecommendationsItems() {
         recommendationsItems.clear();
 

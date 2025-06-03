@@ -16,7 +16,7 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.maps1.PlaceDetailsActivity;
+import com.example.maps1.places.PlaceDetailsActivity;
 import com.example.maps1.R;
 
 import org.json.JSONArray;

@@ -5,13 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".PlaceDetailsActivity">
+    android:background="@color/card_background"
+    tools:context=".places.PlaceDetailsActivity">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:paddingBottom="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -19,21 +21,13 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Додано головне фото -->
-            <ImageView
-                android:id="@+id/main_photo"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="16dp"
-                android:contentDescription="@string/place_photo"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_placeholder" />
-
-            <!-- Photo Gallery -->
+            <!-- Photo Gallery Only -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="16dp">
+                android:layout_height="250dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/light_gray"
+                android:paddingVertical="8dp">
 
                 <LinearLayout
                     android:id="@+id/photos_container"
@@ -42,69 +36,99 @@
                     android:orientation="horizontal" />
             </HorizontalScrollView>
 
-            <!-- Place Info -->
-            <LinearLayout
+            <!-- Place Info Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/card_stroke"
+                app:strokeWidth="1dp">
 
-                <TextView
-                    android:id="@+id/place_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:text="Назва місця" />
-
-                <TextView
-                    android:id="@+id/place_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textSize="16sp"
-                    android:text="Адреса" />
-
-                <TextView
-                    android:id="@+id/place_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Опис закладу"
-                    android:textSize="14sp" />
-
-                <!-- Rating -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <RatingBar
-                        android:id="@+id/place_rating"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/place_name"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:isIndicator="true"
-                        android:numStars="5"
-                        android:rating="3.5"
-                        android:stepSize="0.1"
-                        />
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/full_black"
+                        android:text="Назва місця" />
 
-                    <Button
-                        android:id="@+id/btn_reviews"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/place_address"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:text="Переглянути відгуки"
-                        android:textAllCaps="false" />
+                        android:layout_marginTop="8dp"
+                        android:textSize="16sp"
+                        android:textColor="@color/gray_600"
+                        android:text="Адреса" />
+
+                    <TextView
+                        android:id="@+id/place_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Опис закладу"
+                        android:textSize="14sp"
+                        android:textColor="@color/full_black" />
+
+                    <!-- Rating -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <RatingBar
+                            android:id="@+id/place_rating"
+                            style="@style/Widget.AppCompat.RatingBar.Small"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:isIndicator="true"
+                            android:numStars="5"
+                            android:rating="3.5"
+                            android:stepSize="0.1"
+                            android:progressTint="@color/gold"
+                            android:progressBackgroundTint="@color/light_gray"
+                            android:secondaryProgressTint="@color/gold" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_reviews"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="Переглянути відгуки"
+                            android:textAllCaps="false"
+                            android:textColor="@color/primary"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            app:backgroundTint="@android:color/transparent"/>
+                    </LinearLayout>
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <!-- Contact Info -->
+            <!-- Contact Info Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/card_stroke"
+                app:strokeWidth="1dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
                         android:id="@+id/place_phone"
@@ -112,61 +136,77 @@
                         android:layout_height="wrap_content"
                         android:drawableStart="@android:drawable/ic_menu_call"
                         android:drawablePadding="8dp"
+                        android:drawableTint="@color/primary"
                         android:text="Телефон: не вказано"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textColor="@color/full_black" />
 
                     <TextView
                         android:id="@+id/place_hours"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="12dp"
                         android:drawableStart="@android:drawable/ic_menu_agenda"
                         android:drawablePadding="8dp"
+                        android:drawableTint="@color/primary"
                         android:text="Години роботи: не вказано"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textColor="@color/full_black" />
 
                     <TextView
                         android:id="@+id/place_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="12dp"
                         android:drawableStart="@android:drawable/ic_menu_send"
                         android:drawablePadding="8dp"
+                        android:drawableTint="@color/primary"
                         android:text="Email: не вказано"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textColor="@color/full_black" />
                 </LinearLayout>
-
-                <!-- Buttons -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
-
-                    <Button
-                        android:id="@+id/btn_save"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:backgroundTint="@color/primary_light"
-                        android:text="Зберегти"
-                        android:textColor="@android:color/white" />
-
-                    <Button
-                        android:id="@+id/btn_route"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:backgroundTint="@color/primary_light"
-                        android:text="Маршрут"
-                        android:textColor="@android:color/white" />
-                </LinearLayout>
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </ScrollView>
+
+    <!-- Buttons Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/card_background">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:weightSum="2">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Зберегти"
+                android:textColor="@android:color/white"
+                app:backgroundTint="@color/primary"
+                style="@style/Widget.MaterialComponents.Button"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_route"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Маршрут"
+                android:textColor="@android:color/white"
+                app:backgroundTint="@color/primary"
+                style="@style/Widget.MaterialComponents.Button"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

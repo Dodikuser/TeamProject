@@ -7,4 +7,5 @@
     <dimen name="card_padding">12dp</dimen>
     <dimen name="card_stroke_width">1dp</dimen>
     <dimen name="star_size">16dp</dimen>
+    <dimen name="photo_width">300dp</dimen>
 </resources>

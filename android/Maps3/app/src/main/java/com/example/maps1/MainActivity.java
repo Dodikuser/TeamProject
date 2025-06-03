@@ -36,6 +36,7 @@ import com.example.maps1.account.MainAccount;
 import com.example.maps1.Favorites.FavoritesFragment;
 import com.example.maps1.history.HistoryFragment;
 import com.example.maps1.fragment.MapFragment;
+import com.example.maps1.places.PlaceDetailsActivity;
 import com.example.maps1.recommendations.RecommendationsFragment;
 import com.example.maps1.places.MyPlace;
 import com.google.android.gms.location.FusedLocationProviderClient;

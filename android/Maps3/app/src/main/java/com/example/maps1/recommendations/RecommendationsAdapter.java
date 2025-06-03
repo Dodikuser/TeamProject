@@ -1,11 +1,11 @@
 package com.example.maps1.recommendations;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.maps1.R;
+import com.example.maps1.places.PlaceDetailsActivity;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
 
     public interface OnItemClickListener {
         void onItemClick(RecommendationsItem item);
+        void onFavoriteClick(RecommendationsItem item);
     }
 
     private List<RecommendationsItem> items;
@@ -51,13 +53,24 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
         if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(item.getImageUrl())
-                    .placeholder(R.drawable.ic_placeholder)
+                    .placeholder(R.drawable.placeholder)
                     .into(holder.image);
         } else {
-            holder.image.setImageResource(R.drawable.ic_placeholder);
+            holder.image.setImageResource(R.drawable.placeholder);
         }
 
         holder.btnGo.setOnClickListener(v -> listener.onItemClick(item));
+        holder.favorite.setOnClickListener(v -> listener.onFavoriteClick(item));
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), PlaceDetailsActivity.class);
+            intent.putExtra("place_name", item.getName());
+            intent.putExtra("place_address", item.getAddress());
+            intent.putExtra("place_description", item.getDescription());
+            intent.putExtra("place_rating", item.getRating());
+            intent.putExtra("place_image_url", item.getImageUrl());
+            // Додаткові поля, якщо є
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -72,6 +85,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
         TextView distance;
         TextView ratingText;
         Button btnGo;
+        ImageView favorite;
 
         public RecommendationsViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -81,6 +95,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<Recommendations
             distance = itemView.findViewById(R.id.recommendations_item_distance);
             ratingText = itemView.findViewById(R.id.recommendations_item_rating_text);
             btnGo = itemView.findViewById(R.id.recommendations_item_btn_go);
+            favorite = itemView.findViewById(R.id.recommendations_item_favorite);
         }
     }
 }
