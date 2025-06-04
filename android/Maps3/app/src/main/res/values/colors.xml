@@ -25,4 +25,9 @@
     <color name="liked_color">#FF0000</color>
     <color name="unliked_color">#5F6368</color>
     <color name="gray_icon">#5F6368</color>
+    <color name="background_light">#F5F5F5</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="accent">#03DAC6</color>
 </resources>

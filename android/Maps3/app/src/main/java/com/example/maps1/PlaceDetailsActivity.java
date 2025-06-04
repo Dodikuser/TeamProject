@@ -1,25 +1,23 @@
 package com.example.maps1;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import com.example.maps1.places.MyPlace;
 import com.bumptech.glide.Glide;
-import com.google.android.libraries.places.api.net.FetchPhotoRequest;
+import com.example.maps1.places.MyPlace;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-
 
 public class PlaceDetailsActivity extends AppCompatActivity {
     private MyPlace place;
@@ -30,13 +28,13 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_place_details);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        bottomNav.setOnItemSelectedListener(this::handleNavigationItemSelected);
-        MyPlace place = getIntent().getParcelableExtra("place");
+        //bottomNav.setOnItemSelectedListener(this::handleNavigationItemSelected);
+
+        place = getIntent().getParcelableExtra("place");
         if (place == null) {
             finish();
             return;
         }
-
 
         // Ініціалізація View
         ImageView mainPhoto = findViewById(R.id.main_photo);
@@ -46,6 +44,7 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         TextView placePhone = findViewById(R.id.place_phone);
         TextView placeHours = findViewById(R.id.place_hours);
         TextView placeWebsite = findViewById(R.id.place_email);
+        LinearLayout photosContainer = findViewById(R.id.photos_container);
 
         // Заповнення даними
         placeName.setText(place.getName());
@@ -58,7 +57,6 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         // Фото
         java.util.List<String> photoUrls = place.getPhotoUrls();
         if (photoUrls != null && !photoUrls.isEmpty()) {
-            // Главное фото
             Glide.with(this)
                     .load(photoUrls.get(0))
                     .placeholder(R.drawable.ic_placeholder)
@@ -68,12 +66,11 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         }
 
         // Галерея
-        android.widget.LinearLayout photosContainer = findViewById(R.id.photos_container);
         photosContainer.removeAllViews();
         if (photoUrls != null && photoUrls.size() > 1) {
             for (int i = 1; i < photoUrls.size(); i++) {
                 ImageView imageView = new ImageView(this);
-                android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         getResources().getDimensionPixelSize(R.dimen.search_card_width) / 2,
                         getResources().getDimensionPixelSize(R.dimen.search_card_height)
                 );
@@ -103,30 +100,36 @@ public class PlaceDetailsActivity extends AppCompatActivity {
             }
         });
 
+        // Кнопка відгуків
+        Button btnReviews = findViewById(R.id.btn_reviews);
+        btnReviews.setOnClickListener(v -> {
+            Intent intent = new Intent(PlaceDetailsActivity.this, ReviewsActivity.class);
+            intent.putExtra("place_name", place.getName());
+            intent.putExtra("place_rating", place.getRating());
+            intent.putExtra("reviews_count", 267); // можеш замінити на динамічне значення
+            startActivity(intent);
+        });
+
+        // Кнопка "Назад"
+        ImageButton btnBack = findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> finish());
     }
 
-    private boolean handleNavigationItemSelected(@NonNull MenuItem item) {
+    /*private boolean handleNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
-            // Повернутися до MainActivity
-            finish();
-            return true;
-        } else if (id == R.id.nav_favorites) {
-            // Перейти до FavoritesFragment (або активності)
-            // Наприклад, відкрити нову активність або фрагмент
-            return true;
-        } else if (id == R.id.nav_recommendations) {
-            // Перейти до RecommendationsFragment
-            return true;
-        } else if (id == R.id.nav_history) {
-            // Перейти до HistoryFragment
-            return true;
-        } else if (id == R.id.nav_account) {
-            // Перейти до AccountFragment
-            return true;
+        switch (id) {
+            case R.id.nav_home:
+                finish();
+                return true;
+            case R.id.nav_favorites:
+            case R.id.nav_recommendations:
+            case R.id.nav_history:
+            case R.id.nav_account:
+                // TODO: Реалізуй переходи до відповідних екранів
+                return true;
+            default:
+                return false;
         }
-
-        return false;
-    }
+    }*/
 }

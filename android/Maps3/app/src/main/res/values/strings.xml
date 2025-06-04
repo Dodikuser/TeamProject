@@ -6,7 +6,7 @@
     <string name="button_login">Login</string>
     <string name="login">Увійти</string>
     <string name="register">Реєстрація</string>
-    <string name="first_name">Ім\'я</string>
+    <string name="first_name">Імя</string>
     <string name="last_name">Прізвище</string>
     <string name="email">Email</string>
     <string name="password">Пароль</string>
@@ -17,5 +17,7 @@
     <string name="your_account">Твій аккаунт</string>
     <string name="welcome_to_aroundme">Ласкаво просимо до AroundMe</string>
     <string name="place_name_example_1">Назва місця</string>
-    <string name="place_name_example_2">Кафе \'Львівські пляцки\'</string>
+    <string name="place_name_example_2">Кафе Львівські пляцки</string>
+    <string name="back_button">Назад</string>
+    <string name="place_details">Деталі місця</string>
 </resources>

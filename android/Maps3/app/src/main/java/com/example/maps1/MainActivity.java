@@ -116,11 +116,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         // Ініціалізація мапи
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
+        // SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        //         .findFragmentById(R.id.map);
+        // if (mapFragment != null) {
+        //     mapFragment.getMapAsync(this);
+        // }
 
         // Налаштування нижньої навігації
         bottomNav = findViewById(R.id.bottomNavigation);

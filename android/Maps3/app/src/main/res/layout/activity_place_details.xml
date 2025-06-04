@@ -5,7 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/background_light"
     tools:context=".PlaceDetailsActivity">
+
+    <!-- Header with back button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/ic_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/back_button"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/place_details"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+    </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,7 +44,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Додано головне фото -->
+            <!-- Main Photo from first file -->
             <ImageView
                 android:id="@+id/main_photo"
                 android:layout_width="match_parent"
@@ -39,131 +64,197 @@
                     android:id="@+id/photos_container"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal" />
+                    android:orientation="horizontal"
+                    android:padding="4dp" />
             </HorizontalScrollView>
 
-            <!-- Place Info -->
-            <LinearLayout
+            <!-- Place Info Card from second file -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginBottom="16dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp">
 
-                <TextView
-                    android:id="@+id/place_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:text="Назва місця" />
-
-                <TextView
-                    android:id="@+id/place_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textSize="16sp"
-                    android:text="Адреса" />
-
-                <TextView
-                    android:id="@+id/place_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Опис закладу"
-                    android:textSize="14sp" />
-
-                <!-- Rating -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal">
-
-                    <RatingBar
-                        android:id="@+id/place_rating"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:isIndicator="true"
-                        android:numStars="5"
-                        android:rating="3.5"
-                        android:stepSize="0.1"
-                        />
-
-                    <Button
-                        android:id="@+id/btn_reviews"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:text="Переглянути відгуки"
-                        android:textAllCaps="false" />
-                </LinearLayout>
-
-                <!-- Contact Info -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/place_phone"
+                        android:id="@+id/place_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawableStart="@android:drawable/ic_menu_call"
-                        android:drawablePadding="8dp"
-                        android:text="Телефон: не вказано"
-                        android:textSize="14sp" />
+                        android:text="Назва місця"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"/>
 
                     <TextView
-                        android:id="@+id/place_hours"
+                        android:id="@+id/place_address"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:drawableStart="@android:drawable/ic_menu_agenda"
-                        android:drawablePadding="8dp"
-                        android:text="Години роботи: не вказано"
-                        android:textSize="14sp" />
+                        android:textSize="16sp"
+                        android:text="Адреса"
+                        android:textColor="@color/text_secondary"/>
 
                     <TextView
-                        android:id="@+id/place_email"
+                        android:id="@+id/place_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:drawableStart="@android:drawable/ic_menu_send"
-                        android:drawablePadding="8dp"
-                        android:text="Email: не вказано"
-                        android:textSize="14sp" />
-                </LinearLayout>
+                        android:layout_marginTop="12dp"
+                        android:text="Опис закладу"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary"/>
 
-                <!-- Buttons -->
+                    <!-- Rating -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <RatingBar
+                            android:id="@+id/place_rating"
+                            style="@style/Widget.AppCompat.RatingBar.Small"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:isIndicator="true"
+                            android:numStars="5"
+                            android:rating="3.5"
+                            android:stepSize="0.1"
+                            android:progressTint="@color/primary"
+                            android:progressBackgroundTint="@color/primary_light"
+                            android:secondaryProgressTint="@color/primary"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="3.5"
+                            android:textSize="14sp"/>
+
+                        <Button
+                            android:id="@+id/btn_reviews"
+                            style="@style/TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:text="Переглянути відгуки"
+                            android:textAllCaps="false"/>
+                    </LinearLayout>
+
+                    <!-- Contact Info -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/place_phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/ic_phone"
+                            android:drawablePadding="8dp"
+                            android:drawableTint="@color/primary"
+                            android:text="Телефон: не вказано"
+                            android:textSize="14sp"/>
+
+                        <TextView
+                            android:id="@+id/place_hours"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawableStart="@drawable/ic_time"
+                            android:drawablePadding="8dp"
+                            android:drawableTint="@color/primary"
+                            android:text="Години роботи: не вказано"
+                            android:textSize="14sp"/>
+
+                        <TextView
+                            android:id="@+id/place_email"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawableStart="@drawable/ic_email"
+                            android:drawablePadding="8dp"
+                            android:drawableTint="@color/primary"
+                            android:text="Email: не вказано"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Buttons Card from second file -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
                     android:orientation="horizontal"
-                    android:weightSum="2">
+                    android:padding="12dp">
 
                     <Button
                         android:id="@+id/btn_save"
+                        style="@style/OutlinedButton"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
                         android:backgroundTint="@color/primary_light"
                         android:text="Зберегти"
-                        android:textColor="@android:color/white" />
+                        android:textColor="@android:color/white"/>
 
                     <Button
                         android:id="@+id/btn_route"
+                        style="@style/FilledButton"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:layout_weight="1"
                         android:layout_marginStart="8dp"
                         android:backgroundTint="@color/primary_light"
                         android:text="Маршрут"
-                        android:textColor="@android:color/white" />
+                        android:textColor="@android:color/white"/>
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Original buttons layout from first file (as alternative) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btn_save_alt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:backgroundTint="@color/primary_light"
+                    android:text="Зберегти"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/btn_route_alt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="@color/primary_light"
+                    android:text="Маршрут"
+                    android:textColor="@android:color/white" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
@@ -175,5 +266,5 @@
         android:background="?attr/colorPrimary"
         app:itemIconTint="@drawable/nav_item_color_state"
         app:itemTextColor="@drawable/nav_item_color_state"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"/>
 </LinearLayout>

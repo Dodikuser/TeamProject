@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Maps1</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="button_login">Login</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="place_photo">Place Photo</string>
+    <string name="save">Save</string>
+    <string name="route">Route</string>
+    <string name="reviews">Reviews</string>
+    <string name="your_account">Your Account</string>
+    <string name="welcome_to_aroundme">Welcome to AroundMe</string>
+    <string name="place_name_example_1">Place Name</string>
+    <string name="place_name_example_2">Cafe Lvivski Platsky</string>
+    <string name="back_button">Back</string>
+    <string name="place_details">Place Details</string>
+</resources>

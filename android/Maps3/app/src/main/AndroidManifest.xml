@@ -41,6 +41,8 @@
 
 
         <activity android:name=".LoginActivity" android:exported="false" />
+        <activity android:name=".ReviewsActivity" />
+        <activity android:name=".CreateReviewActivity" />
 
     </application>
 </manifest>
