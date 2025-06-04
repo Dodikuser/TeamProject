@@ -1,24 +1,40 @@
-const API_BASE_URL = 'https://localhost:7103/api';
+const API_BASE_URL = 'https://localhost:7103/api';//https://localhost:7103/api'
 
 class BaseService {
+    static noAuthEndpoints = [
+        '/user/login',
+        '/user/register',
+        'login',
+        'register',
+        '/user/google',
+        'google',
+        // Добавьте сюда другие пути, которые не требуют токена
+    ];
+
     getAuthToken() {
         return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     }
 
     async makeRequest(endpoint, options = {}) {
         try {
-            const token = this.getAuthToken();
-            if (!token) {
-                throw new Error('Токен авторизації не знайдено');
+            // Проверяем, нужно ли пропускать проверку токена (без учёта регистра)
+            const endpointLower = endpoint.toLowerCase();
+            const skipAuth = BaseService.noAuthEndpoints.some(path => endpointLower.includes(path.toLowerCase()));
+            let headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            if (!skipAuth) {
+                const token = this.getAuthToken();
+                if (!token) {
+                    throw new Error('Токен авторизації не знайдено');
+                }
+                headers['Authorization'] = `Bearer ${token}`;
             }
 
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 ...options,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                }
+                headers
             });
 
             if (!response.ok) {

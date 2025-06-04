@@ -88,18 +88,39 @@ export default function Recommendations() {
         });
         
         const favoritesSet = await fetchFavorites();
+
+        // Функция для расчёта расстояния
+        const getDistance = (lat1, lng1, lat2, lng2) => {
+          const toRad = (value) => value * Math.PI / 180;
+          const R = 6371;
+          const dLat = toRad(lat2 - lat1);
+          const dLng = toRad(lng2 - lng1);
+          const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          return R * c;
+        };
         
         // Transform API data and include isFavorite flag
-        const transformedPlaces = Array.isArray(data) ? data.map(item => ({
-          id: item.gmapsPlaceId || item.id,
-          originalItem: item,
-          image: item.photo?.path || item.photos?.[0]?.path || 'https://cdn-icons-png.flaticon.com/512/2966/2966959.png',
-          title: item.title || item.name || 'Без назви',
-          location: item.location || item.address || 'Місцезнаходження невідоме',
-          rating: parseFloat(item.rating || item.stars || 4),
-          distance: item.distance || item.distanceText || '100 км',
-          isFavorite: favoritesSet.has(item.gmapsPlaceId || item.id)
-        })) : [];
+        const transformedPlaces = Array.isArray(data) ? data.map(item => {
+          const placeLat = item.latitude || item.lat || (item.location && item.location.lat);
+          const placeLng = item.longitude || item.lng || (item.location && item.location.lng);
+          let distance = item.distance || item.distanceText || 'N/A';
+          if ((!item.distance && !item.distanceText) && placeLat && placeLng) {
+            distance = `${getDistance(latitude, longitude, placeLat, placeLng).toFixed(1)} км`;
+          }
+          return {
+            id: item.gmapsPlaceId || item.id,
+            originalItem: item,
+            image: item.photo?.path || item.photos?.[0]?.path || 'https://cdn-icons-png.flaticon.com/512/2966/2966959.png',
+            title: item.title || item.name || 'Без назви',
+            location: item.location || item.address || 'Місцезнаходження невідоме',
+            rating: parseFloat(item.rating || item.stars || 4),
+            distance,
+            isFavorite: favoritesSet.has(item.gmapsPlaceId || item.id)
+          };
+        }) : [];
 
         setRecommendations(transformedPlaces);
       } catch (err) {

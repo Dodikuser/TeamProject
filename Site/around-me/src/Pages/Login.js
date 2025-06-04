@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import UserService from '../services/UserService';
 
 
 
@@ -26,33 +27,18 @@ const GoogleLoginForm = (isLogin) => {
   };
 
   const sendToken = async (token, isLogin) => {
-    const SERVER_URL = 'https://localhost:7103/api/User';
-    const url = isLogin ? `${SERVER_URL}/login` : `${SERVER_URL}/register`;
-
+    const url = isLogin ? '/User/login' : '/User/register';
     try {
-      const res = await fetch(url, {
+      const payload = { googleJwtToken: token };
+      const data = await UserService.makeRequest(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          googleJwtToken: token
-        })
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Ошибка регистрации: ${res.status} ${res.statusText}. Ответ сервера: ${text}`);
-      }
-
-      const data = await res.text();
-
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      }, false);
+      console.log('data:', data);
       if (isLogin) {
-        const parsed = JSON.parse(data);
-        console.log('data:', parsed);
-        console.log('data.token:', parsed.token);
-        login(parsed.token);
-        navigate("/favorites");
+        login(data.token);
+        navigate('/favorites');
       } else {
         await sendToken(token, true);
       }
@@ -60,8 +46,7 @@ const GoogleLoginForm = (isLogin) => {
       console.error('Авторизация через Google провалилась:', err);
       if (err.message.includes('UnregisteredGoogle')) {
         sendToken(token, false);
-      }
-      else if (err.message.includes('EmailBusy')) {
+      } else if (err.message.includes('EmailBusy')) {
         sendToken(token, true);
       }
     }
@@ -141,10 +126,7 @@ export default function LoginRegister() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const SERVER_URL = 'https://localhost:7103/api/User';
-    const url = isLogin ? `${SERVER_URL}/login` : `${SERVER_URL}/register`;
-
+    const url = isLogin ? '/User/login' : '/User/register';
     const payload = isLogin
       ? {
           type: 'standard',
@@ -158,20 +140,15 @@ export default function LoginRegister() {
           email: formData.email,
           password: formData.password
         };
-
     try {
-      const response = await fetch(url, {
+      const data = await UserService.makeRequest(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      }, false);
       if (isLogin) {
         login(data.token);
-        navigate("/my-places");
+        navigate('/my-places');
       }
     } catch (error) {
       console.error('Error:', error);

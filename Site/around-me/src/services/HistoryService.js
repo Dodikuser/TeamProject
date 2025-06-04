@@ -144,18 +144,21 @@ class HistoryService extends BaseService {
     /**
      * @param {string} searchTerm
      * @param {boolean} [isIncognito=false]
-     * @returns {Promise<import('../Models/History').SearchHistory>}
+     * @returns {Promise<void>}
      */
     async addSearch(searchTerm, isIncognito = false) {
-        // TODO: Реализовать реальный API запрос
-        return {
-            id: 'new-search-id',
-            userId: 'current-user-id',
-            searchTerm,
-            searchDate: new Date().toISOString(),
-            isIncognito,
-            results: []
+        const body = {
+            historyId: 0,
+            text: searchTerm,
+            searchDateTime: new Date().toISOString(),
+            userId: 0,
+            isIncognito
         };
+        return this.makeRequest('/history/requests/action?historyAction=0', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
     }
 
     /**

@@ -5,6 +5,7 @@ import SortOffcanvas from '../Components/SortOffcanvas';
 import VisitHistory from '../Components/VisitHistory';
 import SearchHistory from '../Components/SearchHistory';
 import HistoryService from '../services/HistoryService';
+import FavoriteService from '../services/FavoriteService';
 import { useNavigate } from 'react-router-dom';
 
 export default function History() {
@@ -32,20 +33,8 @@ export default function History() {
   // API call to get user's favorites
   const fetchFavorites = async () => {
     try {
-      const response = await fetch('https://localhost:7103/api/Favorites/get?skip=0&take=1000', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${HistoryService.getAuthToken()}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const favoriteIds = new Set(data.favorites.$values.map(fav => fav.placeDTO.gmapsPlaceId));
+      const response = await FavoriteService.getFavorites({ skip: 0, take: 1000 });
+      const favoriteIds = new Set(response.favorites.$values.map(fav => fav.placeDTO.gmapsPlaceId));
       setFavorites(favoriteIds);
       return favoriteIds;
     } catch (err) {

@@ -10,10 +10,17 @@ class PlaceService extends BaseService {
      */
     transformPlaceData(placeData) {
         const photoValues = placeData.photos?.$values || [];
+        // Получаем src для фото: если есть photoId, используем /api/place/photo/{photoId}, иначе path
+        const getPhotoSrc = (photo) => {
+            if (photo?.photoId) {
+                return `/api/place/photo/${photo.photoId}`;
+            }
+            return photo?.path || 'https://via.placeholder.com/300x180?text=No+Image';
+        };
         return {
             id: placeData.gmapsPlaceId,
-            image: photoValues[0]?.path || 'https://via.placeholder.com/300x180?text=No+Image',
-            images: photoValues.map(photo => photo.path) || ['https://via.placeholder.com/300x180?text=No+Image'],
+            image: getPhotoSrc(photoValues[0]),
+            images: photoValues.length > 0 ? photoValues.map(getPhotoSrc) : ['https://via.placeholder.com/300x180?text=No+Image'],
             title: placeData.name,
             location: placeData.address,
             locationText: placeData.address,

@@ -7,7 +7,6 @@ import FavoritesCard from '../Components/Cards/FavoritesCard';
 import {useNavigate} from "react-router-dom";
 import FavoriteService from '../services/FavoriteService';
 
-const API_BASE_URL = 'https://localhost:7103/api';
 
 export default function Favorites() {
   const navigate = useNavigate();

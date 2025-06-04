@@ -9,6 +9,7 @@ import FavoriteService from '../services/FavoriteService';
 import LocationCard from '../Components/LocationCard';
 import GeoService from '../services/GeoService';
 import MapStateService from '../services/MapStateService';
+import HistoryService from '../services/HistoryService';
 
 
 function Home() {
@@ -71,7 +72,11 @@ function Home() {
       const markers = searchResults
         .map(place =>
           place.originalItem && place.originalItem.latitude && place.originalItem.longitude
-            ? { lat: place.originalItem.latitude, lng: place.originalItem.longitude }
+            ? {
+                lat: place.originalItem.latitude,
+                lng: place.originalItem.longitude,
+                id: place.id || place.gmapsPlaceId
+              }
             : null
         )
         .filter(Boolean);
@@ -89,6 +94,12 @@ function Home() {
         try {
           setLoading(true);
           setError(null);
+          // Сохраняем запрос в историю поиска
+          try {
+            await HistoryService.addSearch(searchQuery);
+          } catch (err) {
+            console.warn('Не удалось сохранить запрос в историю поиска:', err);
+          }
           
           let latitude = 47.81052;
           let longitude = 35.18286;

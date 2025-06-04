@@ -4,7 +4,7 @@ import ReviewsModal from './ReviewsModal';
 import RatingModal from './RatingModal';
 import ReviewService from '../services/ReviewService';
 
-const LocationModal = ({ show, onHide, place }) => {
+const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
@@ -62,7 +62,7 @@ const LocationModal = ({ show, onHide, place }) => {
       { day: 'Вівторок', hours: '09:00 - 21:00' },
       { day: 'Середа', hours: '09:00 - 21:00' },
       { day: 'Четвер', hours: '09:00 - 21:00' },
-      { day: 'П’ятниця', hours: '09:00 - 21:00' },
+      { day: 'Пʼятниця', hours: '09:00 - 21:00' },
       { day: 'Субота', hours: '10:00 - 20:00' },
       { day: 'Неділя', hours: 'Вихідний' },
     ];
@@ -127,6 +127,7 @@ const LocationModal = ({ show, onHide, place }) => {
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    console.log(place.images);
   };
 
   return (
@@ -344,7 +345,7 @@ const LocationModal = ({ show, onHide, place }) => {
 
                 <Col xs={12} md={7} className="d-flex flex-column justify-content-between">
                   <div className="d-flex justify-content-center gap-4 mb-3">
-                    <div className="action-button">
+                    <div className="action-button" onClick={onBuildRoute} style={{cursor: 'pointer'}}>
                       <span className="material-symbols-outlined">turn_right</span>
                       <span>Маршрути</span>
                     </div>

@@ -350,34 +350,7 @@ const AccountPage = () => {
               reviews.map((review, index) => (
                 <div key={index} className="d-flex justify-content-between align-items-start border-bottom py-3">
                   <div className="d-flex gap-3">
-                    {review.placePhoto ? (
-                      <img
-                        src={review.placePhoto}
-                        alt={review.placeName}
-                        style={{
-                          width: '80px',
-                          height: '80px',
-                          objectFit: 'cover',
-                          borderRadius: '8px'
-                        }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: '80px',
-                          height: '80px',
-                          backgroundColor: '#f0f0f0',
-                          borderRadius: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <span className="material-symbols-outlined" style={{ fontSize: '2rem', color: '#666' }}>
-                          photo
-                        </span>
-                      </div>
-                    )}
+                    
                     <div className="flex-grow-1 pe-3">
                       <div className="d-flex justify-content-between align-items-start mb-1">
                         <h6 className="mb-0">{review.placeName || 'Без назви'}</h6>
