@@ -1,6 +1,8 @@
 package com.example.maps1;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -13,6 +15,18 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Arrays;
 import java.util.List;
+import okhttp3.*;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import android.widget.Toast;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class ReviewsActivity extends AppCompatActivity {
 
@@ -25,6 +39,7 @@ public class ReviewsActivity extends AppCompatActivity {
         String placeName = getIntent().getStringExtra("place_name");
         double rating = getIntent().getDoubleExtra("place_rating", 3.5);
         int reviewsCount = getIntent().getIntExtra("reviews_count", 267);
+        String placeId = getIntent().getStringExtra("place_id");
 
         // Ініціалізуємо елементи UI (змінений тип для btnBack)
         ImageButton btnBack = findViewById(R.id.btn_back); // Тепер ImageButton
@@ -55,8 +70,10 @@ public class ReviewsActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSort.setAdapter(adapter);
 
-        // Додаємо тестові відгуки
-        addTestReviews(reviewsContainer);
+        // Загружаем отзывы с сервера
+        if (placeId != null && !placeId.isEmpty()) {
+            loadReviewsFromServer(placeId, reviewsContainer);
+        }
 
         // Обробники кліків
         btnBack.setOnClickListener(v -> finish());
@@ -66,52 +83,112 @@ public class ReviewsActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+    private OkHttpClient getUnsafeOkHttpClient() {
+        try {
+            // Создаём доверенный менеджер, который ничего не проверяет
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {}
 
-    private void addTestReviews(LinearLayout container) {
-        // Тестові дані відгуків
-        List<Review> reviews = Arrays.asList(
-                new Review("Іван Петренко", "Все чудово!", 4.5f, "2 роки тому"),
-                new Review("Марія Сидоренко", "Мені подобається це місце. Як на мене, відчувається позитивна атмосфера.", 4.0f, "5 днів тому"),
-                new Review("Олександр Коваленко", "Рекомендую!", 4.0f, "1 тиждень тому"),
-                new Review("Анна Шевченко", "Не дуже сподобалося, занадто шумно.", 2.5f, "3 місяці тому"),
-                new Review("Василь Іваненко", "Гарне місце, але дорого.", 3.5f, "1 місяць тому")
-        );
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {}
 
-        // Додаємо відгуки до контейнера
-        for (Review review : reviews) {
-            View reviewView = getLayoutInflater().inflate(R.layout.item_review, container, false);
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[]{};
+                        }
+                    }
+            };
 
-            TextView tvAuthor = reviewView.findViewById(R.id.tv_author);
-            TextView tvText = reviewView.findViewById(R.id.tv_text);
-            RatingBar ratingBar = reviewView.findViewById(R.id.rating_bar);
-            TextView tvDate = reviewView.findViewById(R.id.tv_date);
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 
-            tvAuthor.setText(review.getAuthor());
-            tvText.setText(review.getText());
-            ratingBar.setRating(review.getRating());
-            tvDate.setText(review.getDate());
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-            container.addView(reviewView);
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+            builder.hostnameVerifier((hostname, session) -> true); // х*й на имя хоста
+
+            return builder.build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    // Допоміжний клас для відгуків
-    private static class Review {
-        private String author;
-        private String text;
-        private float rating;
-        private String date;
+    private void loadReviewsFromServer(String placeId, LinearLayout container) {
 
-        public Review(String author, String text, float rating, String date) {
-            this.author = author;
-            this.text = text;
-            this.rating = rating;
-            this.date = date;
+        SharedPreferences prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        String token = prefs.getString("auth_token", null);
+        if (token == null) {
+            runOnUiThread(() -> Toast.makeText(ReviewsActivity.this, "Необходима авторизация", Toast.LENGTH_SHORT).show());
+            return;
         }
+        OkHttpClient client = getUnsafeOkHttpClient();
+        String url = "https://10.0.2.2:7103/api/Review/get?placeId=" + placeId + "&skip=0&take=10";
 
-        public String getAuthor() { return author; }
-        public String getText() { return text; }
-        public float getRating() { return rating; }
-        public String getDate() { return date; }
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + token)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> Toast.makeText(ReviewsActivity.this, "Помилка завантаження відгуків", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String json = response.body().string();
+                    JsonObject root = JsonParser.parseString(json).getAsJsonObject();
+                    JsonArray values = root.getAsJsonArray("$values");
+                    Type listType = new TypeToken<ArrayList<ReviewDTO>>(){}.getType();
+                    ArrayList<ReviewDTO> reviews = new Gson().fromJson(values, listType);
+
+                    runOnUiThread(() -> {
+                        container.removeAllViews();
+                        for (ReviewDTO review : reviews) {
+                            View reviewView = getLayoutInflater().inflate(R.layout.item_review, container, false);
+                            TextView tvAuthor = reviewView.findViewById(R.id.tv_author);
+                            TextView tvText = reviewView.findViewById(R.id.tv_text);
+                            RatingBar ratingBar = reviewView.findViewById(R.id.rating_bar);
+                            TextView tvDate = reviewView.findViewById(R.id.tv_date);
+
+                            tvAuthor.setText(review.userName);
+                            tvText.setText(review.text);
+                            ratingBar.setRating(review.stars);
+                            tvDate.setText(review.reviewDateTime);
+
+                            container.addView(reviewView);
+                        }
+                    });
+                } else {
+                    runOnUiThread(() -> Toast.makeText(ReviewsActivity.this, "Помилка сервера: " + response.code(), Toast.LENGTH_SHORT).show());
+                }
+            }
+        });
+    }
+
+    // Модель для ReviewDTO
+    public static class ReviewDTO {
+        public String text;
+        public int price;
+        public int quality;
+        public int congestion;
+        public int location;
+        public int infrastructure;
+        public int stars;
+        public String reviewDateTime;
+        public String gmapId;
+        public long placeId;
+        public long userId;
+        public String userName;
+        public PhotoDTO photo;
+    }
+    public static class PhotoDTO {
+        public String path;
+        public long placeId;
     }
 }

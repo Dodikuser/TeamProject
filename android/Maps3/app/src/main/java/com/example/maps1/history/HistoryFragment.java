@@ -158,10 +158,6 @@ public class HistoryFragment extends Fragment {
     private void showVisitHistory() {
         isShowingVisitHistory = true;
 
-        // Update button states
-        btnVisitHistory.setBackgroundTintList(getResources().getColorStateList(android.R.color.holo_blue_light));
-        btnSearchHistory.setBackgroundTintList(getResources().getColorStateList(android.R.color.darker_gray));
-
         // Set adapter
         recyclerView.setAdapter(historyAdapter);
 
@@ -173,10 +169,6 @@ public class HistoryFragment extends Fragment {
 
     private void showSearchHistory() {
         isShowingVisitHistory = false;
-
-        // Update button states
-        btnSearchHistory.setBackgroundTintList(getResources().getColorStateList(android.R.color.holo_blue_light));
-        btnVisitHistory.setBackgroundTintList(getResources().getColorStateList(android.R.color.darker_gray));
 
         // Set adapter
         recyclerView.setAdapter(searchHistoryAdapter);
