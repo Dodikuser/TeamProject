@@ -64,6 +64,24 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -80,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LinearLayout searchResultsLayout;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardLayoutListener;
     private boolean isKeyboardVisible = false;
+    private final ExecutorService aiSearchExecutor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,12 +194,261 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
             }
-            searchWithCurrentLocation(query);
-            showSearchResults(true);
+            // Новый серверный поиск
+            aiPlaceSearchRequest(query);
         } else {
             showSearchResults(false);
         }
     }
+    private static SSLSocketFactory getTrustAllSslSocketFactory() throws Exception {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[0];
+                    }
+
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {}
+
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {}
+                }
+        };
+
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        return sc.getSocketFactory();
+    }
+
+    private void aiPlaceSearchRequest(String query) {
+        // Локация и радиус — поебать, пока оставим
+        int radius = 1000;
+        double latitude = 47.81052;
+        double longitude = 35.18286;
+
+        String urlStr = String.format(
+                "https://10.0.2.2:7103/api/AI/search?text=%s&radius=%d&latitude=%f&longitude=%f",
+                urlEncode(query), radius, latitude, longitude);
+
+        showSearchResults(true);
+        searchResultsLayout.removeAllViews();
+
+        aiSearchExecutor.execute(() -> {
+            try {
+                // Получаем наш кастомный socket factory
+                SSLSocketFactory sslSocketFactory = getTrustAllSslSocketFactory();
+
+                // Отключаем проверку hostname
+                HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+
+                URL url = new URL(urlStr);
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                conn.setSSLSocketFactory(sslSocketFactory); // ВОТ ТУТ НУЖНО СТАВИТЬ ТО, ЧТО МЫ СОЗДАЛИ
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == 200) {
+                    InputStream is = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    reader.close();
+                    is.close();
+                    parseAndShowAiResults(sb.toString());
+                } else {
+                    runOnUiThread(() -> searchWithCurrentLocation(query));
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> searchWithCurrentLocation(query));
+            }
+        });
+    }
+
+
+
+    private void parseAndShowAiResults(String json) {
+        runOnUiThread(() -> {
+            try {
+                JSONObject root = new JSONObject(json);
+                JSONArray values = root.optJSONArray("$values");
+                if (values == null) {
+                    showToast("Нічого не знайдено");
+                    showSearchResults(false);
+                    return;
+                }
+                if (values.length() == 0) {
+                    showToast("Нічого не знайдено");
+                    showSearchResults(false);
+                    return;
+                }
+                searchResultsLayout.removeAllViews();
+                // Удаляем старые маркеры (если нужно, можно добавить отдельный метод для этого)
+                if (googleMap != null) {
+                    googleMap.clear();
+                }
+                // Собираем список мест для карты
+                java.util.List<com.example.maps1.places.MyPlace> placesForMap = new java.util.ArrayList<>();
+                for (int i = 0; i < values.length(); i++) {
+                    JSONObject place = values.getJSONObject(i);
+                    String name = place.optString("name", "");
+                    double lat = place.optDouble("latitude", 0);
+                    double lng = place.optDouble("longitude", 0);
+                    String address = place.optString("address", "");
+                    double stars = place.optDouble("stars", 0);
+                    String photoUrl = null;
+                    if (place.has("photo") && !place.isNull("photo")) {
+                        JSONObject photo = place.getJSONObject("photo");
+                        photoUrl = photo.optString("path", null);
+                    }
+                    addAiSearchResultCard(name, address, lat, lng, stars, photoUrl);
+                    if (lat != 0 && lng != 0) {
+                        placesForMap.add(new com.example.maps1.places.MyPlace(
+                            null, name, address, "Опис відсутній", stars, null, null, null,
+                            photoUrl != null ? java.util.Collections.singletonList(photoUrl) : new java.util.ArrayList<>(),
+                            new com.google.android.gms.maps.model.LatLng(lat, lng)
+                        ));
+                    }
+                }
+                // Передаем места во фрагмент карты
+                androidx.fragment.app.Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                if (currentFragment instanceof com.example.maps1.fragment.MapFragment) {
+                    ((com.example.maps1.fragment.MapFragment) currentFragment).showPlacesOnMap(placesForMap);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                showToast("Помилка обробки результату");
+                showSearchResults(false);
+            }
+        });
+    }
+
+    private void addAiSearchResultCard(String name, String address, double lat, double lng, double stars, String photoUrl) {
+        MaterialCardView card = new MaterialCardView(this);
+        card.setLayoutParams(new LinearLayout.LayoutParams(
+                getResources().getDimensionPixelSize(R.dimen.search_card_width),
+                getResources().getDimensionPixelSize(R.dimen.search_card_height)));
+        card.setCardBackgroundColor(ContextCompat.getColor(this, R.color.card_background));
+        card.setStrokeColor(ContextCompat.getColor(this, R.color.card_stroke));
+        card.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.card_stroke_width));
+        card.setRadius(getResources().getDimension(R.dimen.card_corner_radius));
+        card.setCardElevation(getResources().getDimension(R.dimen.card_elevation));
+
+        LinearLayout cardContent = new LinearLayout(this);
+        cardContent.setOrientation(LinearLayout.VERTICAL);
+        cardContent.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        cardContent.setGravity(Gravity.CENTER);
+        cardContent.setPadding(
+                getResources().getDimensionPixelSize(R.dimen.card_padding),
+                getResources().getDimensionPixelSize(R.dimen.card_padding),
+                getResources().getDimensionPixelSize(R.dimen.card_padding),
+                getResources().getDimensionPixelSize(R.dimen.card_padding));
+
+        // Миниатюра
+        ImageView thumbnail = new ImageView(this);
+        int thumbSize = getResources().getDimensionPixelSize(R.dimen.search_card_thumb_size);
+        LinearLayout.LayoutParams thumbParams = new LinearLayout.LayoutParams(thumbSize, thumbSize);
+        thumbParams.gravity = Gravity.CENTER;
+        thumbnail.setLayoutParams(thumbParams);
+        thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        int thumbMargin = getResources().getDimensionPixelSize(R.dimen.card_padding) / 2;
+        thumbParams.setMargins(0, 0, 0, thumbMargin);
+        // Загрузка изображения
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            Glide.with(this)
+                .load(photoUrl)
+                .placeholder(R.drawable.ic_placeholder)
+                .into(thumbnail);
+        } else {
+            thumbnail.setImageResource(R.drawable.ic_placeholder);
+        }
+        cardContent.addView(thumbnail, 0); // Добавляем миниатюру первой
+
+        TextView nameTextView = new TextView(this);
+        nameTextView.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        nameTextView.setText(name);
+        nameTextView.setTextColor(ContextCompat.getColor(this, R.color.card_text));
+        nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        nameTextView.setGravity(Gravity.CENTER);
+        nameTextView.setMaxLines(2);
+        nameTextView.setEllipsize(TextUtils.TruncateAt.END);
+        nameTextView.setPadding(0, 0, 0, 8);
+
+        TextView addressTextView = new TextView(this);
+        addressTextView.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        addressTextView.setText(address);
+        addressTextView.setTextColor(ContextCompat.getColor(this, R.color.card_text));
+        addressTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        addressTextView.setGravity(Gravity.CENTER);
+        addressTextView.setMaxLines(2);
+        addressTextView.setEllipsize(TextUtils.TruncateAt.END);
+        addressTextView.setPadding(0, 0, 0, 8);
+
+        LinearLayout ratingLayout = new LinearLayout(this);
+        ratingLayout.setOrientation(LinearLayout.HORIZONTAL);
+        ratingLayout.setGravity(Gravity.CENTER);
+
+        ImageView starIcon = new ImageView(this);
+        starIcon.setImageResource(R.drawable.ic_star);
+        starIcon.setColorFilter(ContextCompat.getColor(this, R.color.card_rating));
+        starIcon.setLayoutParams(new LinearLayout.LayoutParams(
+                getResources().getDimensionPixelSize(R.dimen.star_size),
+                getResources().getDimensionPixelSize(R.dimen.star_size)));
+
+        TextView ratingTextView = new TextView(this);
+        ratingTextView.setText(String.format(Locale.getDefault(), "%.1f", stars));
+        ratingTextView.setTextColor(ContextCompat.getColor(this, R.color.card_rating));
+        ratingTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        ratingTextView.setPadding(4, 0, 0, 0);
+
+        ratingLayout.addView(starIcon);
+        ratingLayout.addView(ratingTextView);
+
+        cardContent.addView(nameTextView);
+        cardContent.addView(addressTextView);
+        cardContent.addView(ratingLayout);
+        card.addView(cardContent);
+
+        card.setOnClickListener(v -> {
+            // Открываем экран деталей места
+            MyPlace place = new MyPlace(
+                null, // id неизвестен
+                name,
+                address,
+                "Опис відсутній",
+                stars,
+                null, // phone
+                null, // hours
+                null, // email
+                photoUrl != null ? java.util.Collections.singletonList(photoUrl) : new java.util.ArrayList<>(),
+                new com.google.android.gms.maps.model.LatLng(lat, lng)
+            );
+            openPlaceDetails(place);
+            showSearchResults(false);
+            searchEditText.clearFocus();
+        });
+        searchResultsLayout.addView(card);
+    }
+
+    private String urlEncode(String s) {
+        try {
+            return java.net.URLEncoder.encode(s, "UTF-8");
+        } catch (Exception e) {
+            return s;
+        }
+    }
+
     private void showSearchResults(boolean show) {
         runOnUiThread(() -> {
             if (show && searchResultsContainer.getVisibility() != View.VISIBLE) {
@@ -207,85 +475,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
-    private void addSearchResultCard(String placeName, LatLng location, double rating) {
-        // 1. Створюємо основну картку
-        MaterialCardView card = new MaterialCardView(this);
-        card.setLayoutParams(new LinearLayout.LayoutParams(
-                getResources().getDimensionPixelSize(R.dimen.search_card_width),
-                getResources().getDimensionPixelSize(R.dimen.search_card_height)));
-
-        // Встановлюємо правильний фон
-        card.setCardBackgroundColor(ContextCompat.getColor(this, R.color.card_background));
-        card.setStrokeColor(ContextCompat.getColor(this, R.color.card_stroke));
-        card.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.card_stroke_width));
-        card.setRadius(getResources().getDimension(R.dimen.card_corner_radius));
-        card.setCardElevation(getResources().getDimension(R.dimen.card_elevation));
-
-        // 2. Основний контейнер
-        LinearLayout cardContent = new LinearLayout(this);
-        cardContent.setOrientation(LinearLayout.VERTICAL);
-        cardContent.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        cardContent.setGravity(Gravity.CENTER);
-        cardContent.setPadding(
-                getResources().getDimensionPixelSize(R.dimen.card_padding),
-                getResources().getDimensionPixelSize(R.dimen.card_padding),
-                getResources().getDimensionPixelSize(R.dimen.card_padding),
-                getResources().getDimensionPixelSize(R.dimen.card_padding));
-
-        // 3. Назва місця
-        TextView nameTextView = new TextView(this);
-        nameTextView.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-        nameTextView.setText(placeName);
-        nameTextView.setTextColor(ContextCompat.getColor(this, R.color.card_text));
-        nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        nameTextView.setGravity(Gravity.CENTER);
-        nameTextView.setMaxLines(2);
-        nameTextView.setEllipsize(TextUtils.TruncateAt.END);
-        nameTextView.setPadding(0, 0, 0, 8);
-
-        // 4. Рейтинг
-        LinearLayout ratingLayout = new LinearLayout(this);
-        ratingLayout.setOrientation(LinearLayout.HORIZONTAL);
-        ratingLayout.setGravity(Gravity.CENTER);
-
-        ImageView starIcon = new ImageView(this);
-        starIcon.setImageResource(R.drawable.ic_star);
-        starIcon.setColorFilter(ContextCompat.getColor(this, R.color.card_rating));
-        starIcon.setLayoutParams(new LinearLayout.LayoutParams(
-                getResources().getDimensionPixelSize(R.dimen.star_size),
-                getResources().getDimensionPixelSize(R.dimen.star_size)));
-
-        TextView ratingTextView = new TextView(this);
-        ratingTextView.setText(String.format(Locale.getDefault(), "%.1f", rating));
-        ratingTextView.setTextColor(ContextCompat.getColor(this, R.color.card_rating));
-        ratingTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        ratingTextView.setPadding(4, 0, 0, 0);
-
-        ratingLayout.addView(starIcon);
-        ratingLayout.addView(ratingTextView);
-
-        // Збираємо всі елементи
-        cardContent.addView(nameTextView);
-        cardContent.addView(ratingLayout);
-        card.addView(cardContent);
-
-        // Обробник кліку
-        card.setOnClickListener(v -> {
-            if (googleMap != null) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
-                showSearchResults(false);
-                searchEditText.clearFocus();
-            }
-        });
-
-        searchResultsLayout.addView(card);
-    }
-
-
 
     @SuppressLint("MissingPermission")
     private void searchWithCurrentLocation(String query) {
@@ -378,7 +567,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             );
             // Використовуємо випадковий рейтинг для демонстрації
             double rating = 3.5 + (Math.random() * 1.5); // Рейтинг від 3.5 до 5.0
-            addSearchResultCard(prediction.getFullText(null).toString(), location, rating);
         }
     }
     private void showTestCafes(LatLng userLocation) {
@@ -401,7 +589,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     userLocation.latitude + (Math.random() * 0.02 - 0.01),
                     userLocation.longitude + (Math.random() * 0.02 - 0.01)
             );
-            addSearchResultCard(entry.getKey(), location, entry.getValue());
         }
     }
 

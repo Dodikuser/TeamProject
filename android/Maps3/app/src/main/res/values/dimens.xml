@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="search_card_width">160dp</dimen>
-    <dimen name="search_card_height">120dp</dimen>
+    <dimen name="search_card_height">180dp</dimen>
     <dimen name="card_corner_radius">8dp</dimen>
     <dimen name="card_elevation">2dp</dimen>
     <dimen name="card_padding">12dp</dimen>
     <dimen name="card_stroke_width">1dp</dimen>
     <dimen name="star_size">16dp</dimen>
+    <dimen name="search_card_thumb_size">64dp</dimen>
 </resources>

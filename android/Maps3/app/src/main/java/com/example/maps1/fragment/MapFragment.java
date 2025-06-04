@@ -145,4 +145,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Toast.makeText(requireContext(), "Доступ до геопозиції заборонено", Toast.LENGTH_SHORT).show();
         }
     }
+
+    // Показать маркеры для списка мест
+    public void showPlacesOnMap(List<MyPlace> places) {
+        if (mMap == null || places == null) return;
+        mMap.clear();
+        for (MyPlace place : places) {
+            if (place.getLocation() != null) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(place.getLocation())
+                        .title(place.getName())
+                        .snippet(place.getAddress()));
+            }
+        }
+        // Центрируем карту на первом месте, если есть
+        if (!places.isEmpty() && places.get(0).getLocation() != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(places.get(0).getLocation(), 14));
+        }
+    }
 }
