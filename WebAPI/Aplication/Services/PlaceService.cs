@@ -1,4 +1,5 @@
-﻿using Application.DTOs;
+﻿using Aplication.Services;
+using Application.DTOs;
 using Application.DTOs.GmapDTOs;
 using Entities;
 using Entities.Models;
@@ -6,7 +7,7 @@ using Infrastructure.Repository;
 
 namespace Application.Services
 {
-    public class PlaceService(FavoritesRepository _favoritesRepository, PlaceRepository _placeRepository, GmapsService _gmapsService, Config _config, ReviewRepository _reviewRepository, PhotoRepository _photoRepository)
+    public class PlaceService(FavoritesRepository _favoritesRepository, PlaceRepository _placeRepository, GmapsService _gmapsService, Config _config, ReviewRepository _reviewRepository, PhotoRepository _photoRepository, PhotoDownloadService _photoDownloadService)
     {
 
         private string _googleMapsKey { get { return _config.GoogleMapsKey; } }
@@ -19,9 +20,12 @@ namespace Application.Services
                 return await _placeRepository.GetByIdGmapsPlaceIdWhisPhotos(gmapsPlaceId);
 
             GPlaceDetailsResult gPlaceDetailsResult = await _gmapsService.GetPlaceDetailsAsync(gmapsPlaceId);
-            Place place = PlaceTypesConverter.ConvertFromGPlace(gPlaceDetailsResult, gmapsPlaceId, _googleMapsKey);
 
+            var place = await gPlaceDetailsResult.ConvertFromGPlaceAsync(gmapsPlaceId, _googleMapsKey, _photoDownloadService);
             await _placeRepository.AddAsync(place);
+
+
+            await _placeRepository.SaveChangesAsync();
             return place;
         }
 
@@ -95,7 +99,8 @@ namespace Application.Services
                         ? new PhotoDTO
                         {
                             Path = place.Photos.First().Path,
-                            PlaceId = place.Photos.First().PlaceId
+                            PlaceId = place.Photos.First().PlaceId,
+                            Id = place.Photos.First().Id
                         }
                         : null
                 }
@@ -127,7 +132,7 @@ namespace Application.Services
 
             if (place == null) return null;
             List<Photo> photos = await _photoRepository.GetAllByPlaceAsync(place.Id);
-            List<PhotoDTO> photoDTOs = photos.Select(p => new PhotoDTO { Path = p.Path, PlaceId = p.PlaceId }).ToList();
+            List<PhotoDTO> photoDTOs = photos.Select(p => new PhotoDTO { Path = p.Path, PlaceId = p.PlaceId, Id = p.Id }).ToList();
             PlaceDTOFull dto = new PlaceDTOFull()
             {
                 Name = place.Name,
@@ -148,6 +153,11 @@ namespace Application.Services
             };
 
             return dto;
+        }
+        public async Task<byte[]?> GetPhotoBlobAsync(ulong photoId)
+        {
+            var photo = await _photoRepository.FindAsync(photoId);
+            return photo?.Data;
         }
     }
 }

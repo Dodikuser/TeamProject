@@ -92,6 +92,15 @@ namespace WebAPI.Controllers
 
         }
 
+        [HttpGet("photo/{photoId}")]
+        public async Task<IActionResult> GetPhotoBlob([FromRoute] ulong photoId)
+        {
+            var data = await _placeService.GetPhotoBlobAsync(photoId);
+            if (data == null)
+                return NotFound();
+            return File(data, "image/jpeg"); // Можно добавить определение MIME-типа
+        }
+
     }
 
 }

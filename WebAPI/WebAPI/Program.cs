@@ -57,6 +57,8 @@ namespace WebAPI
                 client.BaseAddress = new Uri("https://places.googleapis.com/v1/");
             });
 
+            builder.Services.AddScoped<Aplication.Services.PhotoDownloadService>();
+            builder.Services.AddHttpClient<Aplication.Services.PhotoDownloadService>();
 
             builder.Services.AddControllers()
             .AddJsonOptions(options =>

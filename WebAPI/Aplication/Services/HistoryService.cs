@@ -147,12 +147,14 @@ namespace Application.Services
                                 ? new PhotoDTO
                                 {
                                     Path = mainPhoto.Path,
-                                    PlaceId = mainPhoto.PlaceId
+                                    PlaceId = mainPhoto.PlaceId,
+                                    Id = mainPhoto.Id
                                 }
                                 : new PhotoDTO
                                 {
                                     Path = string.Empty,
-                                    PlaceId = history.Place.Id
+                                    PlaceId = history.Place.Id,
+                                    Id = history.Place.Id
                                 }
                 }
             };

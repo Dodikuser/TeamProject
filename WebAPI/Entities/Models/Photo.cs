@@ -7,6 +7,8 @@ namespace Entities.Models
         public ulong Id { get; set; }
         public string Path { get; set; }
 
+        public byte[]? Data { get; set; } // BLOB-данные фотографии
+
         public ulong PlaceId { get; set; }
 
         // Связь с Place

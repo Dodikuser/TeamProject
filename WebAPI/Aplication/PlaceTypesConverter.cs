@@ -89,14 +89,15 @@ namespace Application
                 TokensAvailable = place.TokensAvailable,
                 LastPromotionDateTime = place.LastPromotionDateTime,
                 //IsOpen = place.IsOpen,
-                OpeningHours = place.OpeningHours, 
+                OpeningHours = place.OpeningHours,
                 GmapsPlaceId = place.GmapsPlaceId,
-                UserId = (int?)place.UserId, 
+                UserId = (int?)place.UserId,
                 Stars = place.Stars,
                 Photos = place.Photos.Select(photo => new PhotoDTO
                 {
                     Path = photo.Path,
-                    PlaceId = photo.PlaceId
+                    PlaceId = photo.PlaceId,
+                    Id = photo.Id,
                 }).ToList()
             };
         }
@@ -117,14 +118,19 @@ namespace Application
                 ? place.Photos.Select(photo => new PhotoDTO
                 {
                     Path = photo.Path,
-                    PlaceId = photo.PlaceId
+                    PlaceId = photo.PlaceId,
+                    Id = photo.Id,
                 }).First()
                 : null,
 
             };
         }
 
-        public static Place ConvertFromGPlace(GPlaceDetailsResult gPlace, string gmapsPlaceId, string googleApiKey)
+        public static async Task<Place> ConvertFromGPlaceAsync(
+            this GPlaceDetailsResult gPlace,
+            string gmapsPlaceId,
+            string googleApiKey,
+            Aplication.Services.PhotoDownloadService photoDownloadService)
         {
             var place = new Place
             {
@@ -135,22 +141,25 @@ namespace Application
                 PhoneNumber = gPlace.PhoneNumber,
                 Site = gPlace.Website,
                 Description = gPlace.EditorialSummary?.Overview,
-                //IsOpen = gPlace.OpeningHours?.OpenNow,
                 GmapsPlaceId = gmapsPlaceId,
                 Stars = gPlace.Rating ?? 0,
-
                 OpeningHours = ParseOpeningHours(gPlace.OpeningHours?.WeekdayText),
-
-                Photos = gPlace.Photos?.Select(p => new Photo
-                {
-                    Path = p.GetPhotoUrl(googleApiKey),
-                }).ToList() ?? new List<Photo>(),
-
+                Photos = new List<Photo>(),
                 Reviews = new List<Review>(),
                 Histories = new List<History>(),
                 Favorites = new List<Favorite>(),
                 AdHashtags = new List<AdHashtag>()
             };
+
+            if (gPlace.Photos != null)
+            {
+                foreach (var gPhoto in gPlace.Photos.Slice(0, 1))
+                {
+                    var photoUrl = gPhoto.GetPhotoUrl(googleApiKey);
+                    var photo = await photoDownloadService.DownloadAndSavePhotoAsync(photoUrl, place.Id, photoUrl);
+                    place.Photos.Add(photo);
+                }
+            }
 
             return place;
         }

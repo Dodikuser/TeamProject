@@ -78,6 +78,7 @@ namespace Application.Services
                     {
                         PlaceId = review.PlaceId,
                         Path = photo == null ? "" : photo.Path,
+                        Id = photo.Id,
                     }
                 });
             }
@@ -109,6 +110,7 @@ namespace Application.Services
                     {
                         PlaceId = review.PlaceId,
                         Path = photo == null ? "" : photo.Path,
+                        Id = photo.Id,
                     }
                 });
             }
