@@ -1,6 +1,7 @@
 ﻿using Application.Services;
 using Application.Services.AI;
 using Application.Services.Email;
+using Application.Services.Payment;
 using Entities;
 using Infrastructure;
 using Infrastructure.Repository;
@@ -17,6 +18,16 @@ namespace WebAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            if (builder.Environment.EnvironmentName == "vm")
+            {
+                builder.Configuration.AddJsonFile("/home/test-demo/AroundMe/configs/mysettings.vm.webapi.json", optional: false, reloadOnChange: true);
+
+                builder.WebHost.ConfigureKestrel((context, options) =>
+                {
+                    options.Configure(context.Configuration.GetSection("Kestrel"));
+                });
+            }
 
             //подключаем сервис конфига
             builder.Services.Configure<Config>(builder.Configuration.GetSection("MapSettings"));
@@ -59,6 +70,11 @@ namespace WebAPI
 
             builder.Services.AddScoped<Aplication.Services.PhotoDownloadService>();
             builder.Services.AddHttpClient<Aplication.Services.PhotoDownloadService>();
+
+            builder.Services.AddHttpClient<PayPalService>();
+
+            builder.Services.AddHostedService<OrderService>();
+            builder.Services.AddScoped<OrderService>();
 
             builder.Services.AddControllers()
             .AddJsonOptions(options =>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entities.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,27 @@ namespace Application.Services.Email
             var html = await File.ReadAllTextAsync(path);
             return html.Replace("{{CODE}}", code);
         }
+
+        public async Task<string> GetReceiptEmailBodyAsync(
+            string provider,
+            decimal amount,
+            string currency,
+            int tokens,
+            string transactionId,
+            DateTime date)
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, "EmailTemplates", "ReceiptTemplate.html");
+            var html = await File.ReadAllTextAsync(path);
+
+            return html
+                .Replace("{{PROVIDER}}", provider)
+                .Replace("{{AMOUNT}}", amount.ToString("0.00"))
+                .Replace("{{CURRENCY}}", currency)
+                .Replace("{{TOKENS}}", tokens.ToString())
+                .Replace("{{TXID}}", transactionId)
+                .Replace("{{DATE}}", date.ToString("dd.MM.yyyy HH:mm"));
+        }
+
     }
 
 }

@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f1fa;
+            color: #333;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #e2d9f3;
+            padding: 30px;
+            border-radius: 8px;
+        }
+
+        .header {
+            text-align: center;
+            color: #8e7cc3;
+        }
+
+        .details {
+            margin-top: 20px;
+        }
+
+            .details ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            .details li {
+                margin: 8px 0;
+            }
+
+        .footer {
+            color: #888;
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="header">Дякуємо за оплату — команда AroundMe</h2>
+        <p>Ми успішно отримали ваш платіж через <strong>{{PROVIDER}}</strong>.</p>
+
+        <div class="details">
+            <h3>Деталі платежу:</h3>
+            <ul>
+                <li><strong>Сума:</strong> {{AMOUNT}} {{CURRENCY}}</li>
+                <li><strong>Токенів нараховано:</strong> {{TOKENS}}</li>
+                <li><strong>ID транзакції:</strong> {{TXID}}</li>
+                <li><strong>Дата:</strong> {{DATE}}</li>
+            </ul>
+        </div>
+
+        <p>Токени вже нараховано на ваш акаунт. Дякуємо, що користуєтесь <strong>AroundMe</strong>!</p>
+
+        <div class="footer">
+            Це автоматичне повідомлення. Якщо у вас виникли питання — зверніться в підтримку.
+        </div>
+    </div>
+</body>
+</html>

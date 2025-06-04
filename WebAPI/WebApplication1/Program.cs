@@ -10,13 +10,19 @@ namespace WebApplication1
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            if (builder.Environment.EnvironmentName == "vm")
+            {
+                builder.Configuration.AddJsonFile("/home/test-demo/AroundMe/configs/mysettings.vm.adminpanel.json", optional: false, reloadOnChange: true);
+
+                builder.WebHost.ConfigureKestrel((context, options) =>
+                {
+                    options.Configure(context.Configuration.GetSection("Kestrel"));
+                });
+            }
+
             // Для SQL Server
             builder.Services.AddDbContext<MyDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            // Или для других СУБД, например:
-            // options.UseNpgsql() для PostgreSQL
-            // options.UseSqlite() для SQLite
 
             // Add services to the container.
             builder.Services.AddRazorPages();
