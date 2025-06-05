@@ -72,11 +72,11 @@ public class RecommendationService {
             }
 
             String responseBody = response.body().string();
-            return parseRecommendations(responseBody);
+            return parseRecommendations(responseBody, request.latitude, request.longitude);
         }
     }
 
-    private static List<RecommendationsItem> parseRecommendations(String jsonResponse) {
+    private static List<RecommendationsItem> parseRecommendations(String jsonResponse, double userLat, double userLng) {
         List<RecommendationsItem> items = new ArrayList<>();
 
         try {
@@ -100,8 +100,16 @@ public class RecommendationService {
                     imageUrl = photo.optString("path", "");
                 }
 
-                // Calculate distance (placeholder for now)
+                // Calculate distance
                 String distance = "N/A";
+                if (latitude != 0.0 && longitude != 0.0) {
+                    double dist = haversine(userLat, userLng, latitude, longitude);
+                    if (dist < 1.0) {
+                        distance = String.format("%.0f м", dist * 1000);
+                    } else {
+                        distance = String.format("%.2f км", dist);
+                    }
+                }
 
                 RecommendationsItem item = new RecommendationsItem(
                         name, address, "", rating, imageUrl, distance, placeId, liked
@@ -113,6 +121,18 @@ public class RecommendationService {
         }
 
         return items;
+    }
+
+    // Haversine formula to calculate distance between two lat/lng points in km
+    private static double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // Radius of the earth in km
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 
     public static void toggleLike(String placeId, boolean like, String token) throws IOException {

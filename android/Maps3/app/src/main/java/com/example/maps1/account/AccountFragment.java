@@ -63,7 +63,7 @@ public class AccountFragment extends Fragment {
 
         // Google Sign-In options
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com")
+                .requestIdToken("1079685505640-7jii1hsjj5h517kfhsqg06rpgqtrse2d.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
