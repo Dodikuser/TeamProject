@@ -1,8 +1,11 @@
-﻿using Application.DTOs;
-using Microsoft.AspNetCore.Mvc;
+﻿using Application;
+using Application.DTOs;
 using Application.Services;
-using Application;
+using Entities;
 using Entities.Models;
+using Infrastructure.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
@@ -13,14 +16,19 @@ namespace WebAPI.Controllers
         private readonly WtfService _wtfService;
         private readonly GmapsService _gmapsService;
         private readonly PlaceService _placeService;
+        private readonly Config _config;
+        private readonly UserRepository _userRepository;
 
-        public AIController(WtfService wtfService, GmapsService gmapsService, PlaceService placeService)
+        public AIController(WtfService wtfService, GmapsService gmapsService, PlaceService placeService, UserRepository userRepository, Config config)
         {
             _wtfService = wtfService;
             _gmapsService = gmapsService;
             _placeService = placeService;
+            _userRepository = userRepository;
+            _config = config;
         }
 
+        [Authorize]
         [HttpGet("search")]
         public async Task<IActionResult> AiPlaceSearch(
             [FromQuery] string text,
@@ -29,11 +37,23 @@ namespace WebAPI.Controllers
             [FromQuery] double latitude,
             [FromQuery] double longitude)
         {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+
+            try
+            {
+                await _userRepository.RemoveTokensAsync(userId, _config.SearchPrice);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+
+
             var dto = await _wtfService.AiPlaceSearch(text, hashTagIds, radius, longitude, latitude);
 
             foreach (var x in dto.GooglePlaceIds)
             {
-                Console.WriteLine("------------------------------------------------------------------" + x);
+                Console.WriteLine("---->" + x);
             }
 
             var resultList = new List<PlaceDTODefaultCard>();
@@ -75,7 +95,6 @@ namespace WebAPI.Controllers
 
             return Ok(resultList);
         }
-
 
         [HttpGet("reverseGeocoding")]
         public async Task<IActionResult> ReverseGeocodingAsync2([FromQuery] double latitude, [FromQuery] double longitude)

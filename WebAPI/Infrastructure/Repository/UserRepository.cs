@@ -102,5 +102,21 @@ namespace Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task RemoveTokensAsync(ulong userId, int count)
+        {
+            if (count <= 0)
+                throw new ArgumentException("Token count must be positive");
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
+
+            if (user.TokensAvailable < count)
+                throw new InvalidOperationException("Not enough tokens to remove");
+
+            user.TokensAvailable -= count;
+            await _context.SaveChangesAsync();
+        }
     }
 }

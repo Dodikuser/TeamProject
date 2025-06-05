@@ -1,5 +1,6 @@
 ﻿using Application.Services.Email;
 using Application.Services.Payment;
+using Entities;
 using Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,13 @@ namespace WebAPI.Controllers
     public class PaymentsController : ControllerBase
     {
         private readonly PayPalService _payPalService;
+        private readonly Config _config;
 
 
-        public PaymentsController(PayPalService payPalService)
+        public PaymentsController(PayPalService payPalService, Config config)
         {
             _payPalService = payPalService;
-
+            _config = config;
         }
 
         [Authorize]
@@ -33,6 +35,14 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(new { error = ex.Message });
             }
+        }
+
+        [Authorize]
+        [HttpGet("conversion-table")]
+        public IActionResult GetConversionTable()
+        {
+            // Возвращаем таблицу конвертаций токенов из конфига
+            return Ok(_config.TokensPerCurrency);
         }
 
     }
