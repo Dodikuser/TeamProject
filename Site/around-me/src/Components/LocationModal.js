@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 import ReviewsModal from './ReviewsModal';
 import RatingModal from './RatingModal';
 import ReviewService from '../services/ReviewService';
+import HistoryService from '../services/HistoryService';
 
 const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -12,6 +13,23 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [reviewsError, setReviewsError] = useState(null);
   const [averageRating, setAverageRating] = useState(0);
+
+  // Защита от повторного запроса
+  const lastAddedRef = useRef();
+
+  useEffect(() => {
+    if (show && place?.id && lastAddedRef.current !== place.id) {
+      lastAddedRef.current = place.id;
+      const addToHistory = async () => {
+        try {
+          await HistoryService.addVisitHistoryItem(place.id);
+        } catch (historyError) {
+          console.warn('Failed to add place to visit history:', historyError);
+        }
+      };
+      addToHistory();
+    }
+  }, [show, place?.id]);
 
   const loadReviews = async () => {
     if (!place?.id) return;
