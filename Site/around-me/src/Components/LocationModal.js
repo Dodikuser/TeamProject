@@ -3,6 +3,7 @@ import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 import ReviewsModal from './ReviewsModal';
 import RatingModal from './RatingModal';
 import ReviewService from '../services/ReviewService';
+import GeoService from '../services/GeoService';
 
 const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -12,6 +13,8 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [reviewsError, setReviewsError] = useState(null);
   const [averageRating, setAverageRating] = useState(0);
+  const [showRouteIframe, setShowRouteIframe] = useState(false);
+  const [userCoords, setUserCoords] = useState(null);
 
   const loadReviews = async () => {
     if (!place?.id) return;
@@ -128,6 +131,19 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     console.log(place.images);
+  };
+
+  const getDirectionsUrl = (userLat, userLng, destLat, destLng) =>
+    `https://www.google.com/maps/embed/v1/directions?key=AIzaSyCUsLj0t6zzykl9q2CgjBCU-sXxyJnuv5s&origin=${userLat},${userLng}&destination=${destLat},${destLng}&mode=driving`;
+
+  const handleShowRoute = async () => {
+    try {
+      const pos = await GeoService.getCurrentPosition();
+      setUserCoords(pos);
+      setShowRouteIframe(true);
+    } catch (e) {
+      alert('Не удалось получить вашу геолокацию');
+    }
   };
 
   return (
@@ -288,90 +304,104 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
 
           <Modal.Body className="modal-body-scroll">
             <Container fluid>
-              <Row className="justify-content-center">
-                <Col xs={12} md={8} className="modal-main-image-wrapper">
-                  {images.length > 1 && (
-                    <>
-                      <button className="image-nav-button left" onClick={prevImage}>
-                        &#8592;
-                      </button>
-                      <button className="image-nav-button right" onClick={nextImage}>
-                        &#8594;
-                      </button>
-                    </>
-                  )}
-                  <img
-                    src={images[currentImageIndex]}
-                    alt={`${place.title} ${currentImageIndex + 1}`}
-                    className="modal-main-image"
-                  />
-                </Col>
-              </Row>
+              {showRouteIframe && userCoords ? (
+                <Row className="justify-content-center mb-3">
+                  <Col xs={12}>
+                    <iframe
+                      width="100%"
+                      height="400"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      allowFullScreen
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src={getDirectionsUrl(userCoords.lat, userCoords.lng, place.coordinates.lat, place.coordinates.lng)}
+                    />
+                    <Button className="mt-3" variant="outline-primary" onClick={() => setShowRouteIframe(false)}>
+                      Назад до карти
+                    </Button>
+                  </Col>
+                </Row>
+              ) : (
+                <>
+                  <Row className="justify-content-center">
+                    <Col xs={12} md={8} className="modal-main-image-wrapper">
+                      {images.length > 1 && (
+                        <>
+                          <button className="image-nav-button left" onClick={prevImage}>
+                            &#8592;
+                          </button>
+                          <button className="image-nav-button right" onClick={nextImage}>
+                            &#8594;
+                          </button>
+                        </>
+                      )}
+                      <img
+                        src={images[currentImageIndex]}
+                        alt={`${place.title} ${currentImageIndex + 1}`}
+                        className="modal-main-image"
+                      />
+                    </Col>
+                  </Row>
 
-              <Row>
-                <Col xs={12} md={5} className="modal-info">
-                  {place.location && (
-                    <div className="info-item">
-                      <span className="material-symbols-outlined">location_on</span>
-                      <span>{place.location}</span>
-                    </div>
-                  )}
-                  
-                  {(place.hours || (place.schedule && place.schedule.length > 0)) && (
-                    <ScheduleInfo hours={place.hours} schedule={place.schedule} />
-                  )}
-
-                  {place.phone && (
-                    <div className="info-item">
-                      <span className="material-symbols-outlined">call</span>
-                      <span>{place.phone}</span>
-                    </div>
-                  )}
-
-                  {place.email && (
-                    <div className="info-item">
-                      <span className="material-symbols-outlined">mail</span>
-                      <span>{place.email}</span>
-                    </div>
-                  )}
-
-                  {place.description && (
-                    <div className="info-item">
-                      <span className="material-symbols-outlined">info</span>
-                      <span>{place.description}</span>
-                    </div>
-                  )}
-                </Col>
-
-                <Col xs={12} md={7} className="d-flex flex-column justify-content-between">
-                  <div className="d-flex justify-content-center gap-4 mb-3">
-                    <div className="action-button" onClick={onBuildRoute} style={{cursor: 'pointer'}}>
-                      <span className="material-symbols-outlined">turn_right</span>
-                      <span>Маршрути</span>
-                    </div>
-                    <div className="action-button">
-                      <span className="material-symbols-outlined">favorite</span>
-                      <span>Зберегти</span>
-                    </div>
-                    <div className="action-button">
-                      <span className="material-symbols-outlined">share</span>
-                      <span>Поділитися</span>
-                    </div>
-                  </div>
-
-                  <div className="d-flex justify-content-center gap-3 flex-wrap">
-                    <button className="review-button" onClick={() => setShowRatingModal(true)}>
-                      <span className="material-symbols-outlined">add</span>
-                      Залишити відгук
-                    </button>
-
-                    <button className="review-button" onClick={() => setShowReviews(true)}>
-                      <span className="material-symbols-outlined">reviews</span>
-                      Переглянути відгуки
-                    </button>
-                  </div>
-                </Col>
-              </Row>
+                  <Row>
+                    <Col xs={12} md={5} className="modal-info">
+                      {place.location && (
+                        <div className="info-item">
+                          <span className="material-symbols-outlined">location_on</span>
+                          <span>{place.location}</span>
+                        </div>
+                      )}
+                      {(place.hours || (place.schedule && place.schedule.length > 0)) && (
+                        <ScheduleInfo hours={place.hours} schedule={place.schedule} />
+                      )}
+                      {place.phone && (
+                        <div className="info-item">
+                          <span className="material-symbols-outlined">call</span>
+                          <span>{place.phone}</span>
+                        </div>
+                      )}
+                      {place.email && (
+                        <div className="info-item">
+                          <span className="material-symbols-outlined">mail</span>
+                          <span>{place.email}</span>
+                        </div>
+                      )}
+                      {place.description && (
+                        <div className="info-item">
+                          <span className="material-symbols-outlined">info</span>
+                          <span>{place.description}</span>
+                        </div>
+                      )}
+                    </Col>
+                    <Col xs={12} md={7} className="d-flex flex-column justify-content-between">
+                      <div className="d-flex justify-content-center gap-4 mb-3">
+                        <div className="action-button" onClick={handleShowRoute} style={{cursor: 'pointer'}}>
+                          <span className="material-symbols-outlined">turn_right</span>
+                          <span>Маршрути</span>
+                        </div>
+                        <div className="action-button">
+                          <span className="material-symbols-outlined">favorite</span>
+                          <span>Зберегти</span>
+                        </div>
+                        <div className="action-button">
+                          <span className="material-symbols-outlined">share</span>
+                          <span>Поділитися</span>
+                        </div>
+                      </div>
+                      <div className="d-flex justify-content-center gap-3 flex-wrap">
+                        <button className="review-button" onClick={() => setShowRatingModal(true)}>
+                          <span className="material-symbols-outlined">add</span>
+                          Залишити відгук
+                        </button>
+                        <button className="review-button" onClick={() => setShowReviews(true)}>
+                          <span className="material-symbols-outlined">reviews</span>
+                          Переглянути відгуки
+                        </button>
+                      </div>
+                    </Col>
+                  </Row>
+                </>
+              )}
             </Container>
           </Modal.Body>
 

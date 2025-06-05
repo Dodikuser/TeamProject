@@ -14,7 +14,7 @@ class PlaceService extends BaseService {
         // Получаем src для фото: если есть photoId, используем /api/place/photo/{photoId}, иначе path
         const getPhotoSrc = (photo) => {
             if (photo?.id) {
-                return `/api/place/photo/${photo.id}`;
+                return `https://localhost:7103/api/place/photo/${photo.id}`;
             }
             return photo?.path || 'https://via.placeholder.com/300x180?text=No+Image';
         };
