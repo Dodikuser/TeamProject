@@ -36,15 +36,15 @@ namespace Application.Services
         {
             var hashtags = new List<string>();
 
-            if (hashTagIds != null && hashTagIds.Any())
-            {
-                foreach (var id in hashTagIds)
-                {
-                    var tagEntity = await _hashtagRepository.FindAsync(id);
-                    if (!string.IsNullOrWhiteSpace(tagEntity?.Tag))
-                        hashtags.Add(tagEntity.Tag.Trim());
-                }
-            }
+            //if (hashTagIds != null && hashTagIds.Any())
+            //{
+            //    foreach (var id in hashTagIds)
+            //    {
+            //        var tagEntity = await _hashtagRepository.FindAsync(id);
+            //        if (!string.IsNullOrWhiteSpace(tagEntity?.Tag))
+            //            hashtags.Add(tagEntity.Tag.Trim());
+            //    }
+            //}
 
             //return await SearchNearbyWithPromptAsync(
             //    userText: text,
@@ -67,11 +67,12 @@ namespace Application.Services
 
         public async Task<AiPlaceSearchDTO> AiPlaceRecommendation(ulong hashTagId, int radius, double longitude, double latitude, string Tag = "Цікаві місця")
         {
-            var tagEntity = await _hashtagRepository.FindAsync(hashTagId);
-            if (tagEntity == null || string.IsNullOrWhiteSpace(tagEntity.Prompt))
-                throw new ArgumentException("Hashtag or prompt not found");
+            var hashtags = new List<string>();
+            //var tagEntity = await _hashtagRepository.FindAsync(hashTagId);
+            //if (tagEntity == null || string.IsNullOrWhiteSpace(tagEntity.Prompt))
+            //    throw new ArgumentException("Hashtag or prompt not found");
 
-            var hashtags = new List<string> { tagEntity.Tag?.Trim() ?? "" };
+            //var hashtags = new List<string> { tagEntity.Tag?.Trim() ?? "" };
 
             // При рекомендации пользовательский текст пустой
             //return await SearchNearbyWithPromptAsync(
