@@ -17,10 +17,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.maps1.places.MyPlace;
+import com.example.maps1.utils.PlaceUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class PlaceDetailsActivity extends AppCompatActivity {
     private MyPlace place;
+    private TextView placeHours;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,8 @@ public class PlaceDetailsActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(this::handleNavigationItemSelected);
+
+        placeHours = findViewById(R.id.place_hours);
 
         place = getIntent().getParcelableExtra("place");
         if (place == null) {
@@ -83,6 +87,16 @@ public class PlaceDetailsActivity extends AppCompatActivity {
                         .into(imageView);
                 photosContainer.addView(imageView);
             }
+        }
+        // Завантаження часу
+        if (place.getId() != null) {
+            PlaceUtils.fetchPlaceHoursFromGoogle(this, place.getId(), hours -> {
+                placeHours.setText(hours);
+                // Оновлюємо об'єкт place, якщо потрібно
+                place.setHours(hours.replace("Години роботи:\n", "").replace("Години роботи: ", ""));
+            });
+        } else {
+            placeHours.setText("Години роботи: не вказано");
         }
 
         // Кнопка маршруту

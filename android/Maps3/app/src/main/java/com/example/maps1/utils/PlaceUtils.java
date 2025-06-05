@@ -1,11 +1,18 @@
 package com.example.maps1.utils;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.example.maps1.places.MyPlace;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class PlaceUtils {
@@ -60,6 +67,49 @@ public class PlaceUtils {
             } catch (Exception e) {
                 android.os.Handler mainHandler = new android.os.Handler(context.getMainLooper());
                 mainHandler.post(() -> Toast.makeText(context, "Помилка завантаження місця", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+    public static void fetchPlaceHoursFromGoogle(Context context, String placeId, Consumer<String> callback) {
+        // Робимо контекст фінальним для використання в лямбда-виразах
+        final Context finalContext = context;
+
+        new Thread(() -> {
+            try {
+                // Ініціалізуємо Places API, якщо ще не ініціалізовано
+                if (!Places.isInitialized()) {
+                    Places.initialize(finalContext, "AIzaSyAnE3sfsbwYmNEhxAq_XFelrA6_BznVymc");
+                }
+                PlacesClient placesClient = Places.createClient(finalContext);
+
+                // Вказуємо поля, які хочемо отримати
+                List<Place.Field> fields = Arrays.asList(
+                        Place.Field.OPENING_HOURS,
+                        Place.Field.UTC_OFFSET
+                );
+
+                FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, fields).build();
+
+                placesClient.fetchPlace(request).addOnSuccessListener(response -> {
+                    Place place = response.getPlace();
+                    String hoursInfo;
+
+                    if (place.getOpeningHours() != null) {
+                        hoursInfo = "Години роботи:\n" + TextUtils.join("\n", place.getOpeningHours().getWeekdayText());
+                    } else {
+                        hoursInfo = "Години роботи: не вказано";
+                    }
+
+                    // Повертаємо результат на головний потік
+                    android.os.Handler handler = new android.os.Handler(finalContext.getMainLooper());
+                    handler.post(() -> callback.accept(hoursInfo));
+                }).addOnFailureListener(e -> {
+                    android.os.Handler handler = new android.os.Handler(finalContext.getMainLooper());
+                    handler.post(() -> callback.accept("Години роботи: не вдалося завантажити"));
+                });
+            } catch (Exception e) {
+                android.os.Handler handler = new android.os.Handler(finalContext.getMainLooper());
+                handler.post(() -> callback.accept("Години роботи: помилка завантаження"));
             }
         }).start();
     }
