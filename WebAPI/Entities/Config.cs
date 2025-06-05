@@ -34,5 +34,8 @@
 
         public PayPalOptions PayPalOptions { get; set; }
         public Dictionary<string, decimal> TokensPerCurrency { get; set; } = new();
+
+        public int SearchPrice { get; set; }
+        public int RegistrationBonus { get; set; }
     }
 }

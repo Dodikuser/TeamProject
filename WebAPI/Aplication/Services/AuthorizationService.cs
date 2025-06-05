@@ -13,10 +13,12 @@ namespace Application.Services
     public class AuthorizationService
     {
         private readonly UserRepository _userRepository;
+        private readonly Config _config;
 
-        public AuthorizationService(UserRepository userRepository)
+        public AuthorizationService(UserRepository userRepository, Config config)
         {
             _userRepository = userRepository;
+            _config = config;
         }
 
         public async Task<RegisterStatus> Register(UserRegisterDTO loginData)
@@ -46,7 +48,8 @@ namespace Application.Services
                 PasswordHash = passwordHash,
                 CreatedAt = DateTime.Now,
                 SearchHistoryOn = true,
-                VisitHistoryOn = true
+                VisitHistoryOn = true,
+                TokensAvailable = _config.RegistrationBonus
             };
 
             await _userRepository.AddAsync(user);
@@ -80,7 +83,8 @@ namespace Application.Services
                 GoogleId = googleId,
                 CreatedAt = DateTime.Now,
                 SearchHistoryOn = true,
-                VisitHistoryOn = true
+                VisitHistoryOn = true,
+                TokensAvailable = _config.RegistrationBonus
             };
 
             await _userRepository.AddAsync(user);
@@ -103,7 +107,8 @@ namespace Application.Services
                 FacebookId = facebookId,
                 CreatedAt = DateTime.Now,
                 SearchHistoryOn = true,
-                VisitHistoryOn = true
+                VisitHistoryOn = true,
+                TokensAvailable = _config.RegistrationBonus
             };
 
             await _userRepository.AddAsync(user);
