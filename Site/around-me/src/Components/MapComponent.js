@@ -4,6 +4,7 @@ import GeoService from '../services/GeoService';
 import MapStateService from '../services/MapStateService';
 import PlaceService from '../services/PlaceService';
 import LocationModal from './LocationModal';
+import HistoryService from '../services/HistoryService';
 
 const mapContainerStyle = {
   width: '75%',

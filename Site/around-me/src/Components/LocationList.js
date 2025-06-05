@@ -5,6 +5,7 @@ import { Container } from 'react-bootstrap';
 import PlaceService from '../services/PlaceService';
 import { DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import GeoService from '../services/GeoService';
+import HistoryService from '../services/HistoryService';
 
 const sampleData = [
 

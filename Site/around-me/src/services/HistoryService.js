@@ -17,6 +17,22 @@ class HistoryService extends BaseService {
     }
 
     /**
+     * Добавление места в историю посещений
+     * @param {string} gmapsPlaceId - ID места из Google Maps
+     * @returns {Promise<void>}
+     */
+    async addVisitHistoryItem(gmapsPlaceId) {
+        const placeHistoryDTO = {
+            gmapsPlaceId,
+            isFromRecs: false
+        };
+        return this.makeRequest('/history/places/action?historyAction=Add', {
+            method: 'POST',
+            body: JSON.stringify(placeHistoryDTO)
+        });
+    }
+
+    /**
      * Получение истории поиска
      * @param {Object} params
      * @param {number} [params.skip=0]
