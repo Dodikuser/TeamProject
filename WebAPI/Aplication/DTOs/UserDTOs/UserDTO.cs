@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Entities.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.DTOs
 {
@@ -11,5 +12,8 @@ namespace Application.DTOs
         public DateTime CreatedAt { get; set; }
         public bool SearchHistoryOn { get; set; }
         public bool VisitHistoryOn { get; set; }
+        public int TokensAvailable { get; set; }
+
+
     }
 }

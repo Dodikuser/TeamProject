@@ -25,6 +25,7 @@ namespace Application.Services
                     CreatedAt = user.CreatedAt,
                     SearchHistoryOn = user.SearchHistoryOn,
                     VisitHistoryOn = user.VisitHistoryOn,
+                    TokensAvailable = user.TokensAvailable
                 };
             return null;
         }
