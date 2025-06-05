@@ -130,5 +130,11 @@
             android:text="@string/login"
             style="@style/Widget.MaterialComponents.Button"/>
 
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/btnGoogleSignIn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
     </LinearLayout>
 </ScrollView>

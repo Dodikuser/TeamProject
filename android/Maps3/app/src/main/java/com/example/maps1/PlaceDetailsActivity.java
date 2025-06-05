@@ -107,7 +107,8 @@ public class PlaceDetailsActivity extends AppCompatActivity {
             intent.putExtra("place_name", place.getName());
             intent.putExtra("place_rating", place.getRating());
             intent.putExtra("reviews_count", 267); // можеш замінити на динамічне значення
-            intent.putExtra("place_id", place.getId());
+            intent.putExtra("place_id", place.getId()); // place_id для PlaceId (ulong)
+            intent.putExtra("gmap_id", place.getId()); // gmap_id для GmapId (string)
             startActivity(intent);
         });
 

@@ -202,39 +202,61 @@
                     android:layout_alignParentStart="true">
 
                     <TextView
-                        android:id="@+id/reviewTitle1"
+                        android:id="@+id/reviewPlaceName1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Назва місця"
-                        android:textSize="18sp"
+                        android:textSize="16sp"
                         android:textColor="#000000"
                         android:textStyle="bold"/>
 
                     <TextView
+                        android:id="@+id/reviewDateTime1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Адреса: вулиця Академіка Павлова, 446, Харків"
-                        android:textSize="14sp"
+                        android:text="Дата та час"
+                        android:textSize="12sp"
                         android:textColor="#808080"
-                        android:layout_marginTop="4dp"/>
-
-                    <RatingBar
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:numStars="5"
-                        android:rating="4"
-                        android:stepSize="1"
-                        android:isIndicator="true"
-                        android:layout_marginTop="8dp"
-                        style="@style/Widget.AppCompat.RatingBar.Small"/>
+                        android:layout_marginTop="2dp"/>
 
                     <TextView
+                        android:id="@+id/reviewText1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Коментар: Дуже гарне місце, рекомендую!"
+                        android:text="Текст відгуку"
                         android:textSize="14sp"
                         android:textColor="#000000"
                         android:layout_marginTop="8dp"/>
+
+                    <TextView
+                        android:id="@+id/reviewAddress1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Адреса"
+                        android:textSize="13sp"
+                        android:textColor="#808080"
+                        android:layout_marginTop="4dp"/>
+
+                    <TextView
+                        android:id="@+id/reviewRating1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Рейтинг: 5.0"
+                        android:textSize="13sp"
+                        android:textColor="#626FC2"
+                        android:layout_marginTop="4dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/goToPlaceButton1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Перейти на місце"
+                        android:textSize="12sp"
+                        android:textColor="#FFFFFF"
+                        app:backgroundTint="#626FC2"
+                        android:layout_marginTop="8dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#626FC2"/>
                 </LinearLayout>
             </RelativeLayout>
 
@@ -269,31 +291,61 @@
                     android:layout_alignParentStart="true">
 
                     <TextView
-                        android:id="@+id/reviewTitle2"
+                        android:id="@+id/reviewPlaceName2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Кафе 'Львівські пляцки'"
-                        android:textSize="18sp"
+                        android:text="Назва місця"
+                        android:textSize="16sp"
                         android:textColor="#000000"
                         android:textStyle="bold"/>
 
                     <TextView
+                        android:id="@+id/reviewDateTime2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Адреса: вул. Сумська, 10, Харків"
+                        android:text="Дата та час"
+                        android:textSize="12sp"
+                        android:textColor="#808080"
+                        android:layout_marginTop="2dp"/>
+
+                    <TextView
+                        android:id="@+id/reviewText2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Текст відгуку"
                         android:textSize="14sp"
+                        android:textColor="#000000"
+                        android:layout_marginTop="8dp"/>
+
+                    <TextView
+                        android:id="@+id/reviewAddress2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Адреса"
+                        android:textSize="13sp"
                         android:textColor="#808080"
                         android:layout_marginTop="4dp"/>
 
-                    <RatingBar
+                    <TextView
+                        android:id="@+id/reviewRating2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:numStars="5"
-                        android:rating="5"
-                        android:stepSize="1"
-                        android:isIndicator="true"
+                        android:text="Рейтинг: 5.0"
+                        android:textSize="13sp"
+                        android:textColor="#626FC2"
+                        android:layout_marginTop="4dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/goToPlaceButton2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Перейти на місце"
+                        android:textSize="12sp"
+                        android:textColor="#FFFFFF"
+                        app:backgroundTint="#626FC2"
                         android:layout_marginTop="8dp"
-                        style="@style/Widget.AppCompat.RatingBar.Small"/>
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#626FC2"/>
                 </LinearLayout>
             </RelativeLayout>
         </LinearLayout>

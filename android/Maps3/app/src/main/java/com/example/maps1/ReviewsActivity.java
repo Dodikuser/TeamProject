@@ -40,6 +40,7 @@ public class ReviewsActivity extends AppCompatActivity {
         double rating = getIntent().getDoubleExtra("place_rating", 3.5);
         int reviewsCount = getIntent().getIntExtra("reviews_count", 267);
         String placeId = getIntent().getStringExtra("place_id");
+        String gmapId = getIntent().getStringExtra("gmap_id");
 
         // Ініціалізуємо елементи UI (змінений тип для btnBack)
         ImageButton btnBack = findViewById(R.id.btn_back); // Тепер ImageButton
@@ -80,6 +81,8 @@ public class ReviewsActivity extends AppCompatActivity {
         btnAddReview.setOnClickListener(v -> {
             Intent intent = new Intent(ReviewsActivity.this, CreateReviewActivity.class);
             intent.putExtra("place_name", placeName);
+            intent.putExtra("place_id", placeId);
+            intent.putExtra("gmap_id", gmapId);
             startActivity(intent);
         });
     }

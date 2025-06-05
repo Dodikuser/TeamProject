@@ -33,6 +33,10 @@ public class MainAccount extends Fragment {
 
     private SharedPreferences prefs;
     private TextView nameText, emailText, registrationDate;
+    // Элементы для отзывов
+    private TextView reviewPlaceName1, reviewDateTime1, reviewText1, reviewAddress1, reviewRating1;
+    private TextView reviewPlaceName2, reviewDateTime2, reviewText2, reviewAddress2, reviewRating2;
+    private Button goToPlaceButton1, goToPlaceButton2;
 
     @Nullable
     @Override
@@ -48,8 +52,25 @@ public class MainAccount extends Fragment {
         registrationDate = view.findViewById(R.id.registrationDate);
         ImageView profileIcon = view.findViewById(R.id.profileIcon);
 
+        // Инициализация элементов отзывов
+        reviewPlaceName1 = view.findViewById(R.id.reviewPlaceName1);
+        reviewDateTime1 = view.findViewById(R.id.reviewDateTime1);
+        reviewText1 = view.findViewById(R.id.reviewText1);
+        reviewAddress1 = view.findViewById(R.id.reviewAddress1);
+        reviewRating1 = view.findViewById(R.id.reviewRating1);
+        goToPlaceButton1 = view.findViewById(R.id.goToPlaceButton1);
+
+        reviewPlaceName2 = view.findViewById(R.id.reviewPlaceName2);
+        reviewDateTime2 = view.findViewById(R.id.reviewDateTime2);
+        reviewText2 = view.findViewById(R.id.reviewText2);
+        reviewAddress2 = view.findViewById(R.id.reviewAddress2);
+        reviewRating2 = view.findViewById(R.id.reviewRating2);
+        goToPlaceButton2 = view.findViewById(R.id.goToPlaceButton2);
+
         // Загрузка данных профиля с сервера
         loadProfileData();
+        // Загрузка отзывов пользователя
+        loadUserReviews();
 
         Button editButton = view.findViewById(R.id.editButton);
         editButton.setOnClickListener(v -> showEditProfileDialog());
@@ -57,18 +78,7 @@ public class MainAccount extends Fragment {
         Button logoutButton = view.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(v -> logout());
 
-        // Обробник кнопки "Перейти" для відгуків
-        view.findViewById(R.id.goButton1).setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
-            intent.putExtra("place_name", getString(R.string.place_name_example_1));
-            startActivity(intent);
-        });
-
-        view.findViewById(R.id.goButton2).setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
-            intent.putExtra("place_name", getString(R.string.place_name_example_2));
-            startActivity(intent);
-        });
+        // Обработчики кнопок "Перейти" будут обновлены после загрузки отзывов
 
         return view;
     }
@@ -131,6 +141,144 @@ public class MainAccount extends Fragment {
         }).start();
     }
 
+    private void loadUserReviews() {
+        new Thread(() -> {
+            try {
+                javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[]{
+                        new javax.net.ssl.X509TrustManager() {
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() { return new java.security.cert.X509Certificate[0]; }
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                        }
+                };
+                javax.net.ssl.SSLContext sc = javax.net.ssl.SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+
+                java.net.URL url = new java.net.URL("https://10.0.2.2:7103/api/Review/get-by-user?skip=0&take=10");
+                javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                String token = prefs.getString("auth_token", null);
+                if (token != null) {
+                    conn.setRequestProperty("Authorization", "Bearer " + token);
+                }
+                int responseCode = conn.getResponseCode();
+                if (responseCode == 200) {
+                    java.io.InputStream is = conn.getInputStream();
+                    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+                    String json = s.hasNext() ? s.next() : "";
+
+                    com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(json).getAsJsonObject();
+                    com.google.gson.JsonArray values = root.getAsJsonArray("$values");
+                    java.lang.reflect.Type listType = new com.google.gson.reflect.TypeToken<java.util.ArrayList<ReviewDTO>>(){}.getType();
+                    java.util.ArrayList<ReviewDTO> reviews = new com.google.gson.Gson().fromJson(values, listType);
+
+                    requireActivity().runOnUiThread(() -> {
+                        if (reviews != null && reviews.size() > 0) {
+                            ReviewDTO r1 = reviews.get(0);
+                            reviewDateTime1.setText(r1.reviewDateTime != null ? r1.reviewDateTime.replace("T", " ").substring(0, 16) : "");
+                            reviewText1.setText(r1.text != null ? r1.text : "");
+                            loadPlaceInfoAndBind(r1.gmapId, reviewPlaceName1, reviewAddress1, reviewRating1, goToPlaceButton1, r1.placeId);
+                        } else {
+                            reviewDateTime1.setText("");
+                            reviewText1.setText("Відгуків не знайдено");
+                            reviewPlaceName1.setText("");
+                            reviewAddress1.setText("");
+                            reviewRating1.setText("");
+                        }
+                        if (reviews != null && reviews.size() > 1) {
+                            ReviewDTO r2 = reviews.get(1);
+                            reviewDateTime2.setText(r2.reviewDateTime != null ? r2.reviewDateTime.replace("T", " ").substring(0, 16) : "");
+                            reviewText2.setText(r2.text != null ? r2.text : "");
+                            loadPlaceInfoAndBind(r2.gmapId, reviewPlaceName2, reviewAddress2, reviewRating2, goToPlaceButton2, r2.placeId);
+                        } else {
+                            reviewDateTime2.setText("");
+                            reviewText2.setText("");
+                            reviewPlaceName2.setText("");
+                            reviewAddress2.setText("");
+                            reviewRating2.setText("");
+                        }
+                    });
+                } else {
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(getContext(), "Ошибка загрузки отзывов: " + responseCode, Toast.LENGTH_SHORT).show()
+                    );
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getContext(), "Ошибка подключения: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                );
+            }
+        }).start();
+    }
+
+    // Загружает инфо о месте и заполняет поля карточки
+    private void loadPlaceInfoAndBind(String gmapId, TextView nameView, TextView addressView, TextView ratingView, Button goButton, int placeId) {
+        new Thread(() -> {
+            try {
+                javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[]{
+                        new javax.net.ssl.X509TrustManager() {
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() { return new java.security.cert.X509Certificate[0]; }
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                        }
+                };
+                javax.net.ssl.SSLContext sc = javax.net.ssl.SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+
+                String urlStr = "https://10.0.2.2:7103/api/Place/info/?placeId=" + gmapId;
+                java.net.URL url = new java.net.URL(urlStr);
+                javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                String token = prefs.getString("auth_token", null);
+                if (token != null) {
+                    conn.setRequestProperty("Authorization", "Bearer " + token);
+                }
+                int responseCode = conn.getResponseCode();
+                if (responseCode == 200) {
+                    java.io.InputStream is = conn.getInputStream();
+                    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+                    String json = s.hasNext() ? s.next() : "";
+                    com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(json).getAsJsonObject();
+                    com.google.gson.JsonObject placeInfo = root.getAsJsonObject("placeInfo");
+                    String name = placeInfo.has("name") ? placeInfo.get("name").getAsString() : "";
+                    String address = placeInfo.has("address") ? placeInfo.get("address").getAsString() : "";
+                    double stars = placeInfo.has("stars") ? placeInfo.get("stars").getAsDouble() : 0.0;
+                    requireActivity().runOnUiThread(() -> {
+                        nameView.setText(name);
+                        addressView.setText(address);
+                        ratingView.setText("Рейтинг: " + stars);
+                        goButton.setOnClickListener(v -> {
+                            Intent intent = new Intent(getActivity(), com.example.maps1.PlaceDetailsActivity.class);
+                            intent.putExtra("place_id", placeId);
+                            startActivity(intent);
+                        });
+                    });
+                } else {
+                    requireActivity().runOnUiThread(() -> {
+                        nameView.setText("");
+                        addressView.setText("");
+                        ratingView.setText("");
+                    });
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                requireActivity().runOnUiThread(() -> {
+                    nameView.setText("");
+                    addressView.setText("");
+                    ratingView.setText("");
+                });
+            }
+        }).start();
+    }
 
     private void showEditProfileDialog() {
         EditProfileDialogFragment dialog = new EditProfileDialogFragment();
@@ -165,5 +313,20 @@ public class MainAccount extends Fragment {
         public String createdAt;
         public boolean searchHistoryOn;
         public boolean visitHistoryOn;
+    }
+    // DTO для отзыва
+    public static class ReviewDTO {
+        public String text;
+        public int stars;
+        public String reviewDateTime;
+        public String gmapId;
+        public int placeId;
+        public int userId;
+        public String userName;
+        public PhotoDTO photo;
+    }
+    public static class PhotoDTO {
+        public String path;
+        public int placeId;
     }
 }
