@@ -37,7 +37,6 @@ namespace WebAPI.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet("conversion-table")]
         public IActionResult GetConversionTable()
         {

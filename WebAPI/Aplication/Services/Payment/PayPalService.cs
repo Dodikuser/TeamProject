@@ -16,16 +16,20 @@ namespace Application.Services.Payment
         private readonly MyDbContext _dbContext;
         private readonly Config _config;
         private readonly PayPalHttpClient _client;
+        private readonly HttpClient _httpClient;
 
-        public PayPalService(MyDbContext dbContext, Config config)
+        public PayPalService(HttpClient httpClient, MyDbContext dbContext, Config config)
         {
-            _dbContext = dbContext;
-            _config = config;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
-            PayPalEnvironment environment = config.PayPalOptions.UseSandbox
-                ? new SandboxEnvironment(config.PayPalOptions.ClientId, config.PayPalOptions.Secret)
-                : new LiveEnvironment(config.PayPalOptions.ClientId, config.PayPalOptions.Secret);
+            if (_config.PayPalOptions == null)
+                throw new InvalidOperationException("PayPalOptions configuration is missing");
 
+            PayPalEnvironment environment = _config.PayPalOptions.UseSandbox
+                ? new SandboxEnvironment(_config.PayPalOptions.ClientId, _config.PayPalOptions.Secret)
+                : new LiveEnvironment(_config.PayPalOptions.ClientId, _config.PayPalOptions.Secret);
 
             _client = new PayPalHttpClient(environment);
         }
