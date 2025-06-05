@@ -13,7 +13,7 @@ class RecommendationService extends BaseService {
      */
     async getRecommendations({ 
         hashTagId = 1, 
-        radius = 1000, 
+        radius = 100, 
         latitude = 47.81052, 
         longitude = 35.18286,
         tag = 'Туризм'

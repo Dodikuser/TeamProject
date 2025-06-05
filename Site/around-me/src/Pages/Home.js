@@ -139,9 +139,15 @@ function Home() {
             if (placeLat && placeLng) {
               distance = `${getDistance(latitude, longitude, placeLat, placeLng).toFixed(1)} км`;
             }
+            const getPhotoSrc = (photo) => {
+              if (photo?.id) {
+                  return `https://localhost:7103/api/place/photo/${photo.id}`;
+              }
+              return photo?.path || 'https://cdn-icons-png.flaticon.com/512/2966/2966959.png';
+          };
             return {
               id: item.gmapsPlaceId || item.id,
-              image: item.photo?.path || item.photos?.[0]?.path || 'https://cdn-icons-png.flaticon.com/512/2966/2966959.png',
+              image: getPhotoSrc(item.photo) || getPhotoSrc(item.photos?.[0]),
               title: item.title || item.name || 'Без назви',
               locationText: item.location || item.address || 'Місцезнаходження невідоме',
               rating: item.rating || item.stars || 0,

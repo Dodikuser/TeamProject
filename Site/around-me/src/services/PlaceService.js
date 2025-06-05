@@ -10,10 +10,11 @@ class PlaceService extends BaseService {
      */
     transformPlaceData(placeData) {
         const photoValues = placeData.photos?.$values || [];
+        console.error("!!!PHOTO VALUES!!!", photoValues);
         // Получаем src для фото: если есть photoId, используем /api/place/photo/{photoId}, иначе path
         const getPhotoSrc = (photo) => {
-            if (photo?.photoId) {
-                return `/api/place/photo/${photo.photoId}`;
+            if (photo?.id) {
+                return `/api/place/photo/${photo.id}`;
             }
             return photo?.path || 'https://via.placeholder.com/300x180?text=No+Image';
         };
