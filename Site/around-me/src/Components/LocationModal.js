@@ -3,12 +3,14 @@ import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 import ReviewsModal from './ReviewsModal';
 import RatingModal from './RatingModal';
 import ReviewService from '../services/ReviewService';
+import { useTranslation } from 'react-i18next';
 
 import GeoService from '../services/GeoService';
 import HistoryService from '../services/HistoryService';
 
 
 const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
+  const { t } = useTranslation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
@@ -81,13 +83,13 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
 
     // Пример расписания, если не передано
     const workSchedule = schedule || [
-      { day: 'Понеділок', hours: '09:00 - 21:00' },
-      { day: 'Вівторок', hours: '09:00 - 21:00' },
-      { day: 'Середа', hours: '09:00 - 21:00' },
-      { day: 'Четвер', hours: '09:00 - 21:00' },
-      { day: 'Пʼятниця', hours: '09:00 - 21:00' },
-      { day: 'Субота', hours: '10:00 - 20:00' },
-      { day: 'Неділя', hours: 'Вихідний' },
+      { day: t('monday'), hours: '09:00 - 21:00' },
+      { day: t('tuesday'), hours: '09:00 - 21:00' },
+      { day: t('wednesday'), hours: '09:00 - 21:00' },
+      { day: t('thursday'), hours: '09:00 - 21:00' },
+      { day: t('friday'), hours: '09:00 - 21:00' },
+      { day: t('saturday'), hours: '10:00 - 20:00' },
+      { day: t('sunday'), hours: t('day_off') },
     ];
 
     return (
@@ -337,7 +339,7 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
                       src={getDirectionsUrl(userCoords.lat, userCoords.lng, place.coordinates.lat, place.coordinates.lng)}
                     />
                     <Button className="mt-3" variant="outline-primary" onClick={() => setShowRouteIframe(false)}>
-                      Назад до карти
+                      {t('back_to_map')}
                     </Button>
                   </Col>
                 </Row>
@@ -397,25 +399,25 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
                       <div className="d-flex justify-content-center gap-4 mb-3">
                         <div className="action-button" onClick={handleShowRoute} style={{cursor: 'pointer'}}>
                           <span className="material-symbols-outlined">turn_right</span>
-                          <span>Маршрути</span>
+                          <span>{t('routes')}</span>
                         </div>
                         <div className="action-button">
                           <span className="material-symbols-outlined">favorite</span>
-                          <span>Зберегти</span>
+                          <span>{t('save')}</span>
                         </div>
                         <div className="action-button">
                           <span className="material-symbols-outlined">share</span>
-                          <span>Поділитися</span>
+                          <span>{t('share')}</span>
                         </div>
                       </div>
                       <div className="d-flex justify-content-center gap-3 flex-wrap">
                         <button className="review-button" onClick={() => setShowRatingModal(true)}>
                           <span className="material-symbols-outlined">add</span>
-                          Залишити відгук
+                          {t('leave_review')}
                         </button>
                         <button className="review-button" onClick={() => setShowReviews(true)}>
                           <span className="material-symbols-outlined">reviews</span>
-                          Переглянути відгуки
+                          {t('view_reviews')}
                         </button>
                       </div>
                     </Col>
@@ -427,7 +429,7 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
 
           <Modal.Footer className="modal-footer-fixed">
             <Button variant="secondary" onClick={onHide}>
-              Закрити
+              {t('close')}
             </Button>
           </Modal.Footer>
         </div>

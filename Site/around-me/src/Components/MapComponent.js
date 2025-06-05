@@ -7,10 +7,10 @@ import LocationModal from './LocationModal';
 import HistoryService from '../services/HistoryService';
 
 const mapContainerStyle = {
-  width: '75%',
+  width: '70%',
   height: '100vh',
   position: 'absolute',
-  left: '25%',
+  left: '30%',
   top: 0,
 };
 

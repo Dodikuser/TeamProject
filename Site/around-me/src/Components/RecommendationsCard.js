@@ -1,6 +1,7 @@
 // src/Components/RecommendationsCard.js
 import React, { useState } from 'react';
 import { Card, Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 export default function RecommendationsCard({
   id,
@@ -14,6 +15,7 @@ export default function RecommendationsCard({
   onGoTo
 }) {
   const [animating, setAnimating] = useState(false);
+  const { t } = useTranslation();
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -94,7 +96,7 @@ export default function RecommendationsCard({
             className="custom-animated-button"
             onClick={onGoTo}
           >
-            Перейти
+            {t('go_to')}
           </Button>
         </div>
       </Card.Body>

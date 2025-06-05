@@ -1,6 +1,7 @@
 // Components/MyPlaceCard.js
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 const MyPlaceCard = ({
   image,
@@ -11,6 +12,7 @@ const MyPlaceCard = ({
   onDelete,
   onGoTo,
 }) => {
+  const { t } = useTranslation();
   return (
     <Card className="shadow-sm border-0 h-100 rounded-3">
       <Card.Img
@@ -32,7 +34,7 @@ const MyPlaceCard = ({
          <span
             className="material-symbols-outlined text-muted"
             role="button"
-            title="Видалити"
+            title={t('delete')}
             onClick={(e) => {
                 e.stopPropagation(); 
                 onDelete();
@@ -65,7 +67,7 @@ const MyPlaceCard = ({
   }}
   className="custom-animated-button"
 >
-  Перейти
+  {t('go_to')}
 </Button>
 
 

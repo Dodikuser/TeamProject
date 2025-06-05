@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Dropdown } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 export default function NotificationsMenu() {
   const [show, setShow] = useState(false);
   const [animate, setAnimate] = useState(false);
   const toggleRef = useRef(null);
+  const { t } = useTranslation();
 
   
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function NotificationsMenu() {
             zIndex: 1050,
           }}
         >
-          <Dropdown.Header>Повідомлення</Dropdown.Header>
+          <Dropdown.Header>{t('notifications')}</Dropdown.Header>
           <div
             className="mx-2 my-2"
             style={{
@@ -53,7 +55,7 @@ export default function NotificationsMenu() {
             }}
           />
           <div className="text-center text-muted py-3">
-            Поки немає нових повідомлень
+            {t('no_new_notifications')}
           </div>
         </Dropdown.Menu>
       </Dropdown>

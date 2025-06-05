@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 import FilterOffcanvas from '../Components/FilterOffcanvas';
 import SortOffcanvas from '../Components/SortOffcanvas';
@@ -7,6 +8,7 @@ import MyPlaceCard from '../Components/MyPlaceCard';
 import AddPlaceModal from '../Components/AddPlaceModal';
 
 const MyPlaces = () => {
+  const { t } = useTranslation();
   const [places, setPlaces] = useState([
     {
       title: 'Кавʼярня Aroma',
@@ -95,7 +97,7 @@ const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   return (
     <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', minHeight: '100vh' }}>
-      <h2 style={{ fontFamily: "'Righteous', sans-serif" }} className="mb-4">Мої заклади</h2>
+      <h2 style={{ fontFamily: "'Righteous', sans-serif" }} className="mb-4">{t('my_places')}</h2>
 
       {/* Панель пошуку, фільтрів, сортування */}
       <div className="bg-white p-3 rounded-3 shadow-sm d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -108,7 +110,7 @@ const [showConfirmModal, setShowConfirmModal] = useState(false);
       <span className="material-symbols-outlined" style={{ lineHeight: '1.2', fontSize: '20px' }}>
         filter_list
       </span>
-      <span>Фільтри</span>
+      <span>{t('filters')}</span>
     </Button>
     <Button
       variant="outline-secondary"
@@ -118,14 +120,14 @@ const [showConfirmModal, setShowConfirmModal] = useState(false);
       <span className="material-symbols-outlined" style={{ lineHeight: '1.2', fontSize: '20px' }}>
         sort
       </span>
-      <span>Сортувати</span>
+      <span>{t('sort')}</span>
     </Button>
   </div>
 
   <div className="position-relative flex-grow-1" style={{ maxWidth: '500px', minWidth: '250px' }}>
     <Form.Control
       type="search"
-      placeholder="Пошук"
+      placeholder={t('search')}
       className="ps-3 pe-5"
       value={searchTerm}
       onChange={e => setSearchTerm(e.target.value)}
@@ -142,7 +144,7 @@ const [showConfirmModal, setShowConfirmModal] = useState(false);
 
       {/* Список місць */}
       {filteredPlaces.length === 0 ? (
-        <div className="text-center text-muted py-5">Немає закладів.</div>
+        <div className="text-center text-muted py-5">{t('no_places')}</div>
       ) : (
         <Row>
           {filteredPlaces.map((place, idx) => (
@@ -180,10 +182,10 @@ const [showConfirmModal, setShowConfirmModal] = useState(false);
 
       <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
   <Modal.Body className="text-center py-4">
-    <p className="fs-5 mb-4">Ви дійсно хочете видалити місце?</p>
+    <p className="fs-5 mb-4">{t('confirm_delete_place')}</p>
     <div className="d-flex justify-content-center gap-3">
       <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
-        Скасувати
+        {t('cancel')}
       </Button>
       <Button
         variant="danger"
@@ -195,7 +197,7 @@ const [showConfirmModal, setShowConfirmModal] = useState(false);
           }
         }}
       >
-        Так, видалити
+        {t('yes_delete')}
       </Button>
     </div>
   </Modal.Body>

@@ -10,9 +10,11 @@ import LocationCard from '../Components/LocationCard';
 import GeoService from '../services/GeoService';
 import MapStateService from '../services/MapStateService';
 import HistoryService from '../services/HistoryService';
+import { useTranslation } from 'react-i18next';
 
 
 function Home() {
+  const { t, i18n } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -209,10 +211,10 @@ function Home() {
         <Form className="d-flex justify-content-start w-100 px-2">
           <div
             className="position-relative w-100"
-            style={{ maxWidth: '20%' }}
+            style={{ maxWidth: '25%' }}
           >
             <FormControl
-              placeholder="Запит"
+              placeholder={t('search_query_placeholder')}
               className="bg-light border-0 rounded px-3 py-3"
               style={{ height: '80px', paddingRight: '45px' }}
               value={searchQuery}
@@ -227,7 +229,7 @@ function Home() {
                 color: '#6c757d',
                 cursor: 'pointer',
               }}
-              title="Мікрофон (не активний)"
+              title={t('mic_not_active')}
             >
               mic
             </span>
@@ -242,7 +244,7 @@ function Home() {
               onClick={() => setShowFilters(true)}
             >
               <span className="material-symbols-outlined">filter_list</span>
-              Фільтри
+              {t('filters')}
             </button>
           </Col>
           <Col xs="auto">
@@ -252,7 +254,7 @@ function Home() {
               onClick={() => setShowSort(true)}
             >
               <span className="material-symbols-outlined">sort</span>
-              Сортувати
+              {t('sort')}
             </button>
           </Col>
         </Row>
@@ -263,7 +265,7 @@ function Home() {
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem',
-            maxHeight: '70vh',
+            maxHeight: '56vh',
             overflowY: 'auto',
             overflowX: 'hidden',
             marginTop: '1rem'
@@ -272,7 +274,7 @@ function Home() {
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Завантаження...</span>
+                <span className="visually-hidden">{t('loading')}</span>
               </div>
             </div>
           ) : error ? (
@@ -281,7 +283,7 @@ function Home() {
             </div>
           ) : searchResults.length > 0 ? (
             searchResults.map((place) => (
-              <div key={place.id} style={{ width: '100%', maxWidth: '23%' }}>
+              <div key={place.id} style={{ width: '100%', maxWidth: '28%' }}>
                 <LocationCard
                   image={place.image}
                   title={place.title}
@@ -296,7 +298,7 @@ function Home() {
             ))
           ) : searchQuery && !loading ? (
             <div className="text-center py-5 text-muted">
-              За вашим запитом нічого не знайдено
+              {t('no_results')}
             </div>
           ) : null}
         </div>

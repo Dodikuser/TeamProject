@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form, Modal, Spinner, Alert } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 import FilterOffcanvas from '../Components/FilterOffcanvas';
 import SortOffcanvas from '../Components/SortOffcanvas';
@@ -9,6 +10,7 @@ import FavoriteService from '../services/FavoriteService';
 
 
 export default function Favorites() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [showFilters, setShowFilters] = useState(false);
@@ -162,7 +164,7 @@ export default function Favorites() {
         <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '50vh' }}>
           <div className="text-center">
             <Spinner animation="border" variant="primary" />
-            <p className="mt-3 text-muted">Завантаження улюблених місць...</p>
+            <p className="mt-3 text-muted">{t('loading_favorites')}</p>
           </div>
         </div>
       </Container>
@@ -175,10 +177,10 @@ export default function Favorites() {
         <Row className="mb-3">
           <Col xs={12}>
             <Alert variant="danger" dismissible onClose={() => setError(null)}>
-              <Alert.Heading>Помилка</Alert.Heading>
+              <Alert.Heading>{t('error')}</Alert.Heading>
               <p>{error}</p>
               <Button variant="outline-danger" size="sm" onClick={refreshFavorites}>
-                Спробувати знову
+                {t('try_again')}
               </Button>
             </Alert>
           </Col>
@@ -194,14 +196,14 @@ export default function Favorites() {
                 className="d-flex align-items-center gap-2"
                 onClick={() => setShowFilters(true)}
               >
-                <span className="material-symbols-outlined">filter_list</span> Фільтри
+                <span className="material-symbols-outlined">filter_list</span> {t('filters')}
               </Button>
               <Button
                 variant="outline-secondary"
                 className="d-flex align-items-center gap-2"
                 onClick={() => setShowSort(true)}
               >
-                <span className="material-symbols-outlined">sort</span> Сортувати
+                <span className="material-symbols-outlined">sort</span> {t('sort')}
               </Button>
               <Button
                 variant="outline-primary"
@@ -210,14 +212,14 @@ export default function Favorites() {
                 disabled={loading}
               >
                 <span className="material-symbols-outlined">refresh</span> 
-                {loading ? 'Оновлення...' : 'Оновити'}
+                {loading ? t('updating') + '...' : t('update')}
               </Button>
             </div>
 
             <div className="position-relative" style={{ width: '100%', maxWidth: '500px' }}>
               <Form.Control
                 type="search"
-                placeholder="Пошук"
+                placeholder={t('search')}
                 className="ps-3 pe-5"
                 style={{ borderRadius: '8px' }}
                 value={searchTerm}  
@@ -238,7 +240,7 @@ export default function Favorites() {
 
         {sortedAndFilteredPlaces.length === 0 && !loading ? (
           <Col xs={12} className="text-center py-5 text-muted fs-6">
-            {searchTerm ? 'Нічого не знайдено за вашим запитом' : 'Улюблених поки немає'}
+            {searchTerm ? t('nothing_found_for_query') : t('no_favorites_yet')}
           </Col>
         ) : (
           sortedAndFilteredPlaces.map((place, idx) => (
@@ -267,10 +269,10 @@ export default function Favorites() {
               {loading ? (
                 <>
                   <Spinner size="sm" className="me-2" />
-                  Завантаження...
+                  {t('loading')}...
                 </>
               ) : (
-                'Завантажити більше'
+                t('load_more')
               )}
             </Button>
           </Col>
@@ -288,13 +290,13 @@ export default function Favorites() {
 
       <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
         <Modal.Body className="text-center py-4">
-          <p className="fs-5 mb-4">Ви дійсно хочете видалити улюблене?</p>
+          <p className="fs-5 mb-4">{t('confirm_delete_favorite')}</p>
           <div className="d-flex justify-content-center gap-3">
             <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>
-              Скасувати
+              {t('cancel')}
             </Button>
             <Button variant="danger" onClick={confirmDelete}>
-              Так, видалити
+              {t('yes_delete')}
             </Button>
           </div>
         </Modal.Body>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 import StatisticsModal from './StatisticsModal';
 
@@ -7,6 +8,7 @@ import StatisticsModal from './StatisticsModal';
 
 const AddPlaceModal = ({ show, onHide, onSave, newPlace, setNewPlace }) => {
 const [showStats, setShowStats] = useState(false);
+  const { t } = useTranslation();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewPlace(prev => ({ ...prev, [name]: value }));
@@ -50,12 +52,12 @@ const [showStats, setShowStats] = useState(false);
   return (
     <Modal show={show} onHide={onHide} fullscreen>
       <Modal.Header closeButton>
-        <Modal.Title>Редагувати заклад</Modal.Title>
+        <Modal.Title>{t('edit_place')}</Modal.Title>
       </Modal.Header>
       <Modal.Body style={{ backgroundColor: '#f8f9fa' }}>
         <Row>
           <Col md={5}>
-            <Form.Label className="fw-bold">Фото закладу</Form.Label>
+            <Form.Label className="fw-bold">{t('place_photo')}</Form.Label>
 
             <div
               onDragOver={(e) => e.preventDefault()}
@@ -69,7 +71,7 @@ const [showStats, setShowStats] = useState(false);
                 backgroundColor: '#fff'
               }}
             >
-              <p className="mb-2 text-muted">Перетягніть фото сюди або виберіть файли вручну</p>
+              <p className="mb-2 text-muted">{t('drag_or_select_photo')}</p>
               <Form.Control type="file" multiple accept="image/*" onChange={handleImageUpload} />
             </div>
 
@@ -105,7 +107,7 @@ const [showStats, setShowStats] = useState(false);
     style={{ backgroundColor: '#626FC2', borderColor: '#626FC2' }}
     onClick={() => setShowStats(true)}
   >
-    Показати статистику
+    {t('show_statistics')}
   </Button>
 </div>
 
@@ -115,24 +117,24 @@ const [showStats, setShowStats] = useState(false);
           <Col md={7}>
             <div className="p-4 bg-white rounded-3 shadow-sm">
               <Form.Group className="mb-3">
-                <Form.Label>Назва</Form.Label>
+                <Form.Label>{t('place_name')}</Form.Label>
                 <Form.Control
                   type="text"
                   name="title"
                   value={newPlace.title}
                   onChange={handleChange}
-                  placeholder="Назва"
+                  placeholder={t('place_name')}
                 />
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Адреса</Form.Label>
+                <Form.Label>{t('place_address')}</Form.Label>
                 <Form.Control
                   type="text"
                   name="locationText"
                   value={newPlace.locationText}
                   onChange={handleChange}
-                  placeholder="Адреса"
+                  placeholder={t('place_address')}
                 />
               </Form.Group>
 
@@ -151,38 +153,38 @@ const [showStats, setShowStats] = useState(false);
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Номер телефону</Form.Label>
+                    <Form.Label>{t('phone_number')}</Form.Label>
                     <Form.Control
                       type="text"
                       name="phone"
                       value={newPlace.phone || ''}
                       onChange={handleChange}
-                      placeholder=" "
+                      placeholder={t('phone_number')}
                     />
                   </Form.Group>
                 </Col>
               </Row>
 
               <Form.Group className="mb-3">
-                <Form.Label>Графік роботи</Form.Label>
+                <Form.Label>{t('work_schedule')}</Form.Label>
                 <Form.Control
                   type="text"
                   name="schedule"
                   value={newPlace.schedule || ''}
                   onChange={handleChange}
-                  placeholder="Графік роботи"
+                  placeholder={t('work_schedule')}
                 />
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>Опис</Form.Label>
+                <Form.Label>{t('description')}</Form.Label>
                 <Form.Control
                   as="textarea"
                   name="description"
                   rows={4}
                   value={newPlace.description || ''}
                   onChange={handleChange}
-                  placeholder="Ресторан французької кухні, витончені деталі, класичні страви..."
+                  placeholder={t('description_placeholder')}
                 />
               </Form.Group>
             </div>
@@ -193,12 +195,12 @@ const [showStats, setShowStats] = useState(false);
 
         <Row className="bg-white p-4 mt-3 rounded-3 shadow-sm">
           <Col md={6}>
-            <h6 className="fw-bold mb-3">Фільтри для показу реклами</h6>
+            <h6 className="fw-bold mb-3">{t('ad_filters')}</h6>
 
             <Form.Group className="mb-3">
-              <Form.Label className="fw-semibold">Відображати у таких категоріях</Form.Label>
+              <Form.Label className="fw-semibold">{t('show_in_categories')}</Form.Label>
               <div className="d-flex flex-column">
-                {['Ресторани', 'Кафе', 'Магазини', 'Банки', 'Туризм'].map((category) => (
+                {[t('category_restaurants'), t('category_cafes'), t('category_shops'), t('category_banks'), t('category_tourism')].map((category, idx) => (
                   <Form.Check
                     key={category}
                     type="checkbox"
@@ -226,9 +228,9 @@ const [showStats, setShowStats] = useState(false);
             </Form.Group>
 
             <Form.Group>
-              <Form.Label className="fw-semibold">Радіус</Form.Label>
+              <Form.Label className="fw-semibold">{t('ad_radius')}</Form.Label>
               <div>
-                {['1 км', '1-5 км', '10 км або більше'].map((radius) => (
+                {[t('radius_1km'), t('radius_1_5km'), t('radius_10km_plus')].map((radius) => (
                   <Form.Check
                     key={radius}
                     type="radio"
@@ -247,15 +249,15 @@ const [showStats, setShowStats] = useState(false);
           </Col>
 
           <Col md={6}>
-            <h6 className="fw-bold mb-3">Баланс реклами</h6>
+            <h6 className="fw-bold mb-3">{t('ad_balance')}</h6>
 
             <Form.Group className="mb-3">
-              <Form.Label>Зараз на рахунку</Form.Label>
+              <Form.Label>{t('current_balance')}</Form.Label>
               <Form.Control type="number" value={newPlace.adBalance || 1000} disabled />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Додати</Form.Label>
+              <Form.Label>{t('add_amount')}</Form.Label>
               <Form.Control
                 type="number"
                 name="adAddAmount"
@@ -266,7 +268,7 @@ const [showStats, setShowStats] = useState(false);
               />
             </Form.Group>
 
-            <Button variant="success">Сплатити</Button>
+            <Button variant="success">{t('pay')}</Button>
           </Col>
         </Row>
       </Modal.Body>
@@ -276,13 +278,13 @@ const [showStats, setShowStats] = useState(false);
     style={{ backgroundColor: '#ccc', borderColor: '#ccc', color: '#000' }}
     onClick={onHide}
   >
-    Відхилити зміни
+    {t('reject_changes')}
   </Button>
   <Button
     style={{ backgroundColor: '#626FC2', borderColor: '#626FC2' }}
     onClick={onSave}
   >
-    Зберегти зміни
+    {t('save_changes')}
   </Button>
 </Modal.Footer>
 <StatisticsModal show={showStats} onHide={() => setShowStats(false)} />

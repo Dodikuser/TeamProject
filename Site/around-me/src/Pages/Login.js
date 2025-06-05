@@ -3,14 +3,13 @@ import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserService from '../services/UserService';
-
-
-
+import { useTranslation } from 'react-i18next';
 
 const GoogleLoginForm = (isLogin) => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const googleButtonRef = useRef(null); 
+  const { t } = useTranslation();
 
   const GOOGLE_CLIENT_ID = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
 
@@ -67,7 +66,7 @@ const GoogleLoginForm = (isLogin) => {
         if (googleButtonRef.current) {
           window.google.accounts.id.renderButton(
             googleButtonRef.current, 
-            { theme: 'filled_blue', size: 'large', type: 'icon', text: 'signin_with' } 
+            { theme: 'filled_blue', size: 'large', type: 'standard', text: 'continue_with', shape: 'rectangular', width: 300, locale: t('google_button_locale') }
           );
         }
       } else {
@@ -82,15 +81,12 @@ const GoogleLoginForm = (isLogin) => {
     return () => {
       document.body.removeChild(script);
     };
-  }, []); 
+  }, [t]); 
 
 
   return (
     <Form>
       <Row className="justify-content-center gap-3">
-        <Col xs="auto">
-          <i className="bi bi-facebook social-icon facebook"></i> 
-        </Col>
         <Col xs="auto">
           <div ref={googleButtonRef}></div>
         </Col>
@@ -110,6 +106,7 @@ export default function LoginRegister() {
     email: '',
     password: ''
   });
+  const { t } = useTranslation();
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -176,10 +173,10 @@ export default function LoginRegister() {
         className="p-4 shadow rounded border-primary"
         style={{ width: '100%', maxWidth: '650px', borderWidth: '2px' }}
       >
-        <h3 className="fw-bold">Твій аккаунт</h3>
-        <p className="text-primary">Ласкаво просимо до AroundMe!</p>
+        <h3 className="fw-bold">{t('your_account')}</h3>
+        <p className="text-primary">{t('welcome_to_aroundme')}</p>
 
-        <h5 className="mt-1 mb-3">{isLogin ? 'Вхід' : 'Реєстрація'}</h5>
+        <h5 className="mt-1 mb-3">{isLogin ? t('login') : t('register')}</h5>
 
         <Form onSubmit={handleSubmit}>
           {!isLogin && (
@@ -188,7 +185,7 @@ export default function LoginRegister() {
               <Form.Group controlId="firstName" className="mb-3 position-relative">
                 <Form.Control
                   type="text"
-                  placeholder="Ім'я"
+                  placeholder={t('first_name')}
                   value={formData.firstName}
                   onChange={handleChange('firstName')}
                   className="bg-light-subtle p-2 pe-5"
@@ -214,7 +211,7 @@ export default function LoginRegister() {
               <Form.Group controlId="lastName" className="mb-3 position-relative">
                 <Form.Control
                   type="text"
-                  placeholder="Прізвище"
+                  placeholder={t('last_name')}
                   value={formData.lastName}
                   onChange={handleChange('lastName')}
                   className="bg-light-subtle p-2 pe-5"
@@ -242,7 +239,7 @@ export default function LoginRegister() {
           <Form.Group controlId="email" className="mb-3 position-relative">
             <Form.Control
               type="email"
-              placeholder="Email"
+              placeholder={t('email')}
               value={formData.email}
               onChange={handleChange('email')}
               className="bg-light-subtle p-2 pe-5"
@@ -268,7 +265,7 @@ export default function LoginRegister() {
           <Form.Group controlId="password" className="mb-3 position-relative">
             <Form.Control
               type="password"
-              placeholder="Пароль"
+              placeholder={t('password')}
               value={formData.password}
               onChange={handleChange('password')}
               className="bg-light-subtle p-2 pe-5"
@@ -295,21 +292,21 @@ export default function LoginRegister() {
             className="w-100 fw-bold"
             style={{ backgroundColor: '#5C6BC0', borderColor: '#5C6BC0' }}
           >
-            {isLogin ? 'Вхід' : 'Зареєструватися'}
+            {isLogin ? t('login') : t('register_btn')}
           </Button>
 
           <div className="text-left mt-3">
             <small>
-              {isLogin ? 'Ще не маєте аккаунту?' : 'Вже маєте аккаунт?'}{' '}
+              {isLogin ? t('no_account') : t('already_have_account')}{' '}
               <strong className="text-dark link-hover" onClick={toggleForm}>
-                {isLogin ? 'Реєстрація' : 'Вхід'}
+                {isLogin ? t('register') : t('login')}
               </strong>
             </small>
           </div>
 
           <div className="d-flex align-items-center my-2">
             <hr className="flex-grow-1" />
-            <div className="px-2 text-muted text-nowrap">Або</div>
+            <div className="px-2 text-muted text-nowrap">{t('or')}</div>
             <hr className="flex-grow-1" />
           </div>
 

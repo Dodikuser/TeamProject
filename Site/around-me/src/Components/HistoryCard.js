@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Button } from 'react-bootstrap';
 import FavoriteService from '../services/FavoriteService';
+import { useTranslation } from 'react-i18next';
 
 export default function HistoryCard({
   id,
@@ -15,6 +16,7 @@ export default function HistoryCard({
 }) {
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [animating, setAnimating] = useState(false);
+  const { t } = useTranslation();
 
   const toggleFavorite = async () => {
     const action = isFavorite ? "Remove" : "Add";
@@ -71,7 +73,7 @@ export default function HistoryCard({
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                 directions
               </span>
-              Перейти
+              {t('go_to')}
             </Button>
             <Button
               variant="outline-danger"
@@ -82,7 +84,7 @@ export default function HistoryCard({
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                 delete
               </span>
-              Видалити
+              {t('delete')}
             </Button>
           </div>
         </div>

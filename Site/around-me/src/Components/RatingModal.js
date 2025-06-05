@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import ReviewService from '../services/ReviewService';
+import { useTranslation } from 'react-i18next';
 
 const modalDialogStyle = {
   position: 'fixed',
@@ -12,6 +13,7 @@ const modalDialogStyle = {
 };
 
 const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubmit }) => {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
   const [file, setFile] = useState(null);
@@ -79,14 +81,14 @@ const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubm
               >
                 account_circle
               </span>
-              <span style={{ fontWeight: 500 }}>Ім'я та прізвище</span>
+              <span style={{ fontWeight: 500 }}>{t('name_and_surname')}</span>
             </div>
 
             <Form.Group className="mb-3">
               <Form.Control
                 as="textarea"
                 rows={4}
-                placeholder="Написати відгук"
+                placeholder={t('write_review')}
                 value={review}
                 onChange={(e) => {
                   setReview(e.target.value);
@@ -114,7 +116,7 @@ const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubm
                   }}
                 >
                   <span className="material-symbols-outlined align-middle me-2">add_photo_alternate</span>
-                  Додати фото або відео
+                  {t('add_photo_or_video')}
                   <input
                     type="file"
                     accept="image/*,video/*"
@@ -123,7 +125,7 @@ const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubm
                       const selectedFile = e.target.files?.[0];
                       if (selectedFile) {
                         if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
-                          setError('Файл занадто великий. Максимальний розмір: 5MB');
+                          setError(t('file_too_large'));
                           return;
                         }
                         setFile(selectedFile);
@@ -152,7 +154,7 @@ const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubm
           </Col>
 
           <Col md={6} className="text-center d-flex flex-column justify-content-center">
-            <h5>Оцініть місце</h5>
+            <h5>{t('rate_the_place')}</h5>
             <div style={{ fontSize: '2rem' }}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <span
@@ -186,7 +188,7 @@ const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubm
           disabled={isSubmitting}
         >
           <span className="material-symbols-outlined align-middle me-1">close</span>
-          Скасувати
+          {t('cancel')}
         </Button>
         <Button 
           variant="primary" 
@@ -196,12 +198,12 @@ const RatingModal = ({ show, onHide, placeName = 'Назва місця', onSubm
           {isSubmitting ? (
             <>
               <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              Відправка...
+              {t('sending')}...
             </>
           ) : (
             <>
               <span className="material-symbols-outlined align-middle me-1">send</span>
-              Надіслати
+              {t('send')}
             </>
           )}
         </Button>
