@@ -28,7 +28,7 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_place_details);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        //bottomNav.setOnItemSelectedListener(this::handleNavigationItemSelected);
+        bottomNav.setOnItemSelectedListener(this::handleNavigationItemSelected);
 
         place = getIntent().getParcelableExtra("place");
         if (place == null) {
@@ -117,21 +117,13 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
     }
 
-    /*private boolean handleNavigationItemSelected(@NonNull MenuItem item) {
+    private boolean handleNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-
-        switch (id) {
-            case R.id.nav_home:
-                finish();
-                return true;
-            case R.id.nav_favorites:
-            case R.id.nav_recommendations:
-            case R.id.nav_history:
-            case R.id.nav_account:
-                // TODO: Реалізуй переходи до відповідних екранів
-                return true;
-            default:
-                return false;
-        }
-    }*/
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("selected_nav_item", id);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
+        return true;
+    }
 }

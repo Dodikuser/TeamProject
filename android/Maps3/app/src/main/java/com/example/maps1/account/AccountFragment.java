@@ -261,9 +261,13 @@ public class AccountFragment extends Fragment {
 
                     requireActivity().runOnUiThread(() -> {
                         Toast.makeText(getContext(), "Успішний вхід!", Toast.LENGTH_SHORT).show();
+                        if (requireActivity() instanceof com.example.maps1.MainActivity) {
+                            ((com.example.maps1.MainActivity) requireActivity()).setBottomNavEnabled(true);
+                        }
                         getParentFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container, new MainAccount())
                                 .commit();
+                        
                     });
                 } else {
                     // Обрабатываем ошибку
@@ -336,6 +340,9 @@ public class AccountFragment extends Fragment {
                                 prefs.edit()
                                         .putString("auth_token", tokenG)
                                         .apply();
+                                if (requireActivity() instanceof com.example.maps1.MainActivity) {
+                                    ((com.example.maps1.MainActivity) requireActivity()).setBottomNavEnabled(true);
+                                }
                                 getParentFragmentManager().beginTransaction()
                                         .replace(R.id.fragment_container, new MainAccount())
                                         .commit();

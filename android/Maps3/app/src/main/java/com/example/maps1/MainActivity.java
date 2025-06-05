@@ -108,16 +108,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         searchCardView = findViewById(R.id.searchCardView);
 
-        // Ініціалізація Places API
+        // Инициализация Places API
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), "AIzaSyAnE3sfsbwYmNEhxAq_XFelrA6_BznVymc");
         }
         placesClient = Places.createClient(this);
 
-        // Ініціалізація клієнта локації
+        // Инициализация клиента локации
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Налаштування пошукового поля
+        // Настройка поискового поля
         searchEditText = findViewById(R.id.searchEditText);
         searchEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -134,27 +134,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
-        // Ініціалізація мапи
-        // SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-        //         .findFragmentById(R.id.map);
-        // if (mapFragment != null) {
-        //     mapFragment.getMapAsync(this);
-        // }
 
-        // Налаштування нижньої навігації
         bottomNav = findViewById(R.id.bottomNavigation);
         bottomNav.setOnItemSelectedListener(this::handleNavigationItemSelected);
-        bottomNav.setSelectedItemId(R.id.nav_home);
+        // bottomNav.setSelectedItemId(R.id.nav_home); // Убираем автоматическую установку выбранного пункта
 
-        // Перевірка, чи потрібно відкрити фрагмент акаунта при запуску
-        if (getIntent().hasExtra("show_account_fragment")) {
-            loadAccountFragment();
+        // Обработка перехода с выбранным пунктом меню
+        int selectedNavItem = getIntent().getIntExtra("selected_nav_item", -1);
+        if (selectedNavItem != -1) {
+            bottomNav.setSelectedItemId(selectedNavItem);
         }
+
         searchResultsContainer = findViewById(R.id.searchResultsContainer);
         searchResultsLayout = findViewById(R.id.searchResultsLayout);
         setupKeyboardListeners();
 
         AccountFragment.trustAllCertificates();
+
+        // Проверка токена при запуске
+        String authToken = prefs.getString("auth_token", null);
+        if (authToken == null) {
+            setBottomNavEnabled(false);
+            showFragment(new com.example.maps1.account.AccountFragment());
+        } else {
+            setBottomNavEnabled(true);
+            showFragment(new com.example.maps1.fragment.MapFragment());
+        }
     }
 
     public void showSearchField(boolean show) {
@@ -763,5 +768,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onDestroy();
         View rootView = findViewById(android.R.id.content);
         rootView.getViewTreeObserver().removeOnGlobalLayoutListener(keyboardLayoutListener);
+    }
+
+    public void setBottomNavEnabled(boolean enabled) {
+        bottomNav.setEnabled(enabled);
+        for (int i = 0; i < bottomNav.getMenu().size(); i++) {
+            bottomNav.getMenu().getItem(i).setEnabled(enabled);
+        }
+        // Визуально делаем полупрозрачным если выключено
+        bottomNav.setAlpha(enabled ? 1.0f : 0.5f);
     }
 }
