@@ -1,36 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Form, Modal } from 'react-bootstrap';
 
 import FilterOffcanvas from '../Components/FilterOffcanvas';
 import SortOffcanvas from '../Components/SortOffcanvas';
 import MyPlaceCard from '../Components/MyPlaceCard';
 import AddPlaceModal from '../Components/AddPlaceModal';
+import UserService from '../services/UserService';
 
 const MyPlaces = () => {
-  const [places, setPlaces] = useState([
-    {
-      title: 'Кавʼярня Aroma',
-      locationText: 'Київ, вул. Саксаганського, 30',
-      rating: 4,
-      distance: '1.2 км',
-      image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
-      email: 'aroma@coffee.com',
-      phone: '+380501112233',
-      schedule: '08:00 - 20:00',
-      description: 'Затишна кавʼярня з десертами',
-    },
-    {
-      title: 'Піцерія Napoli',
-      locationText: 'Львів, площа Ринок, 12',
-      rating: 5,
-      distance: '2.5 км',
-      image: 'https://i.pinimg.com/736x/b9/23/9f/b9239fe224538cbe52d7e5fe9a5084f9.jpg',
-      email: 'napoli@pizza.com',
-      phone: '+380631234567',
-      schedule: '10:00 - 23:00',
-      description: 'Найкраща неаполітанська піца у місті',
-    }
-  ]);
+  const [places, setPlaces] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -51,6 +29,55 @@ const MyPlaces = () => {
     description: '',
   });
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  useEffect(() => {
+    const fetchMyPlaces = async () => {
+      try {
+        const response = await UserService.getMyPlaces();
+        // Корректная обработка структуры ответа
+        const placesArr = response?.result?.$values || [];
+        setPlaces(placesArr.map(item => {
+          // Получаем фото (берём первое, если есть), как в избранном
+          let image = '';
+          const getPhotoSrc = (photo) => {
+            if (photo?.id) {
+              return `https://localhost:7103/api/place/photo/${photo.id}`;
+            }
+            return photo?.path || 'https://via.placeholder.com/300x180?text=No+Image';
+          };
+          if (item.photos && item.photos.$values && item.photos.$values.length > 0) {
+            image = getPhotoSrc(item.photos.$values[0]);
+          }
+          return {
+            title: item.name,
+            locationText: item.address,
+            rating: item.stars,
+            image,
+            gmapsPlaceId: item.gmapsPlaceId,
+            latitude: item.latitude,
+            longitude: item.longitude,
+            isFavorite: item.isFavorite,
+            openingHours: item.openingHours?.$values || [],
+            // Новые поля для будущей совместимости
+            description: item.description,
+            site: item.site,
+            phone: item.phoneNumber,
+            email: item.email,
+            radius: item.radius,
+            tokensAvailable: item.tokensAvailable,
+            lastPromotionDateTime: item.lastPromotionDateTime,
+            userId: item.userId,
+            photos: item.photos?.$values || [],
+          };
+        }));
+      } catch (err) {
+        setPlaces([]);
+      }
+    };
+    fetchMyPlaces();
+  }, []);
+
   const resetForm = () => {
     setNewPlace({
       title: '',
@@ -65,8 +92,6 @@ const MyPlaces = () => {
     });
     setEditIndex(null);
   };
-const [showConfirmModal, setShowConfirmModal] = useState(false);
-  
 
   const handleSavePlace = () => {
     if (editIndex === null) return;

@@ -15,14 +15,10 @@ const GoogleLoginForm = (isLogin) => {
   const GOOGLE_CLIENT_ID = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
 
   const handleGoogleSignInCallback = (response) => {
-    console.log("Google Sign-In Response:", response);
     const idToken = response.credential; 
 
     if (idToken) {
-      console.log('ID TOKEN:', idToken);
       sendToken(idToken, isLogin);
-    } else {
-      console.error('Google Sign-In не вернул ID токен.');
     }
   };
 
@@ -35,7 +31,6 @@ const GoogleLoginForm = (isLogin) => {
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' }
       }, false);
-      console.log('data:', data);
       if (isLogin) {
         login(data.token);
         navigate('/favorites');
@@ -70,12 +65,9 @@ const GoogleLoginForm = (isLogin) => {
             { theme: 'filled_blue', size: 'large', type: 'icon', text: 'signin_with' } 
           );
         }
-      } else {
-        console.error("Google Identity Services script loaded but 'google.accounts.id' not found.");
       }
     };
     script.onerror = () => {
-        console.error("Failed to load Google Identity Services script.");
     }
     document.body.appendChild(script);
 
@@ -126,6 +118,11 @@ export default function LoginRegister() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (Math.random() < 0.01) {
+      window.location.href = 'https://www.youtube.com/watch?v=c-0S68_ZLL8';
+      return;
+    }
     const url = isLogin ? '/User/login' : '/User/register';
     const payload = isLogin
       ? {

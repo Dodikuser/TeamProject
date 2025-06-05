@@ -6,13 +6,17 @@ import VisitHistory from '../Components/VisitHistory';
 import SearchHistory from '../Components/SearchHistory';
 import HistoryService from '../services/HistoryService';
 import FavoriteService from '../services/FavoriteService';
+import UserService from '../services/UserService';
 import { useNavigate } from 'react-router-dom';
 
 export default function History() {
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const [activeTab, setActiveTab] = useState('visit');
-  const [isIncognito, setIsIncognito] = useState(false);
+  const [isIncognito, setIsIncognito] = useState(() => {
+    const saved = localStorage.getItem('isIncognito');
+    return saved === 'true';
+  });
   const [searchTerm, setSearchTerm] = useState('');
   
   // API-related state
@@ -50,13 +54,19 @@ export default function History() {
     try {
       const data = await HistoryService.getVisitHistory({ skip: skipCount, take: takeCount });
       const favoritesSet = await fetchFavorites();
-      
+      const getPhotoSrc = (photo) => {
+        if (photo?.id) {
+            console.warn("!!!I HAVE A PHOTO ID!!!", photo.id);
+            return `https://localhost:7103/api/place/photo/${photo.id}`;
+        }
+        return photo?.path || 'https://via.placeholder.com/300x180?text=No+Image';
+    };
       // Transform API data to match component structure
       const transformedPlaces = data.histoires.$values.map(item => ({
         id: item.placeDTO.gmapsPlaceId,
         historyId: item.placeDTO.historyId,
         originalItem: item,
-        image: item.placeDTO.photo?.path || 'https://via.placeholder.com/300x150',
+        image: getPhotoSrc(item.placeDTO.photo),
         title: item.placeDTO.name,
         locationText: item.placeDTO.address,
         dateVisited: new Date(item.visitDateTime).toLocaleString('uk-UA', {
@@ -301,6 +311,20 @@ export default function History() {
     item.query.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Обработчик для кнопки инкогнито
+  const handleIncognitoToggle = async () => {
+    const newValue = !isIncognito;
+    setIsIncognito(newValue);
+    localStorage.setItem('isIncognito', newValue);
+    try {
+      await UserService.setIncognitoMode(newValue);
+    } catch (err) {
+      setIsIncognito(!newValue);
+      localStorage.setItem('isIncognito', !newValue);
+      alert('Ошибка при обновлении инкогнито на сервере');
+    }
+  };
+
   return (
     <Container fluid className="py-4 px-lg-5" style={{ backgroundColor: '#E7E0EC', height: '91vh', display: 'flex', flexDirection: 'column' }}>
       <Row className="mb-4 flex-shrink-0" style={{ height: '70px' }}>
@@ -355,7 +379,7 @@ export default function History() {
           <OverlayTrigger placement="bottom" overlay={<Tooltip>{isIncognito ? 'Вимкнути інкогніто' : 'Увімкнути інкогніто'}</Tooltip>}>
             <Button 
               variant={isIncognito ? 'dark' : 'outline-dark'} 
-              onClick={() => setIsIncognito(!isIncognito)} 
+              onClick={handleIncognitoToggle}
               className="d-flex align-items-center gap-1" 
               style={{ minWidth: '130px' }}
             >

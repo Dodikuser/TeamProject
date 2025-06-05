@@ -45,16 +45,7 @@ const MyPlaceCard = ({
         </div>
 
         <div className="d-flex justify-content-between align-items-center mt-auto">
-          <div>
-            <div className="text-muted small mb-1 d-flex align-items-center gap-1">
-              <span className="material-symbols-outlined fs-6">distance</span>
-              {distance}
-            </div>
-            <div className="text-warning" aria-label={`Рейтинг: ${rating} з 5`}>
-              {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
-            </div>
-          </div>
-        <Button
+          <Button
   size="sm"
   variant="outline-primary"
   onClick={(e) => {
