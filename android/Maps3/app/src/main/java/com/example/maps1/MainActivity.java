@@ -35,6 +35,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.maps1.account.AccountFragment;
 import com.example.maps1.account.MainAccount;
 import com.example.maps1.Favorites.FavoritesFragment;
+import com.example.maps1.history.HistoryApiHelper;
 import com.example.maps1.history.HistoryFragment;
 import com.example.maps1.fragment.MapFragment;
 import com.example.maps1.recommendations.RecommendationsFragment;
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LinearLayout searchResultsLayout;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardLayoutListener;
     private boolean isKeyboardVisible = false;
+    private boolean isFromHistory = false;
     private final ExecutorService aiSearchExecutor = Executors.newSingleThreadExecutor();
 
     @Override
@@ -187,26 +189,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void performSearch() {
         String query = searchEditText.getText().toString().trim();
+
         if (!query.isEmpty()) {
-            // Добавляем запрос в историю
-            String token = prefs.getString("auth_token", null);
-            if (token != null) {
-                com.example.maps1.history.HistoryApiHelper.addSearchHistoryItem(token, query, new com.example.maps1.history.HistoryApiHelper.ApiCallback() {
-                    @Override
-                    public void onSuccess(String response) {
-                        // Можно добавить логирование или обработку успеха
-                    }
-                    @Override
-                    public void onError(String error) {
-                        // Можно добавить логирование ошибки
-                    }
-                });
+            // Додаємо запрос в історію тільки якщо це новий пошук
+            if (!isFromHistory) {
+                String token = prefs.getString("auth_token", null);
+                if (token != null) {
+                    HistoryApiHelper.addSearchHistoryItem(token, query, new HistoryApiHelper.ApiCallback() {
+                        @Override
+                        public void onSuccess(String response) {
+                            // Логування успіху
+                        }
+                        @Override
+                        public void onError(String error) {
+                            // Логування помилки
+                        }
+                    });
+                }
             }
-            // Новый серверный поиск
+            // Виконуємо пошук
             aiPlaceSearchRequest(query);
         } else {
             showSearchResults(false);
         }
+        isFromHistory = false; // Скидаємо прапорець
     }
     private static SSLSocketFactory getTrustAllSslSocketFactory() throws Exception {
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -227,7 +233,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         sc.init(null, trustAllCerts, new java.security.SecureRandom());
         return sc.getSocketFactory();
     }
-
+    //Передача тексту з історії у пошукове поле
+    public void setSearchQuery(String query) {
+        isFromHistory = true;
+        searchEditText.setText(query);
+        searchEditText.requestFocus(); // Додаємо фокус
+        bottomNav.setSelectedItemId(R.id.nav_home);
+        performSearch();
+    }
     private void aiPlaceSearchRequest(String query) {
         if (checkLocationPermission()) {
             fusedLocationClient.getLastLocation()

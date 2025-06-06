@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.maps1.MainActivity;
 import com.example.maps1.PlaceDetailsActivity;
 import com.example.maps1.R;
 import com.example.maps1.utils.PlaceUtils;
@@ -110,7 +111,10 @@ public class HistoryFragment extends Fragment {
         searchHistoryAdapter = new SearchHistoryAdapter(filteredSearchItems, new SearchHistoryAdapter.OnSearchHistoryClickListener() {
             @Override
             public void onItemClick(SearchHistoryItem item) {
-                performSearch(item.getQuery());
+                // Передаємо пошуковий запит у MainActivity
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).setSearchQuery(item.getQuery());
+                }
             }
 
             @Override
@@ -118,7 +122,6 @@ public class HistoryFragment extends Fragment {
                 deleteSearchHistoryItem(item);
             }
         });
-
         // Setup button listeners
         btnVisitHistory.setOnClickListener(v -> showVisitHistory());
         btnSearchHistory.setOnClickListener(v -> showSearchHistory());

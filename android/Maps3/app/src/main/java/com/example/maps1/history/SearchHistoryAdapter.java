@@ -48,7 +48,12 @@ public class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdap
 
         // Click listeners
         holder.itemView.setOnClickListener(v -> listener.onItemClick(item));
-        holder.goButton.setOnClickListener(v -> listener.onItemClick(item));
+        holder.goButton.setOnClickListener(v -> {
+            // Передаємо запит у MainActivity
+            if (listener != null) {
+                listener.onItemClick(item);
+            }
+        });
         holder.deleteSearch.setOnClickListener(v -> listener.onDeleteClick(item));
     }
 

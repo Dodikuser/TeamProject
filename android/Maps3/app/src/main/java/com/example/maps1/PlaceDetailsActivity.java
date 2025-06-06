@@ -48,7 +48,7 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         TextView placePhone = findViewById(R.id.place_phone);
         TextView placeHours = findViewById(R.id.place_hours);
         TextView placeWebsite = findViewById(R.id.place_email);
-        LinearLayout photosContainer = findViewById(R.id.photos_container);
+
 
         // Заповнення даними
         placeName.setText(place.getName());
@@ -69,25 +69,7 @@ public class PlaceDetailsActivity extends AppCompatActivity {
             mainPhoto.setImageResource(R.drawable.ic_placeholder);
         }
 
-        // Галерея
-        photosContainer.removeAllViews();
-        if (photoUrls != null && photoUrls.size() > 1) {
-            for (int i = 1; i < photoUrls.size(); i++) {
-                ImageView imageView = new ImageView(this);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        getResources().getDimensionPixelSize(R.dimen.search_card_width) / 2,
-                        getResources().getDimensionPixelSize(R.dimen.search_card_height)
-                );
-                params.setMargins(8, 0, 8, 0);
-                imageView.setLayoutParams(params);
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                Glide.with(this)
-                        .load(photoUrls.get(i))
-                        .placeholder(R.drawable.ic_placeholder)
-                        .into(imageView);
-                photosContainer.addView(imageView);
-            }
-        }
+
         // Завантаження часу
         if (place.getId() != null) {
             PlaceUtils.fetchPlaceHoursFromGoogle(this, place.getId(), hours -> {

@@ -55,18 +55,6 @@
                 android:src="@drawable/ic_placeholder" />
 
             <!-- Photo Gallery -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="16dp">
-
-                <LinearLayout
-                    android:id="@+id/photos_container"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:padding="4dp" />
-            </HorizontalScrollView>
 
             <!-- Place Info Card from second file -->
             <androidx.cardview.widget.CardView
