@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
+import { Container, Form, Button, Card, Row, Col, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserService from '../services/UserService';
@@ -102,6 +102,7 @@ export default function LoginRegister() {
     email: '',
     password: ''
   });
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -138,6 +139,7 @@ export default function LoginRegister() {
           password: formData.password
         };
     try {
+      setErrorMessage('');
       const data = await UserService.makeRequest(url, {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -149,6 +151,11 @@ export default function LoginRegister() {
       }
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(
+        isLogin
+          ? 'Ошибка входа. Проверьте email и пароль.'
+          : 'Ошибка регистрации. Возможно, такой email уже используется.'
+      );
     }
   };
 
@@ -179,6 +186,11 @@ export default function LoginRegister() {
         <h5 className="mt-1 mb-3">{isLogin ? 'Вхід' : 'Реєстрація'}</h5>
 
         <Form onSubmit={handleSubmit}>
+          {errorMessage && (
+            <Alert variant="danger" className="mb-3">
+              {errorMessage}
+            </Alert>
+          )}
           {!isLogin && (
             <>
               {/* Ім'я */}

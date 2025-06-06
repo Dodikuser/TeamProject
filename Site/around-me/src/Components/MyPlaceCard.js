@@ -10,7 +10,26 @@ const MyPlaceCard = ({
   distance,
   onDelete,
   onGoTo,
+  extraInfo,
 }) => {
+  // Функция для отображения звезд рейтинга
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.25 && rating % 1 < 0.75;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    const stars = [];
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<span key={`full-${i}`} className="text-warning">★</span>);
+    }
+    if (hasHalfStar) {
+      stars.push(<span key="half" className="text-warning">⯪</span>); // ползвезды
+    }
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(<span key={`empty-${i}`} className="text-secondary">☆</span>);
+    }
+    return stars;
+  };
+
   return (
     <Card className="shadow-sm border-0 h-100 rounded-3">
       <Card.Img
@@ -24,6 +43,7 @@ const MyPlaceCard = ({
         <div className="d-flex justify-content-between align-items-start mb-2">
           <div>
             <Card.Title className="fs-6 mb-1">{title}</Card.Title>
+            <div className="rating mb-1">{renderStars(rating)}</div>
             <small className="text-muted d-flex align-items-center gap-1">
               <span className="material-symbols-outlined fs-6">location_on</span>
               {locationText}
@@ -43,6 +63,10 @@ const MyPlaceCard = ({
             </span>
 
         </div>
+
+        {extraInfo && (
+          <div className="mb-2">{extraInfo}</div>
+        )}
 
         <div className="d-flex justify-content-between align-items-center mt-auto">
           <Button
@@ -79,6 +103,9 @@ const MyPlaceCard = ({
             .custom-animated-button:active {
               transform: scale(0.97);
               box-shadow: 0 2px 6px rgba(98, 111, 194, 0.5);
+            }
+            .rating span {
+              font-size: 1.1rem;
             }
           `}
         </style>

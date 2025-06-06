@@ -341,12 +341,15 @@ const AccountPage = () => {
                   {email}
                 </a>
                 <p className="mb-2 text-muted">Дата реєстрації: {createdAt}</p>
-                <button
-                  className="btn btn-success btn-sm btn-hover mb-2"
-                  onClick={() => setShowBuyTokens(true)}
-                >
-                  Поповнити баланс
-                </button>
+                <div className="d-flex justify-content-between align-items-center mb-2" style={{gap: '10px'}}>
+                  <div></div>
+                  <button
+                    className="btn btn-success btn-sm btn-hover"
+                    onClick={() => setShowBuyTokens(true)}
+                  >
+                    Поповнити баланс
+                  </button>
+                </div>
                 <button
                   className="btn btn-sm me-2 btn-hover"
                   style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}

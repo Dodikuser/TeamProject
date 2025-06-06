@@ -38,7 +38,6 @@ const MyPlaces = () => {
         // Корректная обработка структуры ответа
         const placesArr = response?.result?.$values || [];
         setPlaces(placesArr.map(item => {
-          // Получаем фото (берём первое, если есть), как в избранном
           let image = '';
           const getPhotoSrc = (photo) => {
             if (photo?.id) {
@@ -48,18 +47,21 @@ const MyPlaces = () => {
           };
           if (item.photos && item.photos.$values && item.photos.$values.length > 0) {
             image = getPhotoSrc(item.photos.$values[0]);
+          } else if (item.photo) {
+            image = getPhotoSrc(item.photo);
+          } else {
+            image = 'https://via.placeholder.com/300x180?text=No+Image';
           }
           return {
-            title: item.name,
-            locationText: item.address,
+            title: item.name || 'Без названия',
+            locationText: item.address || 'Адрес не указан',
             rating: item.stars,
             image,
             gmapsPlaceId: item.gmapsPlaceId,
             latitude: item.latitude,
             longitude: item.longitude,
             isFavorite: item.isFavorite,
-            openingHours: item.openingHours?.$values || [],
-            // Новые поля для будущей совместимости
+            openingHours: Array.isArray(item.openingHours?.$values) ? item.openingHours.$values : (item.openingHours ? [item.openingHours] : []),
             description: item.description,
             site: item.site,
             phone: item.phoneNumber,
@@ -165,9 +167,9 @@ const MyPlaces = () => {
 </div>
 
 
-      {/* Список місць */}
+      {/* Список мест */}
       {filteredPlaces.length === 0 ? (
-        <div className="text-center text-muted py-5">Немає закладів.</div>
+        <div className="text-center text-muted py-5">У вас пока нет добавленных мест.</div>
       ) : (
         <Row>
           {filteredPlaces.map((place, idx) => (
@@ -180,7 +182,6 @@ const MyPlaces = () => {
                     setShowConfirmModal(true);
                 }}
                 />
-
               </div>
             </Col>
           ))}

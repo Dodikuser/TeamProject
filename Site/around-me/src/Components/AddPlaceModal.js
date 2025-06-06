@@ -171,7 +171,6 @@ const [showStats, setShowStats] = useState(false);
                   name="title"
                   value={newPlace.title}
                   onChange={handleChange}
-                  placeholder="Назва"
                 />
               </Form.Group>
 
@@ -182,7 +181,6 @@ const [showStats, setShowStats] = useState(false);
                   name="locationText"
                   value={newPlace.locationText}
                   onChange={handleChange}
-                  placeholder="Адреса"
                 />
               </Form.Group>
 
@@ -195,7 +193,6 @@ const [showStats, setShowStats] = useState(false);
                       name="email"
                       value={newPlace.email || ''}
                       onChange={handleChange}
-                      placeholder="example@gmail.com"
                     />
                   </Form.Group>
                 </Col>
@@ -207,7 +204,7 @@ const [showStats, setShowStats] = useState(false);
                       name="phone"
                       value={newPlace.phone || ''}
                       onChange={handleChange}
-                      placeholder=" "
+                      
                     />
                   </Form.Group>
                 </Col>
@@ -220,7 +217,7 @@ const [showStats, setShowStats] = useState(false);
                   name="site"
                   value={newPlace.site || ''}
                   onChange={handleChange}
-                  placeholder="https://example.com"
+                  
                 />
               </Form.Group>
 
@@ -243,7 +240,7 @@ const [showStats, setShowStats] = useState(false);
                   rows={4}
                   value={newPlace.description || ''}
                   onChange={handleChange}
-                  placeholder="Ресторан французької кухні, витончені деталі, класичні страви..."
+                  
                 />
               </Form.Group>
             </div>
