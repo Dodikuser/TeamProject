@@ -74,8 +74,9 @@ const AccountPage = () => {
     async function fetchUserData() {
       try {
         const userData = await UserService.getUserData();
-        if (userData && typeof userData.TokensAvailable !== 'undefined') {
-          setTokensAvailable(userData.TokensAvailable);
+        console.log(userData.tokensAvailable);
+        if (userData && typeof userData.tokensAvailable !== 'undefined') {
+          setTokensAvailable(userData.tokensAvailable);
         }
       } catch (e) {
         // ignore
@@ -277,13 +278,12 @@ const AccountPage = () => {
       <div className="container py-5" style={{ fontFamily: 'Arial, sans-serif' }}>
         <div className="card mb-4 p-4">
 
-          <h2 className="h5 mb-3">{t('account')}Обліковий запис</h2>
+          <h2 className="h5 mb-3">{t('account')}</h2>
           {tokensAvailable !== null && (
             <div className="mb-3">
               <b>Ваш баланс токенов:</b> {tokensAvailable}
             </div>
           )}
-
           {loading ? (
             <div className="text-center py-4">
               <div className="spinner-border text-primary" role="status">

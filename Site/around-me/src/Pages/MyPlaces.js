@@ -130,46 +130,46 @@ const MyPlaces = () => {
       <h2 style={{ fontFamily: "'Righteous', sans-serif" }} className="mb-4">{t('my_places')}</h2>
 
       {/* Панель пошуку, фільтрів, сортування */}
-      <div className="bg-white p-3 rounded-3 shadow-sm d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-  <div className="d-flex gap-2 flex-wrap">
-    <Button
-      variant="outline-secondary"
-      className="d-flex align-items-center gap-2 py-1"
-      onClick={() => setShowFilters(true)}
-    >
-      <span className="material-symbols-outlined" style={{ lineHeight: '1.2', fontSize: '20px' }}>
-        filter_list
-      </span>
-      <span>{t('filters')}</span>
-    </Button>
-    <Button
-      variant="outline-secondary"
-      className="d-flex align-items-center gap-2 py-1"
-      onClick={() => setShowSort(true)}
-    >
-      <span className="material-symbols-outlined" style={{ lineHeight: '1.2', fontSize: '20px' }}>
-        sort
-      </span>
-      <span>{t('sort')}</span>
-    </Button>
-  </div>
+      {/* <div className="bg-white p-3 rounded-3 shadow-sm d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div className="d-flex gap-2 flex-wrap">
+          <Button
+            variant="outline-secondary"
+            className="d-flex align-items-center gap-2 py-1"
+            onClick={() => setShowFilters(true)}
+          >
+            <span className="material-symbols-outlined" style={{ lineHeight: '1.2', fontSize: '20px' }}>
+              filter_list
+            </span>
+            <span>{t('filters')}</span>
+          </Button>
+          <Button
+            variant="outline-secondary"
+            className="d-flex align-items-center gap-2 py-1"
+            onClick={() => setShowSort(true)}
+          >
+            <span className="material-symbols-outlined" style={{ lineHeight: '1.2', fontSize: '20px' }}>
+              sort
+            </span>
+            <span>{t('sort')}</span>
+          </Button>
+        </div>
 
-  <div className="position-relative flex-grow-1" style={{ maxWidth: '500px', minWidth: '250px' }}>
-    <Form.Control
-      type="search"
-      placeholder={t('search')}
-      className="ps-3 pe-5"
-      value={searchTerm}
-      onChange={e => setSearchTerm(e.target.value)}
-    />
-    <span
-      className="material-symbols-outlined position-absolute end-0 top-50 translate-middle-y me-3 text-muted"
-      style={{ pointerEvents: 'none', lineHeight: '1', fontSize: '20px' }}
-    >
-      search
-    </span>
-  </div>
-</div>
+        <div className="position-relative flex-grow-1" style={{ maxWidth: '500px', minWidth: '250px' }}>
+          <Form.Control
+            type="search"
+            placeholder={t('search')}
+            className="ps-3 pe-5"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+          <span
+            className="material-symbols-outlined position-absolute end-0 top-50 translate-middle-y me-3 text-muted"
+            style={{ pointerEvents: 'none', lineHeight: '1', fontSize: '20px' }}
+          >
+            search
+          </span>
+        </div>
+      </div> */}
 
 
       {/* Список мест */}
@@ -206,8 +206,8 @@ const MyPlaces = () => {
       />
 
       {/* Бокові панелі */}
-      <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} />
-      <SortOffcanvas show={showSort} onClose={() => setShowSort(false)} />
+      {/* <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} />
+      <SortOffcanvas show={showSort} onClose={() => setShowSort(false)} /> */}
 
       <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
   <Modal.Body className="text-center py-4">

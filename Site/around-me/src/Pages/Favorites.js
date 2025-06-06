@@ -191,20 +191,7 @@ export default function Favorites() {
         <Col xs={12}>
           <div className="bg-white p-3 rounded-3 shadow-sm d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div className="d-flex gap-2 flex-wrap">
-              <Button
-                variant="outline-secondary"
-                className="d-flex align-items-center gap-2"
-                onClick={() => setShowFilters(true)}
-              >
-                <span className="material-symbols-outlined">filter_list</span> {t('filters')}
-              </Button>
-              <Button
-                variant="outline-secondary"
-                className="d-flex align-items-center gap-2"
-                onClick={() => setShowSort(true)}
-              >
-                <span className="material-symbols-outlined">sort</span> {t('sort')}
-              </Button>
+              
               <Button
                 variant="outline-primary"
                 className="d-flex align-items-center gap-2"
@@ -279,14 +266,8 @@ export default function Favorites() {
         )}
       </Row>
 
-      <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} />
-      <SortOffcanvas 
-        show={showSort} 
-        onClose={() => setShowSort(false)} 
-        onSort={handleSort}
-        currentSortType={sortType}
-        currentSortOrder={sortOrder}
-      />
+      {/* <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} /> */}
+      {/* <SortOffcanvas show={showSort} onClose={() => setShowSort(false)} /> */}
 
       <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered>
         <Modal.Body className="text-center py-4">

@@ -91,7 +91,7 @@ const [showStats, setShowStats] = useState(false);
       });
     }
     try {
-      await PlaceService.updatePlaceFull(newPlace.gmapsPlaceId, placeDTO, photosFormData);
+      await PlaceService.updateMyPlace(placeDTO, photosFormData);
       if (onSave) onSave();
       if (onHide) onHide();
     } catch (err) {

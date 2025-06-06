@@ -140,32 +140,38 @@ class PlaceService extends BaseService {
     }
 
     /**
-     * Обновить место по полной DTO (PlaceDTOFull) и фото
-     * @param {string} placeId
+     * Обновить место пользователя (my) по полной DTO (PlaceDTOFull) и фото
      * @param {Object} placeDTOFull - объект PlaceDTOFull
      * @param {FormData} [photosFormData] - FormData с фото (опционально)
      * @returns {Promise<any>}
      */
-    async updatePlaceFull(placeId, placeDTOFull, photosFormData) {
-        // TODO: Впиши сюда URL для обновления места
-        const url = '';
+    async updateMyPlace(placeDTOFull, photosFormData) {
         // Сначала отправляем основную DTO
-        const dtoResponse = await this.makeRequest(url, {
+        const dtoResponse = await this.makeRequest('/Place/my/update', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(placeDTOFull)
         });
-        // Если есть фото, отправляем их отдельно
+        // Если есть фото, отправляем их отдельно (если API поддерживает)
         let photosResponse = null;
         if (photosFormData) {
-            // TODO: Впиши сюда URL для загрузки фото
-            const photosUrl = '';
-            photosResponse = await this.makeRequest(photosUrl, {
-                method: 'POST',
-                body: photosFormData
-            });
+            // Если API поддерживает загрузку фото отдельно, укажите нужный endpoint
+            // const photosUrl = '/Place/my/upload-photos';
+            // photosResponse = await this.makeRequest(photosUrl, {
+            //     method: 'POST',
+            //     body: photosFormData
+            // });
         }
         return { dtoResponse, photosResponse };
+    }
+
+    /**
+     * Обновить место по полной DTO (PlaceDTOFull) и фото (устаревший метод)
+     * @deprecated Используйте updateMyPlace
+     */
+    async updatePlaceFull(placeId, placeDTOFull, photosFormData) {
+        // Для обратной совместимости вызываем updateMyPlace
+        return this.updateMyPlace(placeDTOFull, photosFormData);
     }
 }
 

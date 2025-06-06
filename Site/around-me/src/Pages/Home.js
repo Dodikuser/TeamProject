@@ -221,7 +221,7 @@ function Home() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
             />
-            <span
+            {/*<span
               className="material-symbols-outlined position-absolute"
               style={{
                 bottom: '10px',
@@ -232,34 +232,12 @@ function Home() {
               title={t('mic_not_active')}
             >
               mic
-            </span>
+            </span>*/}
           </div>
         </Form>
 
-        <Row className="mt-3">
-          <Col xs="auto">
-            <button
-              type="button"
-              className="btn btn-outline-secondary d-flex align-items-center gap-2"
-              onClick={() => setShowFilters(true)}
-            >
-              <span className="material-symbols-outlined">filter_list</span>
-              {t('filters')}
-            </button>
-          </Col>
-          <Col xs="auto">
-            <button
-              type="button"
-              className="btn btn-outline-secondary d-flex align-items-center gap-2"
-              onClick={() => setShowSort(true)}
-            >
-              <span className="material-symbols-outlined">sort</span>
-              {t('sort')}
-            </button>
-          </Col>
-        </Row>
+        
 
-        {/* Search Results */}
         <div
           style={{
             display: 'flex',
@@ -304,8 +282,7 @@ function Home() {
         </div>
       </Container>
 
-      <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} />
-      <SortOffcanvas show={showSort} onClose={() => setShowSort(false)} />
+
       {selectedPlace && (
         <LocationModal
           show={showModal}

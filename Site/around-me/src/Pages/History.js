@@ -466,8 +466,8 @@ export default function History() {
         </Modal.Body>
       </Modal>
 
-      <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} />
-      <SortOffcanvas show={showSort} onClose={() => setShowSort(false)} />
+      {/* <FilterOffcanvas show={showFilters} onClose={() => setShowFilters(false)} />
+      <SortOffcanvas show={showSort} onClose={() => setShowSort(false)} /> */}
 
       <style>{`
         .custom-animated-button {
