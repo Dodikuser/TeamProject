@@ -54,7 +54,7 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_placeholder" />
 
-            <!-- Photo Gallery -->
+
 
             <!-- Place Info Card from second file -->
             <androidx.cardview.widget.CardView

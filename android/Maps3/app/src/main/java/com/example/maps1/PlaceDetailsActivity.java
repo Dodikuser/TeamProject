@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.example.maps1.places.MyPlace;
 import com.example.maps1.utils.PlaceUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.maps1.Favorites.FavoritesHelper;
 
 public class PlaceDetailsActivity extends AppCompatActivity {
     private MyPlace place;
@@ -48,7 +49,52 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         TextView placePhone = findViewById(R.id.place_phone);
         TextView placeHours = findViewById(R.id.place_hours);
         TextView placeWebsite = findViewById(R.id.place_email);
+        Button btnSave = findViewById(R.id.btn_save);
 
+        // Track favorite state locally (assume not favorite by default)
+        final boolean[] isFavorite = {false};
+
+        // Set initial button text
+        btnSave.setText(isFavorite[0] ? "Видалити з улюблених" : "Зберегти");
+
+        btnSave.setOnClickListener(v -> {
+            // Получаем токен
+            android.content.SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+            String token = prefs.getString("auth_token", null);
+            if (token == null) {
+                Toast.makeText(this, "Необхідна авторизація", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String placeId = place.getId();
+            boolean like = !isFavorite[0];
+            String action = like ? "Add" : "Remove";
+            new Thread(() -> {
+                try {
+                    java.net.URL url = new java.net.URL("https://api.aroundme.pp.ua/api/Favorites/action?gmapsPlaceId="
+                            + java.net.URLEncoder.encode(placeId, "UTF-8") +
+                            "&action=" + action);
+                    java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Authorization", "Bearer " + token);
+                    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    conn.setDoOutput(true);
+                    conn.setDoInput(true);
+                    int responseCode = conn.getResponseCode();
+                    conn.disconnect();
+                    runOnUiThread(() -> {
+                        if (responseCode == java.net.HttpURLConnection.HTTP_OK) {
+                            isFavorite[0] = like;
+                            btnSave.setText(isFavorite[0] ? "Видалити з улюблених" : "Зберегти");
+                            Toast.makeText(this, isFavorite[0] ? "Додано до улюблених" : "Видалено з улюблених", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Помилка: " + responseCode, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (Exception e) {
+                    runOnUiThread(() -> Toast.makeText(this, "Помилка мережі: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            }).start();
+        });
 
         // Заповнення даними
         placeName.setText(place.getName());
@@ -68,7 +114,6 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         } else {
             mainPhoto.setImageResource(R.drawable.ic_placeholder);
         }
-
 
         // Завантаження часу
         if (place.getId() != null) {
