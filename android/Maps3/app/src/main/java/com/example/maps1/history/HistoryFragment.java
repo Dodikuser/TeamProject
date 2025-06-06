@@ -48,7 +48,7 @@ import java.util.Locale;
 
 public class HistoryFragment extends Fragment {
 
-    private static final String BASE_URL = "https://10.0.2.2:7103/api";
+    private static final String BASE_URL = "https://app.aroundme.pp.ua/api";
 
     private RecyclerView recyclerView;
     private HistoryAdapter historyAdapter;
@@ -580,7 +580,7 @@ public class HistoryFragment extends Fragment {
         new Thread(() -> {
             try {
                 String action = addToFavorites ? "Add" : "Remove";
-                URL url = new URL("https://10.0.2.2:7103/api/Favorites/action?gmapsPlaceId="
+                URL url = new URL("https://app.aroundme.pp.ua/api/Favorites/action?gmapsPlaceId="
                         + URLEncoder.encode(item.getId(), "UTF-8") +
                         "&action=" + action);
 

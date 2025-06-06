@@ -111,7 +111,7 @@ public class FavoritesFragment extends Fragment {
 
         new Thread(() -> {
             try {
-                URL url = new URL("https://10.0.2.2:7103/api/Favorites/get?skip=0&take=50");
+                URL url = new URL("https://app.aroundme.pp.ua/api/Favorites/get?skip=0&take=50");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
@@ -207,7 +207,7 @@ public class FavoritesFragment extends Fragment {
 
         new Thread(() -> {
             try {
-                URL url = new URL("https://10.0.2.2:7103/api/Favorites/search?" +
+                URL url = new URL("https://app.aroundme.pp.ua/api/Favorites/search?" +
                         "keyWord=" + java.net.URLEncoder.encode(query, "UTF-8") +
                         "&skip=0&take=50");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -289,7 +289,7 @@ public class FavoritesFragment extends Fragment {
         new Thread(() -> {
             try {
 
-                URL url = new URL("https://10.0.2.2:7103/api/Favorites/action?gmapsPlaceId="
+                URL url = new URL("https://app.aroundme.pp.ua/api/Favorites/action?gmapsPlaceId="
                         + java.net.URLEncoder.encode(item.getGmapsPlaceId(), "UTF-8") +
                         "&action=Remove");
 

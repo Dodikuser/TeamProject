@@ -36,7 +36,7 @@ public class FavoritesHelper {
 
         new Thread(() -> {
             try {
-                URL url = new URL("https://10.0.2.2:7103/api/Favorites/action");
+                URL url = new URL("https://app.aroundme.pp.ua/api/Favorites/action");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Authorization", "Bearer " + token);

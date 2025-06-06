@@ -130,13 +130,6 @@
                             android:progressBackgroundTint="@color/primary_light"
                             android:secondaryProgressTint="@color/primary"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="3.5"
-                            android:textSize="14sp"/>
-
                         <Button
                             android:id="@+id/btn_reviews"
                             style="@style/TextButton"
@@ -145,7 +138,7 @@
                             android:layout_marginStart="16dp"
                             android:background="?attr/selectableItemBackground"
                             android:text="Переглянути відгуки"
-                            android:textAllCaps="false"/>
+                            android:textAllCaps="false" />
                     </LinearLayout>
 
                     <!-- Contact Info -->

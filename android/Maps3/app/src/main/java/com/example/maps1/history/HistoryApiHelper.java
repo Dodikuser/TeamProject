@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 public class HistoryApiHelper {
 
-    private static final String BASE_URL = "https://10.0.2.2:7103/api";
+    private static final String BASE_URL = "https://app.aroundme.pp.ua/api";
 
     public interface ApiCallback {
         void onSuccess(String response);

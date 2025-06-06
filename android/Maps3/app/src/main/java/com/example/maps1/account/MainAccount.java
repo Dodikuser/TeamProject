@@ -103,7 +103,7 @@ public class MainAccount extends Fragment {
                 javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
                 // Настраиваем подключение
-                java.net.URL url = new java.net.URL("https://10.0.2.2:7103/api/User/get");
+                java.net.URL url = new java.net.URL("https://app.aroundme.pp.ua/api/User/get");
                 javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -158,7 +158,7 @@ public class MainAccount extends Fragment {
                 javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
                 javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
-                java.net.URL url = new java.net.URL("https://10.0.2.2:7103/api/Review/get-by-user?skip=0&take=10");
+                java.net.URL url = new java.net.URL("https://app.aroundme.pp.ua/api/Review/get-by-user?skip=0&take=10");
                 javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -243,7 +243,7 @@ public class MainAccount extends Fragment {
                 javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
                 javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
-                String urlStr = "https://10.0.2.2:7103/api/Place/info/?placeId=" + gmapId;
+                String urlStr = "https://app.aroundme.pp.ua/api/Place/info/?placeId=" + gmapId;
                 java.net.URL url = new java.net.URL(urlStr);
                 javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");

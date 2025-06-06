@@ -25,7 +25,7 @@ import java.security.cert.X509Certificate;
 import okhttp3.RequestBody;
 
 public class RecommendationService {
-    private static final String BASE_URL = "https://10.0.2.2:7103/api";
+    private static final String BASE_URL = "https://app.aroundme.pp.ua/api";
     private static final String TAG = "RecommendationService";
     private static OkHttpClient client;
 
@@ -137,7 +137,7 @@ public class RecommendationService {
 
     public static void toggleLike(String placeId, boolean like, String token) throws IOException {
         AccountFragment.trustAllCertificates();
-        URL url = new URL("https://10.0.2.2:7103/api/Favorites/action?gmapsPlaceId="
+        URL url = new URL("https://app.aroundme.pp.ua/api/Favorites/action?gmapsPlaceId="
                 + placeId +
                 "&action=" + (like ? "Add" : "Remove"));
 

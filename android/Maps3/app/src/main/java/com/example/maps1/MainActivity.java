@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             int radius = 1000; // 1km radius
 
                             String urlStr = String.format(
-                                    "https://10.0.2.2:7103/api/AI/search?text=%s&radius=%d&latitude=%f&longitude=%f",
+                                    "https://app.aroundme.pp.ua/api/AI/search?text=%s&radius=%d&latitude=%f&longitude=%f",
                                     urlEncode(query), radius, latitude, longitude);
 
                             showSearchResults(true);

@@ -47,14 +47,14 @@ public class ReviewsActivity extends AppCompatActivity {
         Button btnAddReview = findViewById(R.id.btn_add_review);
         TextView tvRating = findViewById(R.id.tv_rating);
         RatingBar ratingBar = findViewById(R.id.rating_bar);
-        TextView tvReviewsCount = findViewById(R.id.tv_reviews_count);
+
         Spinner spinnerSort = findViewById(R.id.spinner_sort);
         LinearLayout reviewsContainer = findViewById(R.id.reviews_container);
 
         // Встановлюємо значення
         tvRating.setText(String.format("%.1f", rating));
         ratingBar.setRating((float) rating);
-        tvReviewsCount.setText(String.format("Відгуків: %d", reviewsCount));
+
 
         // Налаштовуємо спінер для сортування
         List<String> sortOptions = Arrays.asList(
@@ -128,7 +128,7 @@ public class ReviewsActivity extends AppCompatActivity {
             return;
         }
         OkHttpClient client = getUnsafeOkHttpClient();
-        String url = "https://10.0.2.2:7103/api/Review/get?placeId=" + placeId + "&skip=0&take=10";
+        String url = "https://app.aroundme.pp.ua/api/Review/get?placeId=" + placeId + "&skip=0&take=10";
 
         Request request = new Request.Builder()
                 .url(url)

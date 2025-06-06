@@ -19,7 +19,7 @@ public class PlaceUtils {
     public static void fetchPlaceDetails(Context context, String placeId, Consumer<MyPlace> callback) {
         new Thread(() -> {
             try {
-                java.net.URL url = new java.net.URL("https://10.0.2.2:7103/api/Place/info/?placeId=" + placeId);
+                java.net.URL url = new java.net.URL("https://app.aroundme.pp.ua/api/Place/info/?placeId=" + placeId);
                 java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
 
@@ -117,7 +117,7 @@ public class PlaceUtils {
     public static void addPlaceToHistory(Context context, String token, String placeId) {
         new Thread(() -> {
             try {
-                java.net.URL url = new java.net.URL("https://10.0.2.2:7103/api/history/places/action?historyAction=Add");
+                java.net.URL url = new java.net.URL("https://app.aroundme.pp.ua/api/history/places/action?historyAction=Add");
                 javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
