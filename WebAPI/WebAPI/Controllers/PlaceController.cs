@@ -40,8 +40,20 @@ namespace WebAPI.Controllers
         }
 
         /// <summary> Обновить информацию о своем месте. </summary>
-        [HttpPut("my/{placeId}/info")]
-        public IActionResult UpdatePlaceInfo(int placeId, [FromBody] object placeInfo) => Ok();
+        [HttpPut("my/update")]
+        public async Task<IActionResult> UpdatePlaceInfo([FromBody] PlaceDTOFull placeInfo)
+        {
+            ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
+            var place = await _placeService.GetByGmapId(placeInfo.GmapsPlaceId);
+
+            if (place.UserId != (int)userId)
+            {
+                return Forbid();
+            }
+            await _placeService.UpdateAsync(placeInfo);
+
+            return Ok(placeInfo);
+        }
 
         /// <summary> Обновить настройки своего места. </summary>
         [HttpPut("my/{placeId}/settings")]

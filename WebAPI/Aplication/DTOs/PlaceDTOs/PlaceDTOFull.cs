@@ -1,5 +1,4 @@
 ﻿using Entities.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace Application.DTOs
 {
@@ -8,14 +7,8 @@ namespace Application.DTOs
         public string Name { get; set; }
         public string? Description { get; set; }
         public string Address { get; set; }
-
-        [RegularExpression(@"^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-]*)*$", ErrorMessage = "Invalid site URL format.")]
         public string? Site { get; set; }
-
-        [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format.")]
         public string? PhoneNumber { get; set; }
-
-        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format.")]
         public string? Email { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
