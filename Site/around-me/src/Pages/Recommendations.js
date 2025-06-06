@@ -5,41 +5,14 @@ import RecommendationService from '../services/RecommendationService';
 import FavoriteService from '../services/FavoriteService';
 import { useNavigate } from 'react-router-dom';
 import GeoService from '../services/GeoService';
-
-const categories = [
-  'Цікаві місця', 'Туризм', 'Їжа', 'Природа', 'Шопінг', 'Історія', 'Спорт',
-  'Для дітей', 'Тихі місця', 'Романтика', 'Екзотика', 'Екстрим', 'Розваги', 'Банк', 'Місця поруч', 'Архітектура'
-];
-
-// Error boundary component
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('Error in recommendations:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="text-center py-5 text-danger">
-          Щось пішло не так. Спробуйте оновити сторінку.
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
+import { useTranslation } from 'react-i18next';
 
 export default function Recommendations() {
+  const { t } = useTranslation();
+  const categories = [
+    t('interesting_places'), t('tourism'), t('food'), t('nature'), t('shopping'), t('history_category'), t('sport'),
+    t('for_kids'), t('quiet_places'), t('romance'), t('exotic'), t('extreme'), t('entertainment'), t('bank'), t('places_nearby'), t('architecture')
+  ];
   const scrollRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [recommendations, setRecommendations] = useState([]);
@@ -221,7 +194,7 @@ export default function Recommendations() {
             <div className="position-relative" style={{ width: '100%', maxWidth: '500px' }}>
               <Form.Control
                 type="search"
-                placeholder="Пошук"
+                placeholder={t('search')}
                 className="ps-3 pe-5"
                 style={{ borderRadius: '8px' }}
                 value={searchTerm}
@@ -299,13 +272,13 @@ export default function Recommendations() {
                 variant="outline-primary" 
                 onClick={() => window.location.reload()}
               >
-                Спробувати знову
+                {t('try_again')}
               </Button>
             </div>
           </Col>
         ) : filteredRecommendations.length === 0 ? (
           <Col xs={12} className="text-center py-5 text-muted fs-6">
-            {searchTerm ? 'За вашим запитом нічого не знайдено' : 'Рекомендацій не знайдено'}
+            {searchTerm ? t('nothing_found_for_query') : t('no_recommendations_found')}
           </Col>
         ) : (
           filteredRecommendations.map((rec, idx) => (
@@ -347,9 +320,5 @@ export default function Recommendations() {
     </Container>
   );
 
-  return (
-    <ErrorBoundary>
-      {content}
-    </ErrorBoundary>
-  );
+  return content;
 }

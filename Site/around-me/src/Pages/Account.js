@@ -3,7 +3,11 @@ import UserService from '../services/UserService';
 import ReviewService from '../services/ReviewService';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+
+import { useTranslation } from 'react-i18next';
+
 import BuyTokens from '../Components/BuyTokens';
+
 
 const AccountPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -24,6 +28,7 @@ const AccountPage = () => {
   const [tokensAvailable, setTokensAvailable] = useState(null);
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -36,7 +41,7 @@ const AccountPage = () => {
           setCreatedAt(date.toLocaleDateString());
         }
       } catch (err) {
-        setError('Помилка завантаження даних користувача');
+        setError(t('user_data_error'));
         console.error('Error fetching user data:', err);
       } finally {
         setLoading(false);
@@ -44,7 +49,7 @@ const AccountPage = () => {
     };
 
     fetchUserData();
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     const fetchUserReviews = async () => {
@@ -56,14 +61,14 @@ const AccountPage = () => {
         setReviews(reviews);
       } catch (err) {
         console.error('Error fetching user reviews:', err);
-        setReviewsError('Помилка завантаження відгуків');
+        setReviewsError(t('reviews_error'));
       } finally {
         setReviewsLoading(false);
       }
     };
 
     fetchUserReviews();
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     async function fetchUserData() {
@@ -81,13 +86,13 @@ const AccountPage = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!name.trim()) newErrors.name = 'Імя обовязкове';
+    if (!name.trim()) newErrors.name = t('required_name');
     if (password && !oldPassword) 
-      newErrors.oldPassword = 'Введіть поточний пароль';
+      newErrors.oldPassword = t('required_current_password');
     if (password && password.length < 6)
-      newErrors.password = 'Пароль повинен містити щонайменше 6 символів';
+      newErrors.password = t('password_min_length');
     if (password && password !== confirmPassword)
-      newErrors.confirmPassword = 'Паролі не співпадають';
+      newErrors.confirmPassword = t('passwords_do_not_match');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -112,7 +117,7 @@ const AccountPage = () => {
       setConfirmPassword('');
       setErrors({});
     } catch (err) {
-      setErrors({ oldPassword: 'Невірний поточний пароль' });
+      setErrors({ oldPassword: t('wrong_current_password') });
     }
   };
 
@@ -208,13 +213,13 @@ const AccountPage = () => {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h5 className="mb-3">Редагувати профіль</h5>
+            <h5 className="mb-3">{t('edit_profile')}</h5>
 
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="Ім'я"
+              placeholder={t('name')}
             />
             {errors.name && <div className="error-text">{errors.name}</div>}
 
@@ -222,7 +227,7 @@ const AccountPage = () => {
               type="password"
               value={oldPassword}
               onChange={e => setOldPassword(e.target.value)}
-              placeholder="Поточний пароль"
+              placeholder={t('current_password')}
             />
             {errors.oldPassword && <div className="error-text">{errors.oldPassword}</div>}
 
@@ -230,7 +235,7 @@ const AccountPage = () => {
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Новий пароль (необов'язково)"
+              placeholder={t('new_password_optional')}
             />
             {errors.password && <div className="error-text">{errors.password}</div>}
 
@@ -238,20 +243,20 @@ const AccountPage = () => {
               type="password"
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
-              placeholder="Підтвердження нового пароля"
+              placeholder={t('confirm_new_password')}
             />
             {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
 
             <div className="d-flex justify-content-end">
               <button className="btn btn-secondary me-2 btn-hover" onClick={() => setShowModal(false)}>
-                Скасувати
+                {t('cancel')}
               </button>
               <button
                 className="btn btn-sm btn-hover"
                 style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}
                 onClick={handleSave}
               >
-                Зберегти
+                {t('save')}
               </button>
             </div>
           </div>
@@ -271,12 +276,14 @@ const AccountPage = () => {
 
       <div className="container py-5" style={{ fontFamily: 'Arial, sans-serif' }}>
         <div className="card mb-4 p-4">
-          <h2 className="h5 mb-3">Обліковий запис</h2>
+
+          <h2 className="h5 mb-3">{t('account')}Обліковий запис</h2>
           {tokensAvailable !== null && (
             <div className="mb-3">
               <b>Ваш баланс токенов:</b> {tokensAvailable}
             </div>
           )}
+
           {loading ? (
             <div className="text-center py-4">
               <div className="spinner-border text-primary" role="status">
@@ -327,9 +334,19 @@ const AccountPage = () => {
                       fontSize: '0.75rem',
                     }}
                   >
-                    Змінити
+                    {t('change_avatar')}
                   </div>
                 </div>
+
+                {avatar && (
+                  <button
+                    className="btn btn-outline-danger btn-sm mt-2 btn-hover"
+                    onClick={handleRemoveAvatar}
+                  >
+                    {t('delete_avatar')}
+                  </button>
+                )}
+
               </div>
 
               <div className="col ps-3">
@@ -340,7 +357,8 @@ const AccountPage = () => {
                 >
                   {email}
                 </a>
-                <p className="mb-2 text-muted">Дата реєстрації: {createdAt}</p>
+
+                <p className="mb-2 text-muted">{t('registration_date')}: {createdAt}</p>
                 <div className="d-flex justify-content-between align-items-center mb-2" style={{gap: '10px'}}>
                   <div></div>
                   <button
@@ -355,21 +373,21 @@ const AccountPage = () => {
                   style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}
                   onClick={() => setShowModal(true)}
                 >
-                  Змінити
+                  {t('change')}
                 </button>
-                <button className="btn btn-secondary btn-sm btn-hover" onClick={handleLogout}>Вийти</button>
+                <button className="btn btn-secondary btn-sm btn-hover" onClick={handleLogout}>{t('logout')}</button>
               </div>
             </div>
           )}
         </div>
 
         <div className="card p-4" style={{ minHeight: '250px', display: 'flex', flexDirection: 'column' }}>
-          <h3 className="h6 mb-3">Мої відгуки</h3>
+          <h3 className="h6 mb-3">{t('my_reviews')}</h3>
           <div style={{ overflowY: 'auto', flexGrow: 1 }}>
             {reviewsLoading ? (
               <div className="text-center py-4">
                 <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Завантаження...</span>
+                  <span className="visually-hidden">{t('loading')}</span>
                 </div>
               </div>
             ) : reviewsError ? (
@@ -378,7 +396,7 @@ const AccountPage = () => {
               </div>
             ) : reviews.length === 0 ? (
               <div className="text-center text-muted py-4">
-                У вас поки немає відгуків
+                {t('no_reviews_yet')}
               </div>
             ) : (
               reviews.map((review, index) => (
@@ -387,13 +405,13 @@ const AccountPage = () => {
                     
                     <div className="flex-grow-1 pe-3">
                       <div className="d-flex justify-content-between align-items-start mb-1">
-                        <h6 className="mb-0">{review.placeName || 'Без назви'}</h6>
+                        <h6 className="mb-0">{review.placeName || t('untitled')}</h6>
                         <small className="text-muted">
                           {new Date(review.reviewDateTime).toLocaleDateString()}
                         </small>
                       </div>
                       <p className="mb-1 text-muted" style={{ fontSize: '0.9rem' }}>
-                        {review.placeAddress || 'Адреса не вказана'}
+                        {review.placeAddress || t('address_not_specified')}
                       </p>
                       <div className="d-flex gap-3 mb-2">
                         <div style={{ color: '#FFD700', fontSize: '1.2rem' }}>
@@ -416,7 +434,7 @@ const AccountPage = () => {
                         localStorage.setItem("openPlace", review.gmapId);
                       }}
                     >
-                      Перейти
+                      {t('go_to')}
                     </button>
                   </div>
                 </div>

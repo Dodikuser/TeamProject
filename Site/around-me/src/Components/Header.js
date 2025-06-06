@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Container, Navbar, Dropdown } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ function Header() {
   const currentPath = location.pathname;
 const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 const { isAuthenticated, logout } = useAuth();
+const { t, i18n } = useTranslation();
 
 const handleLogout = () => {
   logout();
@@ -33,10 +35,10 @@ const handleLogout = () => {
 
         <div className="d-flex gap-4 align-items-center mx-auto">
           {[
-            { icon: 'home', label: 'Головна', path: '/' },
-            { icon: 'favorite', label: 'Улюблене', path: '/favorites' },
-            { icon: 'recommend', label: 'Рекомендації', path: '/recommendations' },
-            { icon: 'history', label: 'Історія', path: '/history' },
+            { icon: 'home', label: t('home'), path: '/' },
+            { icon: 'favorite', label: t('favorites'), path: '/favorites' },
+            { icon: 'recommend', label: t('recommendations'), path: '/recommendations' },
+            { icon: 'history', label: t('history'), path: '/history' },
           ].map((item, idx) => {
             const isActive = currentPath === item.path;
 
@@ -71,16 +73,16 @@ const handleLogout = () => {
 
             <Dropdown.Menu className="mt-3">
               {!isAuthenticated ? (
-                <Dropdown.Item as={Link} to="/login">Вхід / Реєстрація</Dropdown.Item>
+                <Dropdown.Item as={Link} to="/login">{t('login_register')}</Dropdown.Item>
               ) : (
                 <>
-                  <Dropdown.Item as={Link} to="/account">Мій акаунт</Dropdown.Item>
-                  <Dropdown.Item as={Link} to="/my-places">Мої заклади</Dropdown.Item>
-                  <Dropdown.Item onClick={handleLogout}>Вийти</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/account">{t('my_account')}</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/my-places">{t('my_places')}</Dropdown.Item>
+                  <Dropdown.Item onClick={handleLogout}>{t('logout')}</Dropdown.Item>
                 </>
               )}
               <Dropdown.Item onClick={() => setShowLanguageMenu(!showLanguageMenu)}>
-                Мова інтерфейсу
+                {t('interface_language')}
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -102,17 +104,29 @@ const handleLogout = () => {
       >
         arrow_back
       </span>
-      <span className="fw-semibold">Обрати мову</span>
+      <span className="fw-semibold">{t('choose_language')}</span>
     </div>
 
     <div className="d-flex flex-column gap-2">
       <label className="d-flex justify-content-between align-items-center border rounded px-3 py-2">
-        <span>Українська (uk)</span>
-        <input type="radio" name="language" value="uk" />
+        <span>{t('ukrainian')}</span>
+        <input
+          type="radio"
+          name="language"
+          value="uk"
+          checked={i18n.language === 'uk'}
+          onChange={() => i18n.changeLanguage('uk')}
+        />
       </label>
       <label className="d-flex justify-content-between align-items-center border rounded px-3 py-2">
-        <span>Англійська (en)</span>
-        <input type="radio" name="language" value="en" />
+        <span>{t('english')}</span>
+        <input
+          type="radio"
+          name="language"
+          value="en"
+          checked={i18n.language === 'en'}
+          onChange={() => i18n.changeLanguage('en')}
+        />
       </label>
     </div>
   </div>

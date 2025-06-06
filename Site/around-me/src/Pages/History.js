@@ -8,8 +8,10 @@ import HistoryService from '../services/HistoryService';
 import FavoriteService from '../services/FavoriteService';
 import UserService from '../services/UserService';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function History() {
+  const { t } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const [activeTab, setActiveTab] = useState('visit');
@@ -336,20 +338,20 @@ export default function History() {
                 onClick={() => setActiveTab('visit')}
                 disabled={loading}
               >
-                Історія відвідування
+                {t('visit_history')}
               </Button>
               <Button 
                 variant={activeTab === 'search' ? 'primary' : 'outline-primary'} 
                 onClick={() => setActiveTab('search')}
                 disabled={loading}
               >
-                Історія пошуку
+                {t('search_history')}
               </Button>
             </div>
             <div className="position-relative" style={{ width: '100%', maxWidth: '500px' }}>
               <Form.Control
                 type="search"
-                placeholder={`Пошук в ${activeTab === 'visit' ? 'історії відвідування' : 'історії пошуку'}`}
+                placeholder={t('search_in_history', { type: t(activeTab === 'visit' ? 'visit_history' : 'search_history').toLowerCase() })}
                 className="ps-3 pe-5"
                 style={{ borderRadius: '8px' }}
                 value={searchTerm}
@@ -365,9 +367,9 @@ export default function History() {
         <Row className="mb-3">
           <Col xs={12}>
             <Alert variant="danger" className="d-flex justify-content-between align-items-center">
-              <span>Помилка: {error}</span>
+              <span>{t('error')}: {error}</span>
               <Button variant="outline-danger" size="sm" onClick={refreshHistory}>
-                Спробувати знову
+                {t('try_again')}
               </Button>
             </Alert>
           </Col>
@@ -376,7 +378,7 @@ export default function History() {
 
       <Row style={{ flex: 1, overflow: 'hidden', height: 'calc(90vh - 80px)' }}>
         <Col xs="auto" className="d-flex flex-column gap-3" style={{ paddingLeft: 0, flexShrink: 0 }}>
-          <OverlayTrigger placement="bottom" overlay={<Tooltip>{isIncognito ? 'Вимкнути інкогніто' : 'Увімкнути інкогніто'}</Tooltip>}>
+          <OverlayTrigger placement="bottom" overlay={<Tooltip>{isIncognito ? t('disable_incognito') : t('enable_incognito')}</Tooltip>}>
             <Button 
               variant={isIncognito ? 'dark' : 'outline-dark'} 
               onClick={handleIncognitoToggle}
@@ -384,7 +386,7 @@ export default function History() {
               style={{ minWidth: '130px' }}
             >
               <span className="material-symbols-outlined">{isIncognito ? 'visibility_off' : 'visibility'}</span>
-              Інкогніто
+              {t('incognito')}
             </Button>
           </OverlayTrigger>
           <Button 
@@ -393,7 +395,7 @@ export default function History() {
             style={{ minWidth: '130px' }}
             disabled={loading}
           >
-            {loading ? <Spinner size="sm" /> : 'Оновити'}
+            {loading ? <Spinner size="sm" /> : t('update')}
           </Button>
           <Button 
             variant="outline-danger" 
@@ -401,7 +403,7 @@ export default function History() {
             style={{ minWidth: '130px' }}
             disabled={loading}
           >
-            Очистити всю історію
+            {t('clear_all_history')}
           </Button>
         </Col>
 
@@ -409,29 +411,37 @@ export default function History() {
           {loading && historyPlaces.length === 0 && searchHistory.length === 0 ? (
             <div className="d-flex justify-content-center align-items-center h-100">
               <Spinner animation="border" role="status">
-                <span className="visually-hidden">Завантаження...</span>
+                <span className="visually-hidden">{t('loading')}</span>
               </Spinner>
             </div>
           ) : (
             <>
               {activeTab === 'visit' ? (
-                <VisitHistory 
-                  places={filteredHistoryPlaces} 
-                  onClear={handleClearVisit} 
-                  onGoTo={handleGoToVisit} 
-                />
+                filteredHistoryPlaces.length === 0 ? (
+                  <div className="text-center text-muted py-5">{t('empty_visit_history')}</div>
+                ) : (
+                  <VisitHistory 
+                    places={filteredHistoryPlaces} 
+                    onClear={handleClearVisit} 
+                    onGoTo={handleGoToVisit} 
+                  />
+                )
               ) : (
-                <SearchHistory 
-                  searches={filteredSearchHistory} 
-                  onClearSearch={handleClearSearch} 
-                  onGoToSearch={handleGoToSearch} 
-                />
+                filteredSearchHistory.length === 0 ? (
+                  <div className="text-center text-muted py-5">{t('empty_search_history')}</div>
+                ) : (
+                  <SearchHistory 
+                    searches={filteredSearchHistory} 
+                    onClearSearch={handleClearSearch} 
+                    onGoToSearch={handleGoToSearch} 
+                  />
+                )
               )}
               
               {hasMore && !loading && (
                 <div className="text-center mt-3">
                   <Button variant="outline-primary" onClick={loadMore}>
-                    Завантажити більше
+                    {t('load_more')}
                   </Button>
                 </div>
               )}
@@ -450,8 +460,8 @@ export default function History() {
         <Modal.Body className="text-center py-4">
           <p className="fs-5 mb-4">{confirmText}</p>
           <div className="d-flex justify-content-center gap-3">
-            <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>Скасувати</Button>
-            <Button variant="danger" onClick={() => { confirmAction(); setShowConfirmModal(false); }}>Так, видалити</Button>
+            <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>{t('cancel')}</Button>
+            <Button variant="danger" onClick={() => { confirmAction(); setShowConfirmModal(false); }}>{t('yes_delete')}</Button>
           </div>
         </Modal.Body>
       </Modal>

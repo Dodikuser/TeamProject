@@ -1,6 +1,7 @@
 // Components/MyPlaceCard.js
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 const MyPlaceCard = ({
   image,
@@ -12,6 +13,9 @@ const MyPlaceCard = ({
   onGoTo,
   extraInfo,
 }) => {
+
+  const { t } = useTranslation();
+
   // Функция для отображения звезд рейтинга
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -52,7 +56,7 @@ const MyPlaceCard = ({
          <span
             className="material-symbols-outlined text-muted"
             role="button"
-            title="Видалити"
+            title={t('delete')}
             onClick={(e) => {
                 e.stopPropagation(); 
                 onDelete();
@@ -80,7 +84,7 @@ const MyPlaceCard = ({
   }}
   className="custom-animated-button"
 >
-  Перейти
+  {t('go_to')}
 </Button>
 
 

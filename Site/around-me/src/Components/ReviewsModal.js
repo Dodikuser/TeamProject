@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Container, Row, Col, Form } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 const ratingDistribution = {
   5: 0.45,
@@ -28,12 +29,13 @@ const modalWrapperStyle = {
 };
 
 const ReviewsModal = ({ show, onHide, reviews = [], rating = 0, isLoading = false, error = null }) => {
+  const { t } = useTranslation();
   const [sortOrder, setSortOrder] = useState('newest');
   const [search, setSearch] = useState('');
 
   // Преобразуем отзывы в нужный формат
   const normalizedReviews = Array.isArray(reviews) ? reviews.map(review => ({
-    name: review.userName || 'Анонім',
+    name: review.userName || t('anonymous'),
     date: review.reviewDateTime,
     stars: review.stars,
     text: review.text,
@@ -53,11 +55,11 @@ const ReviewsModal = ({ show, onHide, reviews = [], rating = 0, isLoading = fals
     const then = new Date(dateString);
     const diff = now - then;
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days < 1) return 'сьогодні';
-    if (days < 7) return `${days} днів тому`;
-    if (days < 30) return `${Math.floor(days / 7)} тижнів тому`;
-    if (days < 365) return `${Math.floor(days / 30)} місяців тому`;
-    return `${Math.floor(days / 365)} роки тому`;
+    if (days < 1) return t('today');
+    if (days < 7) return t('days_ago', { count: days });
+    if (days < 30) return t('weeks_ago', { count: Math.floor(days / 7) });
+    if (days < 365) return t('months_ago', { count: Math.floor(days / 30) });
+    return t('years_ago', { count: Math.floor(days / 365) });
   };
 
   if (!show) return null;
@@ -75,7 +77,7 @@ const ReviewsModal = ({ show, onHide, reviews = [], rating = 0, isLoading = fals
             <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
               arrow_back
             </span>
-            Повернутися
+            {t('back')}
           </Button>
 
           <Container fluid className="flex-grow-1 overflow-hidden d-flex flex-column">
@@ -93,7 +95,7 @@ const ReviewsModal = ({ show, onHide, reviews = [], rating = 0, isLoading = fals
               <>
                 <Row className="mb-4">
                   <Col md={8}>
-                    <h5 className="mb-3">Відгуки</h5>
+                    <h5 className="mb-3">{t('reviews')}</h5>
                     {[5, 4, 3, 2, 1].map((score) => {
                       const count = normalizedReviews.filter(r => r.stars === score).length;
                       const percent = normalizedReviews.length > 0 ? count / normalizedReviews.length : 0;
@@ -121,7 +123,7 @@ const ReviewsModal = ({ show, onHide, reviews = [], rating = 0, isLoading = fals
                     <div className="text-warning fs-4">
                       {'★'.repeat(Math.round(rating))}{'☆'.repeat(5 - Math.round(rating))}
                     </div>
-                    <div className="text-muted">Відгуків: {normalizedReviews.length}</div>
+                    <div className="text-muted">{t('reviews_count', { count: normalizedReviews.length })}</div>
                   </Col>
                 </Row>
 
@@ -131,7 +133,7 @@ const ReviewsModal = ({ show, onHide, reviews = [], rating = 0, isLoading = fals
                       <span className="material-symbols-outlined me-2 text-secondary">search</span>
                       <Form.Control
                         type="text"
-                        placeholder="Пошук у відгуках"
+                        placeholder={t('search_in_reviews')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="border-0 shadow-none"
@@ -144,7 +146,7 @@ const ReviewsModal = ({ show, onHide, reviews = [], rating = 0, isLoading = fals
                       onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
                       className="fw-bold d-inline-flex align-items-center"
                     >
-                      {sortOrder === 'newest' ? 'Найновіші' : 'Найстаріші'}
+                      {sortOrder === 'newest' ? t('newest') : t('oldest')}
                       <span
                         className="material-symbols-outlined ms-1"
                         style={{
@@ -161,7 +163,7 @@ const ReviewsModal = ({ show, onHide, reviews = [], rating = 0, isLoading = fals
                 <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '0.5rem' }}>
                   {filteredReviews.length === 0 ? (
                     <div className="text-center text-muted py-5">
-                      {search ? 'Відгуки не знайдено' : 'Ще немає відгуків'}
+                      {search ? t('no_reviews_found') : t('no_reviews_yet')}
                     </div>
                   ) : (
                     filteredReviews.map((review, index) => (

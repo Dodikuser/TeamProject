@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 export default function FavoritesCard({
   id,
@@ -12,6 +13,8 @@ export default function FavoritesCard({
   onGoTo,
   favoritedAt,
 }) {
+  const { t } = useTranslation();
+
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.25 && rating % 1 < 0.75;
@@ -53,7 +56,7 @@ export default function FavoritesCard({
             role="button"
             style={{ cursor: 'pointer' }}
             onClick={onDelete}
-            title="Видалити"
+            title={t('delete')}
           >
             delete
           </span>
@@ -75,7 +78,7 @@ export default function FavoritesCard({
             onClick={onGoTo}
             className="custom-animated-button"
           >
-            Перейти
+            {t('go_to')}
           </Button>
         </div>
 

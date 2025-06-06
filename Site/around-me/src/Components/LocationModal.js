@@ -3,13 +3,16 @@ import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 import ReviewsModal from './ReviewsModal';
 import RatingModal from './RatingModal';
 import ReviewService from '../services/ReviewService';
+import { useTranslation } from 'react-i18next';
 import FavoriteService from '../services/FavoriteService';
+
 
 import GeoService from '../services/GeoService';
 import HistoryService from '../services/HistoryService';
 
 
 const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
+  const { t } = useTranslation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
@@ -111,6 +114,7 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
 
   const ScheduleInfo = ({ hours, schedule }) => {
     const [open, setOpen] = useState(false);
+
     const workSchedule = schedule && Array.isArray(schedule) && schedule.length > 0 ? schedule : [];
 
     return (
@@ -377,7 +381,7 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
                       src={getDirectionsUrl(userCoords.lat, userCoords.lng, place.coordinates.lat, place.coordinates.lng)}
                     />
                     <Button className="mt-3" variant="outline-primary" onClick={() => setShowRouteIframe(false)}>
-                      Назад до карти
+                      {t('back_to_map')}
                     </Button>
                   </Col>
                 </Row>
@@ -437,25 +441,26 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
                       <div className="d-flex justify-content-center gap-4 mb-3">
                         <div className="action-button" onClick={handleShowRoute} style={{cursor: 'pointer'}}>
                           <span className="material-symbols-outlined">turn_right</span>
-                          <span>Маршрути</span>
+                          <span>{t('routes')}</span>
                         </div>
+
                         <div className="action-button" onClick={handleToggleFavorite} style={{cursor: 'pointer'}}>
                           <span className="material-symbols-outlined">{isFavorite ? 'favorite' : 'favorite_border'}</span>
-                          <span>{isFavorite ? 'У вибраному' : 'Зберегти'}</span>
+                          <span>{isFavorite ? 'У вибраному' : t('save')}</span>
                         </div>
                         <div className="action-button">
                           <span className="material-symbols-outlined">share</span>
-                          <span>Поділитися</span>
+                          <span>{t('share')}</span>
                         </div>
                       </div>
                       <div className="d-flex justify-content-center gap-3 flex-wrap">
                         <button className="review-button" onClick={() => setShowRatingModal(true)}>
                           <span className="material-symbols-outlined">add</span>
-                          Залишити відгук
+                          {t('leave_review')}
                         </button>
                         <button className="review-button" onClick={() => setShowReviews(true)}>
                           <span className="material-symbols-outlined">reviews</span>
-                          Переглянути відгуки
+                          {t('view_reviews')}
                         </button>
                       </div>
                     </Col>
@@ -467,7 +472,7 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
 
           <Modal.Footer className="modal-footer-fixed">
             <Button variant="secondary" onClick={onHide}>
-              Закрити
+              {t('close')}
             </Button>
           </Modal.Footer>
         </div>

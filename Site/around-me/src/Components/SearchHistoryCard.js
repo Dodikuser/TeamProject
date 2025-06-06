@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 import HistoryService from '../services/HistoryService';
+import { useTranslation } from 'react-i18next';
 
 export default function SearchHistoryCard({
   id,
@@ -11,6 +12,8 @@ export default function SearchHistoryCard({
   onClear,
   onSearch,
 }) {
+  const { t } = useTranslation();
+
   const handleClear = async () => {
     try {
       await HistoryService.deleteSearchHistoryItem({ id, searchTerm, searchDate });
@@ -40,7 +43,7 @@ export default function SearchHistoryCard({
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                 search
               </span>
-              Шукати
+              {t('search_btn')}
             </Button>
             <Button
               variant="outline-danger"
@@ -51,13 +54,13 @@ export default function SearchHistoryCard({
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                 delete
               </span>
-              Видалити
+              {t('delete')}
             </Button>
           </div>
         </div>
         {results.length > 0 && (
           <div>
-            <small className="text-muted d-block mb-2">Результати:</small>
+            <small className="text-muted d-block mb-2">{t('results')}:</small>
             <div className="d-flex flex-wrap gap-2">
               {results.map((result, index) => (
                 <span
