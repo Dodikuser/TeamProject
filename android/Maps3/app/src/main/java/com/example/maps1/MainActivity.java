@@ -30,6 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.maps1.account.AccountFragment;
 import com.example.maps1.account.MainAccount;
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         searchCardView = findViewById(R.id.searchCardView);
+        searchEditText = findViewById(R.id.searchEditText);
 
         // Инициализация Places API
         if (!Places.isInitialized()) {
@@ -118,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Настройка поискового поля
-        searchEditText = findViewById(R.id.searchEditText);
         searchEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 performSearch();
@@ -155,9 +156,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String authToken = prefs.getString("auth_token", null);
         if (authToken == null) {
             setBottomNavEnabled(false);
+            showSearchField(false);  // Hide search field when not logged in
             showFragment(new com.example.maps1.account.AccountFragment());
         } else {
             setBottomNavEnabled(true);
+            showSearchField(true);   // Show search field when logged in
             showFragment(new com.example.maps1.fragment.MapFragment());
         }
     }
@@ -717,9 +720,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void showFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+
+        // Show search field only when MapFragment is active
+        showSearchField(fragment instanceof com.example.maps1.fragment.MapFragment);
     }
 
     private void openPlaceDetails(MyPlace place) {
@@ -771,11 +777,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void setBottomNavEnabled(boolean enabled) {
-        bottomNav.setEnabled(enabled);
-        for (int i = 0; i < bottomNav.getMenu().size(); i++) {
-            bottomNav.getMenu().getItem(i).setEnabled(enabled);
-        }
-        // Визуально делаем полупрозрачным если выключено
-        bottomNav.setAlpha(enabled ? 1.0f : 0.5f);
+        runOnUiThread(() -> {
+            if (bottomNav != null) {
+                bottomNav.setEnabled(enabled);
+                bottomNav.setVisibility(enabled ? View.VISIBLE : View.GONE);
+            }
+            // Remove automatic search field visibility update from here
+            // since it will be controlled by the active fragment
+        });
     }
 }
