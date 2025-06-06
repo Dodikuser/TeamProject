@@ -14,7 +14,8 @@ class User {
       theme: 'light',
       language: 'uk',
       notifications: true
-    }
+    },
+    TokensAvailable
   }) {
     this.id = id;
     this.email = email;
@@ -27,7 +28,8 @@ class User {
     this.dateRegistered = dateRegistered;
     this.lastLoginDate = lastLoginDate;
     this.settings = settings;
+    this.TokensAvailable = typeof TokensAvailable !== 'undefined' ? TokensAvailable : null;
   }
 }
 
-export { User }; 
+export { User };

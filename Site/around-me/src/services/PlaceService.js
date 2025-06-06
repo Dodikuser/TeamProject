@@ -18,6 +18,29 @@ class PlaceService extends BaseService {
             }
             return photo?.path || 'https://via.placeholder.com/300x180?text=No+Image';
         };
+        let schedule = [];
+        let openingHoursArr = [];
+        try {
+            if (Array.isArray(placeData.openingHours)) {
+                openingHoursArr = placeData.openingHours;
+            } else if (placeData.openingHours && Array.isArray(placeData.openingHours.$values)) {
+                openingHoursArr = placeData.openingHours.$values;
+            } else {
+                openingHoursArr = [];
+            }
+            if (Array.isArray(placeData.openingHours) && placeData.openingHours.length > 0) {
+                schedule = placeData.openingHours.map(hours => ({
+                    day: hours.dayOfWeek,
+                    hours: hours.isOpen ? `${hours.openTime} - ${hours.closeTime}` : 'Зачинено'
+                }));
+            } else {
+                schedule = [];
+            }
+        } catch (err) {
+            console.error('Ошибка сериализации расписания (openingHours):', err);
+            schedule = [];
+            openingHoursArr = [];
+        }
         return {
             id: placeData.gmapsPlaceId,
             image: getPhotoSrc(photoValues[0]),
@@ -36,10 +59,8 @@ class PlaceService extends BaseService {
             },
             isOpen: placeData.isOpen,
             hours: placeData.isOpen ? 'Відчинено' : 'Зачинено',
-            schedule: placeData.openingHours?.map(hours => ({
-                day: hours.dayOfWeek,
-                hours: hours.isOpen ? `${hours.openTime} - ${hours.closeTime}` : 'Зачинено'
-            })) || []
+            schedule,
+            openingHours: openingHoursArr,
         };
     }
 
@@ -116,6 +137,35 @@ class PlaceService extends BaseService {
             console.error('Error deleting place:', error);
             throw error;
         }
+    }
+
+    /**
+     * Обновить место по полной DTO (PlaceDTOFull) и фото
+     * @param {string} placeId
+     * @param {Object} placeDTOFull - объект PlaceDTOFull
+     * @param {FormData} [photosFormData] - FormData с фото (опционально)
+     * @returns {Promise<any>}
+     */
+    async updatePlaceFull(placeId, placeDTOFull, photosFormData) {
+        // TODO: Впиши сюда URL для обновления места
+        const url = '';
+        // Сначала отправляем основную DTO
+        const dtoResponse = await this.makeRequest(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(placeDTOFull)
+        });
+        // Если есть фото, отправляем их отдельно
+        let photosResponse = null;
+        if (photosFormData) {
+            // TODO: Впиши сюда URL для загрузки фото
+            const photosUrl = '';
+            photosResponse = await this.makeRequest(photosUrl, {
+                method: 'POST',
+                body: photosFormData
+            });
+        }
+        return { dtoResponse, photosResponse };
     }
 }
 

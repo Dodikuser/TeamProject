@@ -3,7 +3,11 @@ import UserService from '../services/UserService';
 import ReviewService from '../services/ReviewService';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+
 import { useTranslation } from 'react-i18next';
+
+import BuyTokens from '../Components/BuyTokens';
+
 
 const AccountPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -20,6 +24,8 @@ const AccountPage = () => {
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [reviewsError, setReviewsError] = useState(null);
+  const [showBuyTokens, setShowBuyTokens] = useState(false);
+  const [tokensAvailable, setTokensAvailable] = useState(null);
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -63,6 +69,20 @@ const AccountPage = () => {
 
     fetchUserReviews();
   }, [t]);
+
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const userData = await UserService.getUserData();
+        if (userData && typeof userData.TokensAvailable !== 'undefined') {
+          setTokensAvailable(userData.TokensAvailable);
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    fetchUserData();
+  }, []);
 
   const validate = () => {
     const newErrors = {};
@@ -243,9 +263,27 @@ const AccountPage = () => {
         </div>
       )}
 
+      {showBuyTokens && (
+        <div className="modal-overlay" onClick={() => setShowBuyTokens(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <button className="btn btn-secondary btn-sm mb-3" onClick={() => setShowBuyTokens(false)}>
+              Закрити
+            </button>
+            <BuyTokens />
+          </div>
+        </div>
+      )}
+
       <div className="container py-5" style={{ fontFamily: 'Arial, sans-serif' }}>
         <div className="card mb-4 p-4">
-          <h2 className="h5 mb-3">{t('account')}</h2>
+
+          <h2 className="h5 mb-3">{t('account')}Обліковий запис</h2>
+          {tokensAvailable !== null && (
+            <div className="mb-3">
+              <b>Ваш баланс токенов:</b> {tokensAvailable}
+            </div>
+          )}
+
           {loading ? (
             <div className="text-center py-4">
               <div className="spinner-border text-primary" role="status">
@@ -299,6 +337,7 @@ const AccountPage = () => {
                     {t('change_avatar')}
                   </div>
                 </div>
+
                 {avatar && (
                   <button
                     className="btn btn-outline-danger btn-sm mt-2 btn-hover"
@@ -307,6 +346,7 @@ const AccountPage = () => {
                     {t('delete_avatar')}
                   </button>
                 )}
+
               </div>
 
               <div className="col ps-3">
@@ -317,7 +357,17 @@ const AccountPage = () => {
                 >
                   {email}
                 </a>
+
                 <p className="mb-2 text-muted">{t('registration_date')}: {createdAt}</p>
+                <div className="d-flex justify-content-between align-items-center mb-2" style={{gap: '10px'}}>
+                  <div></div>
+                  <button
+                    className="btn btn-success btn-sm btn-hover"
+                    onClick={() => setShowBuyTokens(true)}
+                  >
+                    Поповнити баланс
+                  </button>
+                </div>
                 <button
                   className="btn btn-sm me-2 btn-hover"
                   style={{ backgroundColor: '#626FC2', borderColor: '#626FC2', color: '#fff' }}

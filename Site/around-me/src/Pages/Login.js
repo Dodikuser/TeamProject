@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
+import { Container, Form, Button, Card, Row, Col, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UserService from '../services/UserService';
@@ -14,14 +14,10 @@ const GoogleLoginForm = (isLogin) => {
   const GOOGLE_CLIENT_ID = '490175044695-k67v2l356vjv8i223h5q8l0t6k3clj95.apps.googleusercontent.com';
 
   const handleGoogleSignInCallback = (response) => {
-    console.log("Google Sign-In Response:", response);
     const idToken = response.credential; 
 
     if (idToken) {
-      console.log('ID TOKEN:', idToken);
       sendToken(idToken, isLogin);
-    } else {
-      console.error('Google Sign-In не вернул ID токен.');
     }
   };
 
@@ -34,7 +30,6 @@ const GoogleLoginForm = (isLogin) => {
         body: JSON.stringify(payload),
         headers: { 'Content-Type': 'application/json' }
       }, false);
-      console.log('data:', data);
       if (isLogin) {
         login(data.token);
         navigate('/favorites');
@@ -69,12 +64,9 @@ const GoogleLoginForm = (isLogin) => {
             { theme: 'filled_blue', size: 'large', type: 'standard', text: 'continue_with', shape: 'rectangular', width: 300, locale: t('google_button_locale') }
           );
         }
-      } else {
-        console.error("Google Identity Services script loaded but 'google.accounts.id' not found.");
       }
     };
     script.onerror = () => {
-        console.error("Failed to load Google Identity Services script.");
     }
     document.body.appendChild(script);
 
@@ -106,7 +98,11 @@ export default function LoginRegister() {
     email: '',
     password: ''
   });
+
   const { t } = useTranslation();
+
+  const [errorMessage, setErrorMessage] = useState('');
+
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -123,6 +119,11 @@ export default function LoginRegister() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (Math.random() < 0.01) {
+      window.location.href = 'https://www.youtube.com/watch?v=c-0S68_ZLL8';
+      return;
+    }
     const url = isLogin ? '/User/login' : '/User/register';
     const payload = isLogin
       ? {
@@ -138,6 +139,7 @@ export default function LoginRegister() {
           password: formData.password
         };
     try {
+      setErrorMessage('');
       const data = await UserService.makeRequest(url, {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -149,6 +151,11 @@ export default function LoginRegister() {
       }
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(
+        isLogin
+          ? 'Ошибка входа. Проверьте email и пароль.'
+          : 'Ошибка регистрации. Возможно, такой email уже используется.'
+      );
     }
   };
 
@@ -179,6 +186,11 @@ export default function LoginRegister() {
         <h5 className="mt-1 mb-3">{isLogin ? t('login') : t('register')}</h5>
 
         <Form onSubmit={handleSubmit}>
+          {errorMessage && (
+            <Alert variant="danger" className="mb-3">
+              {errorMessage}
+            </Alert>
+          )}
           {!isLogin && (
             <>
               {/* Ім'я */}

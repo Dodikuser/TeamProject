@@ -4,6 +4,8 @@ import ReviewsModal from './ReviewsModal';
 import RatingModal from './RatingModal';
 import ReviewService from '../services/ReviewService';
 import { useTranslation } from 'react-i18next';
+import FavoriteService from '../services/FavoriteService';
+
 
 import GeoService from '../services/GeoService';
 import HistoryService from '../services/HistoryService';
@@ -20,6 +22,7 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
   const [averageRating, setAverageRating] = useState(0);
   const [showRouteIframe, setShowRouteIframe] = useState(false);
   const [userCoords, setUserCoords] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(place?.isFavorite || false);
 
   // Защита от повторного запроса
   const lastAddedRef = useRef();
@@ -37,6 +40,10 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
       addToHistory();
     }
   }, [show, place?.id]);
+
+  useEffect(() => {
+    setIsFavorite(place?.isFavorite || false);
+  }, [place]);
 
   const loadReviews = async () => {
     if (!place?.id) return;
@@ -78,19 +85,37 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
     }
   };
 
+  // Преобразование openingHours для ScheduleInfo
+  let schedule = [];
+  let openStatus = 'Зачинено';
+  if (place && Array.isArray(place.openingHours) && place.openingHours.length > 0) {
+    const daysMap = [
+      'Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'Пʼятниця', 'Субота'
+    ];
+    schedule = place.openingHours.map(item => ({
+      day: daysMap[item.dayOfWeek] || `День ${item.dayOfWeek}`,
+      hours: `${item.open?.slice(0,5) || '--:--'} - ${item.close?.slice(0,5) || '--:--'}`
+    }));
+    // Определяем статус открыто/закрыто для текущего дня
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 - Sunday, 1 - Monday, ...
+    const today = place.openingHours.find(item => item.dayOfWeek === currentDay);
+    if (today && today.open && today.close) {
+      const nowStr = now.toTimeString().slice(0,5);
+      if (today.open.slice(0,5) <= nowStr && nowStr <= today.close.slice(0,5)) {
+        openStatus = 'Відчинено';
+      }
+    }
+  } else if (place && place.schedule && Array.isArray(place.schedule) && place.schedule.length > 0) {
+    schedule = place.schedule;
+  } else {
+    schedule = [];
+  }
+
   const ScheduleInfo = ({ hours, schedule }) => {
     const [open, setOpen] = useState(false);
 
-    // Пример расписания, если не передано
-    const workSchedule = schedule || [
-      { day: t('monday'), hours: '09:00 - 21:00' },
-      { day: t('tuesday'), hours: '09:00 - 21:00' },
-      { day: t('wednesday'), hours: '09:00 - 21:00' },
-      { day: t('thursday'), hours: '09:00 - 21:00' },
-      { day: t('friday'), hours: '09:00 - 21:00' },
-      { day: t('saturday'), hours: '10:00 - 20:00' },
-      { day: t('sunday'), hours: t('day_off') },
-    ];
+    const workSchedule = schedule && Array.isArray(schedule) && schedule.length > 0 ? schedule : [];
 
     return (
       <div className="info-item" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -127,11 +152,15 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
               color: '#333',
             }}
           >
-            {workSchedule.map(({ day, hours }) => (
-              <div key={day}>
-                <strong>{day}:</strong> {hours}
-              </div>
-            ))}
+            {workSchedule.length === 0 ? (
+              <div>Час роботи невідомий</div>
+            ) : (
+              workSchedule.map(({ day, hours }) => (
+                <div key={day}>
+                  <strong>{day}:</strong> {hours}
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
@@ -165,6 +194,19 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
       setShowRouteIframe(true);
     } catch (e) {
       alert('Не удалось получить вашу геолокацию');
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!place.id) {
+      alert('Не удалось определить идентификатор места для избранного');
+      return;
+    }
+    try {
+      await FavoriteService.toggleFavorite(place.id, isFavorite ? 'Remove' : 'Add');
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      alert('Помилка при зміні статусу обраного');
     }
   };
 
@@ -373,8 +415,8 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
                           <span>{place.location}</span>
                         </div>
                       )}
-                      {(place.hours || (place.schedule && place.schedule.length > 0)) && (
-                        <ScheduleInfo hours={place.hours} schedule={place.schedule} />
+                      {(openStatus || (schedule && schedule.length > 0)) && (
+                        <ScheduleInfo hours={openStatus} schedule={schedule} />
                       )}
                       {place.phone && (
                         <div className="info-item">
@@ -401,9 +443,10 @@ const LocationModal = ({ show, onHide, place, onBuildRoute }) => {
                           <span className="material-symbols-outlined">turn_right</span>
                           <span>{t('routes')}</span>
                         </div>
-                        <div className="action-button">
-                          <span className="material-symbols-outlined">favorite</span>
-                          <span>{t('save')}</span>
+
+                        <div className="action-button" onClick={handleToggleFavorite} style={{cursor: 'pointer'}}>
+                          <span className="material-symbols-outlined">{isFavorite ? 'favorite' : 'favorite_border'}</span>
+                          <span>{isFavorite ? 'У вибраному' : t('save')}</span>
                         </div>
                         <div className="action-button">
                           <span className="material-symbols-outlined">share</span>

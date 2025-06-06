@@ -146,6 +146,41 @@ class UserService extends BaseService {
             throw error;
         }
     }
+
+    /**
+     * Установить режим инкогнито для пользователя
+     * @param {boolean} enabled
+     * @returns {Promise<void>}
+     */
+    async setIncognitoMode(enabled) {
+        try {console.error('Error setting incognito mode:', enabled);
+            await this.makeRequest('/User/incognito', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(enabled)
+            });
+        } catch (error) {
+            console.error('Ошибка при установке инкогнито:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Получить места пользователя
+     * @param {number} [skip=0]
+     * @param {number} [take=50]
+     * @returns {Promise<Array>}
+     */
+    async getMyPlaces(skip = 0, take = 50) {
+        try {
+            return await this.makeRequest(`/Place/my?skip=${skip}&take=${take}`, {
+                method: 'GET'
+            });
+        } catch (error) {
+            console.error('Ошибка при получении мест пользователя:', error);
+            throw error;
+        }
+    }
 }
 
 export default new UserService(); 

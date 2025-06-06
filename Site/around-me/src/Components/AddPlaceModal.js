@@ -3,6 +3,7 @@ import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
 import StatisticsModal from './StatisticsModal';
+import PlaceService from '../services/PlaceService';
 
 
 
@@ -47,6 +48,55 @@ const [showStats, setShowStats] = useState(false);
       ...prev,
       images: prev.images.filter((_, i) => i !== indexToRemove)
     }));
+  };
+
+  const handleSave = async () => {
+    // Конвертация newPlace в PlaceDTOFull
+    const placeDTO = {
+      name: newPlace.title || '',
+      description: newPlace.description || '',
+      address: newPlace.locationText || '',
+      site: newPlace.site || '',
+      phoneNumber: newPlace.phone || '',
+      email: newPlace.email || '',
+      longitude: newPlace.longitude ? Number(newPlace.longitude) : 0,
+      latitude: newPlace.latitude ? Number(newPlace.latitude) : 0,
+      radius: newPlace.radius ? Number(newPlace.radius) : undefined,
+      tokensAvailable: newPlace.tokensAvailable ? Number(newPlace.tokensAvailable) : undefined,
+      lastPromotionDateTime: newPlace.lastPromotionDateTime || undefined,
+      stars: newPlace.rating ? Number(newPlace.rating) : 0,
+      openingHours: newPlace.openingHours || undefined,
+      gmapsPlaceId: newPlace.gmapsPlaceId || '',
+      userId: newPlace.userId || undefined,
+      photos: [] // фото отправляем отдельно
+    };
+    // Формируем FormData для фото
+    let photosFormData = null;
+    if (newPlace.images && newPlace.images.length > 0) {
+      photosFormData = new FormData();
+      (newPlace.images).forEach((img, idx) => {
+        // img может быть base64, преобразуем в Blob
+        if (typeof img === 'string' && img.startsWith('data:')) {
+          const arr = img.split(',');
+          const mime = arr[0].match(/:(.*?);/)[1];
+          const bstr = atob(arr[1]);
+          let n = bstr.length;
+          const u8arr = new Uint8Array(n);
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          const file = new File([u8arr], `photo${idx}.jpg`, { type: mime });
+          photosFormData.append('photos', file);
+        }
+      });
+    }
+    try {
+      await PlaceService.updatePlaceFull(newPlace.gmapsPlaceId, placeDTO, photosFormData);
+      if (onSave) onSave();
+      if (onHide) onHide();
+    } catch (err) {
+      alert('Помилка при збереженні місця');
+    }
   };
 
   return (
@@ -123,7 +173,6 @@ const [showStats, setShowStats] = useState(false);
                   name="title"
                   value={newPlace.title}
                   onChange={handleChange}
-                  placeholder={t('place_name')}
                 />
               </Form.Group>
 
@@ -134,7 +183,6 @@ const [showStats, setShowStats] = useState(false);
                   name="locationText"
                   value={newPlace.locationText}
                   onChange={handleChange}
-                  placeholder={t('place_address')}
                 />
               </Form.Group>
 
@@ -147,7 +195,6 @@ const [showStats, setShowStats] = useState(false);
                       name="email"
                       value={newPlace.email || ''}
                       onChange={handleChange}
-                      placeholder="example@gmail.com"
                     />
                   </Form.Group>
                 </Col>
@@ -159,14 +206,24 @@ const [showStats, setShowStats] = useState(false);
                       name="phone"
                       value={newPlace.phone || ''}
                       onChange={handleChange}
-                      placeholder={t('phone_number')}
                     />
                   </Form.Group>
                 </Col>
               </Row>
 
               <Form.Group className="mb-3">
-                <Form.Label>{t('work_schedule')}</Form.Label>
+                <Form.Label>Сайт{t('work_schedule')}</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="site"
+                  value={newPlace.site || ''}
+                  onChange={handleChange}
+                  
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Графік роботи</Form.Label>
                 <Form.Control
                   type="text"
                   name="schedule"
@@ -184,7 +241,6 @@ const [showStats, setShowStats] = useState(false);
                   rows={4}
                   value={newPlace.description || ''}
                   onChange={handleChange}
-                  placeholder={t('description_placeholder')}
                 />
               </Form.Group>
             </div>
@@ -282,7 +338,7 @@ const [showStats, setShowStats] = useState(false);
   </Button>
   <Button
     style={{ backgroundColor: '#626FC2', borderColor: '#626FC2' }}
-    onClick={onSave}
+    onClick={handleSave}
   >
     {t('save_changes')}
   </Button>
