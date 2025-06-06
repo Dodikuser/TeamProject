@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import com.example.maps1.R;
 import com.example.maps1.MainActivity;
 import com.example.maps1.PlaceDetailsActivity;
+import com.example.maps1.utils.PlaceUtils;
 import com.google.gson.Gson;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -66,6 +67,7 @@ public class MainAccount extends Fragment {
         reviewAddress2 = view.findViewById(R.id.reviewAddress2);
         reviewRating2 = view.findViewById(R.id.reviewRating2);
         goToPlaceButton2 = view.findViewById(R.id.goToPlaceButton2);
+
 
         // Загрузка данных профиля с сервера
         loadProfileData();
@@ -217,9 +219,18 @@ public class MainAccount extends Fragment {
     }
 
     // Загружает инфо о месте и заполняет поля карточки
-    private void loadPlaceInfoAndBind(String gmapId, TextView nameView, TextView addressView, TextView ratingView, Button goButton, int placeId) {
+    private void loadPlaceInfoAndBind(String gmapId, TextView nameView, TextView addressView, TextView ratingView, Button goToPlaceButton1, int placeId) {
+        if (gmapId == null || gmapId.isEmpty()) {
+            requireActivity().runOnUiThread(() -> {
+                nameView.setText("");
+                addressView.setText("");
+                ratingView.setText("");
+            });
+            return;
+        }
         new Thread(() -> {
             try {
+                // Довіряємо всім сертифікатам (лише для тестування!)
                 javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[]{
                         new javax.net.ssl.X509TrustManager() {
                             public java.security.cert.X509Certificate[] getAcceptedIssuers() { return new java.security.cert.X509Certificate[0]; }
@@ -237,28 +248,46 @@ public class MainAccount extends Fragment {
                 javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
                 String token = prefs.getString("auth_token", null);
                 if (token != null) {
                     conn.setRequestProperty("Authorization", "Bearer " + token);
                 }
+
                 int responseCode = conn.getResponseCode();
                 if (responseCode == 200) {
                     java.io.InputStream is = conn.getInputStream();
                     java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
                     String json = s.hasNext() ? s.next() : "";
+
                     com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(json).getAsJsonObject();
                     com.google.gson.JsonObject placeInfo = root.getAsJsonObject("placeInfo");
+
                     String name = placeInfo.has("name") ? placeInfo.get("name").getAsString() : "";
                     String address = placeInfo.has("address") ? placeInfo.get("address").getAsString() : "";
                     double stars = placeInfo.has("stars") ? placeInfo.get("stars").getAsDouble() : 0.0;
+
                     requireActivity().runOnUiThread(() -> {
                         nameView.setText(name);
                         addressView.setText(address);
                         ratingView.setText("Рейтинг: " + stars);
-                        goButton.setOnClickListener(v -> {
-                            Intent intent = new Intent(getActivity(), com.example.maps1.PlaceDetailsActivity.class);
-                            intent.putExtra("place_id", placeId);
-                            startActivity(intent);
+
+                        goToPlaceButton1.setEnabled(gmapId != null && !gmapId.isEmpty());
+                        goToPlaceButton1.setOnClickListener(v -> {
+                            if (gmapId != null && !gmapId.isEmpty()) {
+                                // Використовуємо PlaceUtils як у favorites/history/recommendations
+                                PlaceUtils.fetchPlaceDetails(requireContext(), gmapId, place -> {
+                                    if (place != null) {
+                                        Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
+                                        intent.putExtra("place", place);
+                                        startActivity(intent);
+                                    } else {
+                                        Toast.makeText(getContext(), "Не вдалося завантажити дані про місце", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(getContext(), "ID місця некоректний!", Toast.LENGTH_SHORT).show();
+                            }
                         });
                     });
                 } else {
@@ -304,6 +333,12 @@ public class MainAccount extends Fragment {
                 .apply();
 
         loadProfileData(); // Оновлюємо дані на екрані
+    }
+    //метод відкриття інформації про місце при натисканні на відгук
+    private void openPlaceDetails(int placeId) {
+        Intent intent = new Intent(getActivity(), PlaceDetailsActivity.class);
+        intent.putExtra("place_id", placeId);
+        startActivity(intent);
     }
 
     // DTO для пользователя
