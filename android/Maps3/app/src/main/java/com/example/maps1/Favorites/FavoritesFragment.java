@@ -39,6 +39,7 @@ public class FavoritesFragment extends Fragment {
     private List<FavoritesItem> filteredItems = new ArrayList<>();
     private SearchView searchView;
     private String currentQuery = "";
+    private View emptyView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +49,8 @@ public class FavoritesFragment extends Fragment {
         recyclerView = view.findViewById(R.id.favorites_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
+
+        emptyView = view.findViewById(R.id.empty_view);
 
         adapter = new FavoritesAdapter(filteredItems, new FavoritesAdapter.OnItemClickListener() {
             @Override
@@ -167,6 +170,7 @@ public class FavoritesFragment extends Fragment {
                         filteredItems.clear();
                         filteredItems.addAll(favoritesItems);
                         adapter.notifyDataSetChanged();
+                        updateEmptyViewVisibility();
                         Log.d("FavoritesFragment", "Loaded " + filteredItems.size() + " favorites");
                     });
                 } else {
@@ -261,6 +265,7 @@ public class FavoritesFragment extends Fragment {
                         filteredItems.clear();
                         filteredItems.addAll(searchResults);
                         adapter.notifyDataSetChanged();
+                        updateEmptyViewVisibility();
                     });
                 }
                 conn.disconnect();
@@ -301,6 +306,7 @@ public class FavoritesFragment extends Fragment {
                         favoritesItems.remove(item);
                         filteredItems.remove(item);
                         adapter.notifyDataSetChanged();
+                        updateEmptyViewVisibility();
                         Toast.makeText(getContext(), "Місце видалено з улюблених", Toast.LENGTH_SHORT).show();
                     });
                 } else {
@@ -317,5 +323,15 @@ public class FavoritesFragment extends Fragment {
                 );
             }
         }).start();
+    }
+
+    private void updateEmptyViewVisibility() {
+        if (filteredItems.isEmpty()) {
+            emptyView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }

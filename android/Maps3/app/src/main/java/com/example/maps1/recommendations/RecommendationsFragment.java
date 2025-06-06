@@ -28,6 +28,15 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import android.location.Location;
+
 public class RecommendationsFragment extends Fragment {
     private static final String TAG = "RecommendationsFragment";
 
@@ -56,17 +65,23 @@ public class RecommendationsFragment extends Fragment {
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+    private FusedLocationProviderClient fusedLocationClient;
+    private double userLatitude = 47.81052; // default fallback
+    private double userLongitude = 35.18286; // default fallback
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recommendations, container, false);
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         initViews(view);
         setupRecyclerViews();
         setupSearchView();
 
         // Load initial recommendations
-        loadRecommendations();
+        requestUserLocationAndLoadRecommendations();
 
         return view;
     }
@@ -156,6 +171,37 @@ public class RecommendationsFragment extends Fragment {
         });
     }
 
+    private void requestUserLocationAndLoadRecommendations() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null) {
+                    userLatitude = location.getLatitude();
+                    userLongitude = location.getLongitude();
+                }
+                loadRecommendations();
+            }).addOnFailureListener(e -> {
+                showError("Не вдалося отримати локацію: " + e.getMessage());
+                loadRecommendations();
+            });
+        } else {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                requestUserLocationAndLoadRecommendations();
+            } else {
+                showError("Дозвіл на локацію не надано");
+                loadRecommendations();
+            }
+        }
+    }
+
     private void loadRecommendations() {
         showLoading(true);
 
@@ -168,8 +214,8 @@ public class RecommendationsFragment extends Fragment {
                         new RecommendationService.RecommendationRequest(
                                 8,           // hashTagId
                                 1,           // radius
-                                47.81052,    // latitude
-                                35.18286,    // longitude
+                                userLatitude,    // latitude
+                                userLongitude,    // longitude
                                 selectedCategory
                         );
 
