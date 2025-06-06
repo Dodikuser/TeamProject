@@ -13,7 +13,7 @@ namespace Application.Services.Email
 
         public async Task<string> GetConfirmationEmailBodyAsync(string code)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "EmailTemplates", "ConfirmationTemplate.html");
+            var path = Path.Combine(AppContext.BaseDirectory, "HTML_templates", "ConfirmationTemplate.html");
 
             var html = await File.ReadAllTextAsync(path);
             return html.Replace("{{CODE}}", code);
@@ -27,7 +27,7 @@ namespace Application.Services.Email
             string transactionId,
             DateTime date)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "EmailTemplates", "ReceiptTemplate.html");
+            var path = Path.Combine(AppContext.BaseDirectory, "HTML_templates", "ReceiptTemplate.html");
             var html = await File.ReadAllTextAsync(path);
 
             return html
