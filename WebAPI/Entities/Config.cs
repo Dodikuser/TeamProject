@@ -37,5 +37,7 @@
 
         public int SearchPrice { get; set; }
         public int RegistrationBonus { get; set; }
+
+        public int OrderCheckInterval { get; set; }
     }
 }

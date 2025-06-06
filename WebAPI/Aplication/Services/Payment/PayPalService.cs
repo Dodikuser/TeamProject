@@ -1,13 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Application.Services.Payment;
+﻿using Application.Services.Payment;
 using Entities;
 using Entities.Models;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application.Services.Payment
 {
@@ -36,6 +37,10 @@ namespace Application.Services.Payment
 
         public async Task<PaymentOrder> CapturePaymentAsync(string orderId, ulong userId)
         {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"[INFO] Starting PayPal capture process for order ID: {orderId}, user ID: {userId}");
+            Console.ResetColor();
+
             var orderRequest = new OrdersGetRequest(orderId);
             var response = await _client.Execute(orderRequest);
 
@@ -46,14 +51,22 @@ namespace Application.Services.Payment
             if (order.Status != "COMPLETED")
                 throw new Exception($"PayPal order is not completed. Status: {order.Status}");
 
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"[INFO] PayPal order status verified as COMPLETED.");
+            Console.ResetColor();
+
             var purchaseUnit = order.PurchaseUnits.FirstOrDefault();
             if (purchaseUnit == null || purchaseUnit.Payments?.Captures == null || !purchaseUnit.Payments.Captures.Any())
                 throw new Exception("No capture information found.");
 
             var capture = purchaseUnit.Payments.Captures.First();
             var transactionId = capture.Id;
-            var amount = decimal.Parse(capture.Amount.Value);
+            var amount = decimal.Parse(capture.Amount.Value, CultureInfo.InvariantCulture); // ✅ FIX
             var currency = capture.Amount.CurrencyCode;
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"[INFO] Capture ID: {transactionId}, Amount: {amount} {currency}");
+            Console.ResetColor();
 
             DateTime createTime;
             var timeStr = capture.CreateTime ?? order.CreateTime;
@@ -87,8 +100,13 @@ namespace Application.Services.Payment
                 User = user
             };
 
+
             await _dbContext.PaymentOrders.AddAsync(paymentOrder);
             await _dbContext.SaveChangesAsync();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"[SUCCESS] Payment order saved to DB with ID: {paymentOrder.Id}");
+            Console.ResetColor();
 
             return paymentOrder;
         }

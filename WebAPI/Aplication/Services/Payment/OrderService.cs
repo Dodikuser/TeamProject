@@ -17,7 +17,7 @@ namespace Application.Services.Payment
         private readonly ILogger<OrderService> _logger;
         private readonly IServiceProvider _services;
         private readonly Config _config;
-        private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(1);
+        private readonly TimeSpan _checkInterval;
 
         public OrderService(
             ILogger<OrderService> logger,
@@ -27,6 +27,8 @@ namespace Application.Services.Payment
             _logger = logger;
             _services = services;
             _config = config;
+
+            _checkInterval = TimeSpan.FromSeconds(_config.OrderCheckInterval);
         }
 
         public PaymentOrder ProcessOrder(PaymentOrder order)
