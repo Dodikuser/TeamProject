@@ -226,53 +226,58 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void aiPlaceSearchRequest(String query) {
-        // Локация и радиус — поебать, пока оставим
-        int radius = 1000;
-        double latitude = 47.81052;
-        double longitude = 35.18286;
+        if (checkLocationPermission()) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(location -> {
+                        if (location != null) {
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+                            int radius = 1000; // 1km radius
 
-        String urlStr = String.format(
-                "https://10.0.2.2:7103/api/AI/search?text=%s&radius=%d&latitude=%f&longitude=%f",
-                urlEncode(query), radius, latitude, longitude);
+                            String urlStr = String.format(
+                                    "https://10.0.2.2:7103/api/AI/search?text=%s&radius=%d&latitude=%f&longitude=%f",
+                                    urlEncode(query), radius, latitude, longitude);
 
-        showSearchResults(true);
-        searchResultsLayout.removeAllViews();
+                            showSearchResults(true);
+                            searchResultsLayout.removeAllViews();
 
-        aiSearchExecutor.execute(() -> {
-            try {
-                // Получаем наш кастомный socket factory
-                SSLSocketFactory sslSocketFactory = getTrustAllSslSocketFactory();
+                            aiSearchExecutor.execute(() -> {
+                                try {
+                                    SSLSocketFactory sslSocketFactory = getTrustAllSslSocketFactory();
+                                    HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
-                // Отключаем проверку hostname
-                HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+                                    URL url = new URL(urlStr);
+                                    HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                                    conn.setSSLSocketFactory(sslSocketFactory);
+                                    conn.setRequestMethod("GET");
+                                    conn.setDoInput(true);
 
-                URL url = new URL(urlStr);
-                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-                conn.setSSLSocketFactory(sslSocketFactory); // ВОТ ТУТ НУЖНО СТАВИТЬ ТО, ЧТО МЫ СОЗДАЛИ
-                conn.setRequestMethod("GET");
-                conn.setDoInput(true);
-
-                int responseCode = conn.getResponseCode();
-                if (responseCode == 200) {
-                    InputStream is = conn.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    reader.close();
-                    is.close();
-                    parseAndShowAiResults(sb.toString());
-                } else {
-                    runOnUiThread(() -> searchWithCurrentLocation(query));
-                }
-                conn.disconnect();
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> searchWithCurrentLocation(query));
-            }
-        });
+                                    int responseCode = conn.getResponseCode();
+                                    if (responseCode == 200) {
+                                        InputStream is = conn.getInputStream();
+                                        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                                        StringBuilder sb = new StringBuilder();
+                                        String line;
+                                        while ((line = reader.readLine()) != null) {
+                                            sb.append(line);
+                                        }
+                                        reader.close();
+                                        is.close();
+                                        parseAndShowAiResults(sb.toString());
+                                    } else {
+                                        runOnUiThread(() -> searchWithCurrentLocation(query));
+                                    }
+                                    conn.disconnect();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    runOnUiThread(() -> searchWithCurrentLocation(query));
+                                }
+                            });
+                        } else {
+                            showToast("Не вдалося отримати поточну локацію");
+                        }
+                    });
+        }
     }
 
 
