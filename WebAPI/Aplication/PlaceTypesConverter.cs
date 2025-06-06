@@ -67,7 +67,7 @@ namespace Application
                 //IsOpen = argument.OpeningHours.OpenNow,
 
                 //todo convert List<string> to List<OpeningHours>
-                //OpeningHours = argument.OpeningHours.WeekdayText,
+                OpeningHours = argument.OpeningHours != null ? ParseOpeningHours(argument.OpeningHours.WeekdayText) : new List<OpeningHours>(),
             };
             return result;
         }
@@ -164,53 +164,78 @@ namespace Application
             return place;
         }
 
-        private static ICollection<OpeningHours> ParseOpeningHours(List<string>? weekdayText)
-        {
-            if (weekdayText == null)
-                return new List<OpeningHours>();
+         private static ICollection<OpeningHours> ParseOpeningHours(List<string>? weekdayText)
+ {
+     if (weekdayText == null)
+         return new List<OpeningHours>();
 
-            var result = new List<OpeningHours>();
+     var result = new List<OpeningHours>();
+     var daysOfWeek = new[]
+     {
+         DayOfWeek.Monday,
+         DayOfWeek.Tuesday,
+         DayOfWeek.Wednesday,
+         DayOfWeek.Thursday,
+         DayOfWeek.Friday,
+         DayOfWeek.Saturday,
+         DayOfWeek.Sunday
+     };
 
-            foreach (var entry in weekdayText)
-            {
-                var parts = entry.Split(": ", 2);
-                if (parts.Length != 2) continue;
+     for (int i = 0; i < weekdayText.Count && i < daysOfWeek.Length; i++)
+     {
+         var entry = weekdayText[i];
+         var parts = entry.Split(": ", 2);
+         if (parts.Length != 2) continue;
+         var day = daysOfWeek[i];
+         var timesStr = parts[1].Trim();
 
-                var times = parts[1].Split(" – ");
-                if (times.Length != 2) continue;
+         if (timesStr.Equals("Closed", StringComparison.OrdinalIgnoreCase))
+             continue;
+         if (timesStr.Equals("Open 24 hours", StringComparison.OrdinalIgnoreCase))
+         {
+             result.Add(new OpeningHours
+             {
+                 DayOfWeek = day,
+                 Open = new TimeOnly(0, 0),
+                 Close = new TimeOnly(23, 59)
+             });
+             continue;
+         }
+         var intervals = timesStr.Split(", ");
+         foreach (var interval in intervals)
+         {
+             var times = interval.Split("–");
+             if (times.Length != 2) continue;
+             if (TryParseTime(times[0], out var open) && TryParseTime(times[1], out var close))
+             {
+                 result.Add(new OpeningHours
+                 {
+                     DayOfWeek = day,
+                     Open = open,
+                     Close = close
+                 });
+             }
+         }
+     }
+     return result;
+ }
 
-                if (TryParseTime(times[0], out var open) && TryParseTime(times[1], out var close))
-                {
-                    result.Add(new OpeningHours
-                    {
-                        Open = open,
-                        Close = close
-                    });
-                }
-            }
-
-            return result;
-        }
-
-        private static bool TryParseTime(string input, out TimeOnly time)
-        {
-            input = input.Replace(" ", "").Trim();
-
-            if (TimeOnly.TryParseExact(input, new[] { "h:mmtt", "hh:mmtt", "h:mm tt", "hh:mm tt" },
-                System.Globalization.CultureInfo.InvariantCulture,
-                System.Globalization.DateTimeStyles.None, out time))
-            {
-                return true;
-            }
-
-            if (TimeOnly.TryParse(input, out time))
-            {
-                return true;
-            }
-
-            time = default;
-            return false;
-        }
-
+ private static bool TryParseTime(string input, out TimeOnly time)
+ {
+     input = input.Replace(" ", "").Trim();
+     // Пробуем 12- и 24-часовые форматы
+     if (TimeOnly.TryParseExact(input, new[] { "h:mmtt", "hh:mmtt", "h:mm tt", "hh:mm tt", "HH:mm", "H:mm" },
+         System.Globalization.CultureInfo.InvariantCulture,
+         System.Globalization.DateTimeStyles.None, out time))
+     {
+         return true;
+     }
+     if (TimeOnly.TryParse(input, out time))
+     {
+         return true;
+     }
+     time = default;
+     return false;
+ }
     }
 }

@@ -13,14 +13,16 @@ namespace Application.Services
         private readonly SearchesRepository _searchesRepository;
         private readonly PlaceRepository _placeRepository;
         private readonly FavoritesRepository _favoritesRepository;
+private readonly UserRepository _userRepository;
 
-        public HistoryService(HistoryRepository historyRepository, SearchesRepository searchesRepository, PlaceRepository placeRepository, FavoritesRepository favoritesRepository)
-        {
-            _historyRepository = historyRepository;
-            _searchesRepository = searchesRepository;
-            _placeRepository = placeRepository;
-            _favoritesRepository = favoritesRepository;
-        }
+        public HistoryService(HistoryRepository historyRepository, SearchesRepository searchesRepository, PlaceRepository placeRepository, FavoritesRepository favoritesRepository, UserRepository userRepository)
+{
+    _historyRepository = historyRepository;
+    _searchesRepository = searchesRepository;
+    _placeRepository = placeRepository;
+    _favoritesRepository = favoritesRepository;
+    _userRepository = userRepository;
+}
 
         public async Task<List<SearchDTO>> GetSearchHistory(ulong userId, int skip = 0, int take = 10)
         {
@@ -41,6 +43,7 @@ namespace Application.Services
             switch (action)
             {
                 case HistoryActionEnum.Add:
+                if ((await _userRepository.FindAsync(UserId)).SearchHistoryOn)
                     await _searchesRepository.AddAsync(UserId, searchDTO.Text);
                     return HistoryOperationResult.Success;
                 case HistoryActionEnum.Remove:
@@ -87,6 +90,7 @@ namespace Application.Services
                         return HistoryOperationResult.NotFound;
 
                     ulong id = (ulong)await _placeRepository.GetIdByGmapsPlaceIdAsync(historyDTO.GmapsPlaceId);
+                    if ((await _userRepository.FindAsync(UserId)).VisitHistoryOn)
                     await _historyRepository.AddAsync(UserId, id, historyDTO.IsFromRecs ?? false);
                     return HistoryOperationResult.Success;
 

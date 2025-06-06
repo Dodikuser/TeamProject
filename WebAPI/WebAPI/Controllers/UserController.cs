@@ -39,7 +39,7 @@ namespace WebAPI.Controllers
 
         [Authorize]
         [HttpPost("incognito")]
-        public async Task<IActionResult> SetIncognitoMode(bool enabled)
+        public async Task<IActionResult> SetIncognitoMode([FromBody] bool enabled)
         {
             ulong userId = Convert.ToUInt64(User.FindFirst("Id")!.Value);
 

@@ -106,26 +106,44 @@ namespace Application.Services
                 }
             };
         }
-        public async Task<List<PlaceDTODefaultCard>> GetByUserIdAsync(ulong userId, int skip, int take)
-        {
-            List<Place> rawPlaces = await _placeRepository.GetByUserIdAsync(userId, skip, take);
-            List<PlaceDTODefaultCard> result = new List<PlaceDTODefaultCard>();
+        public async Task<List<PlaceDTOFull>> GetByUserIdAsync(ulong userId, int skip, int take)
+{
+    List<Place> rawPlaces = await _placeRepository.GetByUserIdAsync(userId, skip, take);
+    List<PlaceDTOFull> result = new List<PlaceDTOFull>();
 
-            foreach (Place place in rawPlaces)
-            {
-                result.Add(
-                    new PlaceDTODefaultCard()
-                    {
-                        Name = place.Name,
-                        Longitude = place.Longitude,
-                        Latitude = place.Latitude,
-                        GmapsPlaceId = place.GmapsPlaceId,
-                        Stars = (int)Double.Round(await _reviewRepository.GetAvgStarsAsync(place.Id))
-                    }
-                );
-            }
-            return result;
-        }
+    foreach (Place place in rawPlaces)
+    {
+        result.Add(
+           new PlaceDTOFull
+           {
+               Name = place.Name,
+               Longitude = place.Longitude,
+               Latitude = place.Latitude,
+               GmapsPlaceId = place.GmapsPlaceId,
+               Stars = (int)Math.Round(await _reviewRepository.GetAvgStarsAsync(place.Id)),
+               Address = place.Address,
+               Description = place.Description,
+               Site = place.Site,
+               PhoneNumber = place.PhoneNumber,
+               Email = place.Email,
+               Radius = place.Radius,
+               TokensAvailable = place.TokensAvailable,
+               LastPromotionDateTime = place.LastPromotionDateTime,
+               UserId = 0,
+               OpeningHours = place.OpeningHours, // Assuming it's already ICollection<OpeningHours>
+               Photos = place.Photos
+.Select(p => new PhotoDTO
+{
+    Id = p.Id,
+    Path = p.Path,
+    PlaceId = place.Id
+})
+.ToList()
+           }
+        );
+    }
+    return result;
+}
         public async Task<PlaceDTOFull?> GetByGmapId(string gMapId)
         {
             Place? place = await _placeRepository.GetByIdGmapsPlaceId(gMapId);
