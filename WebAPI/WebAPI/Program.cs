@@ -186,8 +186,16 @@ namespace WebAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Добавляем CORS с двумя политиками
             builder.Services.AddCors(options =>
             {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("https://app.aroundme.pp.ua")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+
                 options.AddPolicy("AllowReact", policy =>
                 {
                     policy.WithOrigins("http://localhost:3000")
@@ -210,12 +218,23 @@ namespace WebAPI
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsEnvironment("vm"))
+            {
+                app.UseHttpsRedirection();
+            }
+
+
+            if (app.Environment.IsEnvironment("vm"))
+            {
+                app.UseCors("AllowFrontend"); // 👈 прод
+            }
+            else
+            {
+                app.UseCors("AllowReact"); // 👈 dev
+            }
 
 
             app.UseRouting();
-
-            app.UseCors("AllowReact");
 
             app.UseAuthentication();
             app.UseAuthorization();

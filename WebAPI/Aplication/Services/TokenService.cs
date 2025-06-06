@@ -16,6 +16,7 @@ namespace Application.Services
         private readonly string _secretKey;
         private readonly string _issuer;
         private readonly string _audience;
+        private readonly int _tokenExpiresHours;
         private readonly UserRepository _userRepository;
         private readonly AuthorizationService _authorizationService;
 
@@ -24,6 +25,7 @@ namespace Application.Services
             _secretKey = config.Value.Key;
             _issuer = config.Value.Issuer;
             _audience = config.Value.Audience;
+            _tokenExpiresHours = config.Value.TokenExpiresHours;
             _userRepository = userRepository;
             _authorizationService = authorizationService;
         }
