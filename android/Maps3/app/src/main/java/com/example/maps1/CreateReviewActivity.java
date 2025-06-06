@@ -112,7 +112,7 @@ public class CreateReviewActivity extends AppCompatActivity {
                     javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
                     javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
-                    java.net.URL url = new java.net.URL("https://app.aroundme.pp.ua/api/Review/add");
+                    java.net.URL url = new java.net.URL("https://api.aroundme.pp.ua/api/Review/add");
                     javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
                     conn.setRequestMethod("POST");
                     conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");

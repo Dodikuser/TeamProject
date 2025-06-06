@@ -237,9 +237,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             double longitude = location.getLongitude();
                             int radius = 1000; // 1km radius
 
+                            String userLatitude_ = String.valueOf(latitude);
+                            String userLongitude_ = String.valueOf(longitude);
+
                             String urlStr = String.format(
-                                    "https://app.aroundme.pp.ua/api/AI/search?text=%s&radius=%d&latitude=%f&longitude=%f",
-                                    urlEncode(query), radius, latitude, longitude);
+                                    "https://api.aroundme.pp.ua/api/AI/search?text=%s&radius=%d&latitude=%s&longitude=%s",
+                                    urlEncode(query), radius, userLatitude_, userLongitude_);
 
                             showSearchResults(true);
                             searchResultsLayout.removeAllViews();
@@ -254,6 +257,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     conn.setSSLSocketFactory(sslSocketFactory);
                                     conn.setRequestMethod("GET");
                                     conn.setDoInput(true);
+
+                                    // Додаємо токен
+                                    SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+                                    String token = prefs.getString("auth_token", null);
+                                    if (token != null) {
+                                        conn.setRequestProperty("Authorization", "Bearer " + token);
+                                    }
 
                                     int responseCode = conn.getResponseCode();
                                     if (responseCode == 200) {
@@ -276,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     runOnUiThread(() -> searchWithCurrentLocation(query));
                                 }
                             });
+
                         } else {
                             showToast("Не вдалося отримати поточну локацію");
                         }

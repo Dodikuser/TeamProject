@@ -25,6 +25,7 @@ import com.example.maps1.utils.PlaceUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,6 +36,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.app.ActivityCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+
 import android.location.Location;
 
 public class RecommendationsFragment extends Fragment {
@@ -174,20 +177,32 @@ public class RecommendationsFragment extends Fragment {
     private void requestUserLocationAndLoadRecommendations() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-                if (location != null) {
-                    userLatitude = location.getLatitude();
-                    userLongitude = location.getLongitude();
-                }
-                loadRecommendations();
-            }).addOnFailureListener(e -> {
-                showError("Не вдалося отримати локацію: " + e.getMessage());
-                loadRecommendations();
-            });
+
+            fusedLocationClient
+                    .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                    .addOnSuccessListener(location -> {
+                        if (location != null) {
+                            userLatitude = location.getLatitude();
+                            userLongitude = location.getLongitude();
+                            Log.d("LocationDebug", "Координаты: " + userLatitude + ", " + userLongitude);
+                        } else {
+                            Log.w("LocationDebug", "location == null");
+                        }
+                        loadRecommendations();
+                    })
+                    .addOnFailureListener(e -> {
+                        showError("Ошибка при получении координат: " + e.getMessage());
+                        loadRecommendations();
+                    });
+
         } else {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            requestPermissions(
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE
+            );
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -210,12 +225,15 @@ public class RecommendationsFragment extends Fragment {
                 // Call AccountFragment.trustAllCertificates() if needed
                 // AccountFragment.trustAllCertificates();
 
+                String userLatitude_ = String.valueOf(userLatitude);
+                String userLongitude_ = String.valueOf(userLongitude);
+
                 RecommendationService.RecommendationRequest request =
                         new RecommendationService.RecommendationRequest(
                                 8,           // hashTagId
                                 1,           // radius
-                                userLatitude,    // latitude
-                                userLongitude,    // longitude
+                                userLatitude_,    // latitude
+                                userLongitude_,    // longitude
                                 selectedCategory
                         );
 

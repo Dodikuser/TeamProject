@@ -25,7 +25,7 @@ import java.security.cert.X509Certificate;
 import okhttp3.RequestBody;
 
 public class RecommendationService {
-    private static final String BASE_URL = "https://app.aroundme.pp.ua/api";
+    private static final String BASE_URL = "https://api.aroundme.pp.ua/api";
     private static final String TAG = "RecommendationService";
     private static OkHttpClient client;
 
@@ -59,7 +59,7 @@ public class RecommendationService {
 
     public static List<RecommendationsItem> getRecommendations(RecommendationRequest request) throws IOException {
         //AccountFragment.trustAllCertificates();
-        String url = String.format("%s/ai/recommend?hashTagId=%d&radius=%d&latitude=%f&longitude=%f&tag=%s",
+        String url = String.format("%s/ai/recommend?hashTagId=%d&radius=%d&latitude=%s&longitude=%s&tag=%s",
                 BASE_URL, request.hashTagId, request.radius, request.latitude, request.longitude, request.tag);
 
         Request httpRequest = new Request.Builder()
@@ -72,7 +72,11 @@ public class RecommendationService {
             }
 
             String responseBody = response.body().string();
-            return parseRecommendations(responseBody, request.latitude, request.longitude);
+
+            double latitude = Double.parseDouble(request.latitude);
+            double longitude = Double.parseDouble(request.longitude);
+
+            return parseRecommendations(responseBody,  latitude, longitude);
         }
     }
 
@@ -137,7 +141,7 @@ public class RecommendationService {
 
     public static void toggleLike(String placeId, boolean like, String token) throws IOException {
         AccountFragment.trustAllCertificates();
-        URL url = new URL("https://app.aroundme.pp.ua/api/Favorites/action?gmapsPlaceId="
+        URL url = new URL("https://api.aroundme.pp.ua/api/Favorites/action?gmapsPlaceId="
                 + placeId +
                 "&action=" + (like ? "Add" : "Remove"));
 
@@ -161,11 +165,11 @@ public class RecommendationService {
     public static class RecommendationRequest {
         public int hashTagId;
         public int radius;
-        public double latitude;
-        public double longitude;
+        public String latitude;
+        public String longitude;
         public String tag;
 
-        public RecommendationRequest(int hashTagId, int radius, double latitude, double longitude, String tag) {
+        public RecommendationRequest(int hashTagId, int radius, String latitude, String longitude, String tag) {
             this.hashTagId = hashTagId;
             this.radius = radius;
             this.latitude = latitude;

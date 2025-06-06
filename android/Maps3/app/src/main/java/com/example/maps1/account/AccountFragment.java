@@ -145,7 +145,7 @@ public class AccountFragment extends Fragment {
                 // Отключаем проверку SSL сертификатов для localhost (только для разработки!)
                 // disableSSLVerification();
                 trustAllCertificates();
-                URL url = new URL("https://app.aroundme.pp.ua/api/User/register");
+                URL url = new URL("https://api.aroundme.pp.ua/api/User/register");
                 HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -221,7 +221,7 @@ public class AccountFragment extends Fragment {
         new Thread(() -> {
             try {
                 trustAllCertificates();
-                URL url = new URL("https://app.aroundme.pp.ua/api/User/login");
+                URL url = new URL("https://api.aroundme.pp.ua/api/User/login");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -301,8 +301,8 @@ public class AccountFragment extends Fragment {
             try {
                 trustAllCertificates();
                 String urlStr = isLogin
-                        ? "https://app.aroundme.pp.ua/api/User/login"
-                        : "https://app.aroundme.pp.ua/api/User/register";
+                        ? "https://api.aroundme.pp.ua/api/User/login"
+                        : "https://api.aroundme.pp.ua/api/User/register";
                 URL url = new URL(urlStr);
                 HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");

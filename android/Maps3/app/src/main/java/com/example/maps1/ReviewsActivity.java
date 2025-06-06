@@ -128,7 +128,7 @@ public class ReviewsActivity extends AppCompatActivity {
             return;
         }
         OkHttpClient client = getUnsafeOkHttpClient();
-        String url = "https://app.aroundme.pp.ua/api/Review/get?placeId=" + placeId + "&skip=0&take=10";
+        String url = "https://api.aroundme.pp.ua/api/Review/get?placeId=" + placeId + "&skip=0&take=10";
 
         Request request = new Request.Builder()
                 .url(url)

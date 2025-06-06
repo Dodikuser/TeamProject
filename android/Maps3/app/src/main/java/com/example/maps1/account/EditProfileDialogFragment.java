@@ -72,7 +72,7 @@ public class EditProfileDialogFragment extends DialogFragment {
                     javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
                     javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
-                    java.net.URL url = new java.net.URL("https://app.aroundme.pp.ua/api/api/User/edit");
+                    java.net.URL url = new java.net.URL("https://api.aroundme.pp.ua/api/User/edit");
                     javax.net.ssl.HttpsURLConnection conn = (javax.net.ssl.HttpsURLConnection) url.openConnection();
                     conn.setRequestMethod("PATCH");
                     conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
