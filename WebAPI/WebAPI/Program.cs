@@ -218,10 +218,11 @@ namespace WebAPI
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsEnvironment("vm"))
+            {
+                app.UseHttpsRedirection();
+            }
 
-
-            app.UseRouting();
 
             if (app.Environment.IsEnvironment("vm"))
             {
@@ -232,6 +233,8 @@ namespace WebAPI
                 app.UseCors("AllowReact"); // 👈 dev
             }
 
+
+            app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
