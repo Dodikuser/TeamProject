@@ -63,7 +63,7 @@ public class AccountFragment extends Fragment {
 
         // Google Sign-In options
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("1079685505640-7jii1hsjj5h517kfhsqg06rpgqtrse2d.apps.googleusercontent.com")
+                .requestIdToken("490175044695-s76a9li865at8sbst7is44p5bgl7taqe.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
@@ -134,7 +134,7 @@ public class AccountFragment extends Fragment {
                 Toast.makeText(getContext(), "Google ID Token is null", Toast.LENGTH_SHORT).show();
             }
         } catch (ApiException e) {
-            Toast.makeText(getContext(), "Google sign in failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Ваш аккаунт не підходить" , Toast.LENGTH_SHORT).show();
         }
     }
 
